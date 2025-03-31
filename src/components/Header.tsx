@@ -1,20 +1,21 @@
 
 import React, { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Cloud, Menu, X, UserCircle, Home, Search } from 'lucide-react';
+import { Cloud, Menu, X, UserCircle, Home } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
-import { Input } from '@/components/ui/input';
+import SearchModal from './SearchModal';
+import { Button } from '@/components/ui/button';
 
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const profileRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -36,12 +37,13 @@ const Header: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implement search functionality
-    console.log('Searching for:', searchQuery);
-    // Could navigate to search results page
+  
+  const handleStartFree = () => {
+    if (isAuthenticated) {
+      navigate('/');
+    } else {
+      navigate('/login');
+    }
   };
 
   return (
@@ -56,25 +58,10 @@ const Header: React.FC = () => {
             <h1 className="text-2xl font-handwritten font-bold text-ghibli-forest">Studio Dreamscape</h1>
           </Link>
           
-          <form onSubmit={handleSearch} className="hidden md:flex items-center relative">
-            <Input
-              type="text"
-              placeholder="강의 검색..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-64 rounded-full border-ghibli-meadow/30 focus:border-ghibli-forest transition-all"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ghibli-stone" />
-          </form>
+          <div className="hidden md:block w-64">
+            <SearchModal />
+          </div>
         </div>
-        
-        {/* Mobile Menu Button */}
-        <button 
-          className="md:hidden text-ghibli-forest"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
@@ -82,6 +69,13 @@ const Header: React.FC = () => {
           <Link to="/dev-courses" className="nav-link">개발강의</Link>
           <Link to="/ai-courses" className="nav-link">AI 강의</Link>
           <Link to="/company-info" className="nav-link">회사정보</Link>
+          
+          <Button 
+            onClick={handleStartFree}
+            className="py-2 px-4 bg-ghibli-meadow hover:bg-ghibli-forest text-white rounded-full transition-all duration-300"
+          >
+            무료로 시작하기
+          </Button>
           
           {isAuthenticated ? (
             <div className="relative" ref={profileRef}>
@@ -151,6 +145,16 @@ const Header: React.FC = () => {
             </div>
           )}
         </nav>
+        
+        {/* Mobile Menu Button */}
+        <div className="md:hidden flex items-center space-x-4">
+          <button 
+            className="text-ghibli-forest"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
       
       {/* Mobile Navigation */}
@@ -159,16 +163,7 @@ const Header: React.FC = () => {
         isMenuOpen ? 'top-[calc(100%)] opacity-100' : '-top-[400px] opacity-0'
       )}>
         <div className="px-6 py-4">
-          <form onSubmit={handleSearch} className="flex items-center relative mb-4">
-            <Input
-              type="text"
-              placeholder="강의 검색..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full rounded-full border-ghibli-meadow/30 focus:border-ghibli-forest transition-all"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ghibli-stone" />
-          </form>
+          <SearchModal onClose={() => setIsMenuOpen(false)} />
         </div>
         
         <nav className="container mx-auto px-6 py-6 flex flex-col space-y-4">
@@ -176,6 +171,13 @@ const Header: React.FC = () => {
           <Link to="/dev-courses" className="nav-link text-lg py-2">개발강의</Link>
           <Link to="/ai-courses" className="nav-link text-lg py-2">AI 강의</Link>
           <Link to="/company-info" className="nav-link text-lg py-2">회사정보</Link>
+          
+          <Button 
+            onClick={handleStartFree}
+            className="py-2.5 px-5 mt-2 bg-ghibli-meadow hover:bg-ghibli-forest text-white rounded-full transition-all duration-300 w-full"
+          >
+            무료로 시작하기
+          </Button>
           
           {isAuthenticated ? (
             <div className="pt-2 border-t border-ghibli-earth/10">

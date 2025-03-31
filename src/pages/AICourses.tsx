@@ -4,27 +4,28 @@ import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, Heart, BookmarkPlus } from 'lucide-react';
+import { Star, Heart, BookmarkPlus, Robot, Cpu, Code, Database, Video, Palette } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Mock categories and courses data
 const categories = [
-  { id: 'basics', name: 'AI 기초' },
-  { id: 'ml', name: '머신러닝' },
-  { id: 'dl', name: '딥러닝' },
-  { id: 'nlp', name: '자연어처리' },
-  { id: 'cv', name: '컴퓨터 비전' },
-  { id: 'generative', name: '생성형 AI' },
+  { id: 'html-css', name: 'HTML/CSS', Icon: Code },
+  { id: 'javascript', name: 'JavaScript', Icon: Code },
+  { id: 'python', name: 'Python', Icon: Code },
+  { id: 'devops', name: 'DevOps', Icon: Cpu },
+  { id: 'data', name: '데이터 분석', Icon: Database },
+  { id: 'video', name: '영상 편집', Icon: Video },
+  { id: 'design', name: 'UX/UI 디자인', Icon: Palette },
 ];
 
 const coursesData = Array(12).fill(null).map((_, idx) => ({
   id: `ai-course-${idx}`,
-  title: `AI 기술 마스터 ${idx + 1}`,
-  instructor: `AI 튜터 ${idx + 1}`,
+  title: `AI와 함께하는 ${categories[idx % categories.length].name} 마스터 클래스`,
+  aiTutor: `${['헬퍼', '튜터', '어시스턴트', '코치', '멘토'][idx % 5]} AI`,
   image: `https://api.dicebear.com/7.x/shapes/svg?seed=ai${idx}`,
   category: categories[idx % categories.length].id,
   rating: (4 + Math.random()).toFixed(1),
-  price: (18000 + idx * 1000).toLocaleString(),
+  price: (15000 + idx * 1000).toLocaleString(),
   bookmarks: Math.floor(Math.random() * 100),
 }));
 
@@ -49,13 +50,18 @@ const AICourses: React.FC = () => {
       <Header />
       
       <main className="container mx-auto pt-32 px-4 pb-16">
-        <motion.h1
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-handwritten text-center text-ghibli-forest mb-8"
+          className="text-center mb-8"
         >
-          AI 강의
-        </motion.h1>
+          <h1 className="text-4xl font-handwritten text-ghibli-forest mb-4">
+            AI 강의
+          </h1>
+          <p className="text-lg text-ghibli-stone max-w-2xl mx-auto">
+            전문 분야에 특화된 AI 튜터와 함께 공부해보세요. 24시간 질문 응답, 맞춤형 피드백, 실시간 코드 리뷰까지 제공됩니다.
+          </p>
+        </motion.div>
         
         {/* Categories */}
         <div className="flex flex-wrap justify-center gap-2 mb-10">
@@ -71,7 +77,8 @@ const AICourses: React.FC = () => {
               `}
               onClick={() => setSelectedCategory(category.id)}
             >
-              {category.name}
+              <category.Icon className="h-4 w-4 mr-2" />
+              {category.name} AI 튜터
             </Button>
           ))}
         </div>
@@ -108,22 +115,19 @@ const AICourses: React.FC = () => {
                       <Heart className="h-5 w-5 text-gray-500" />
                     )}
                   </button>
-                  <div className="absolute bottom-3 left-3 px-2 py-1 text-xs font-medium bg-ghibli-sunset text-white rounded-full">
-                    AI 튜터
-                  </div>
                 </div>
                 <CardContent className="p-4">
                   <Link to={`/course/${course.id}`}>
                     <div className="mb-1">
                       <span className="px-2 py-1 text-xs font-medium bg-ghibli-cloud text-ghibli-forest rounded-full">
-                        {categories.find(c => c.id === course.category)?.name}
+                        {categories.find(c => c.id === course.category)?.name} AI
                       </span>
                     </div>
                     <h3 className="font-semibold mb-2 text-ghibli-midnight hover:text-ghibli-forest transition-colors">
                       {course.title}
                     </h3>
-                    <p className="text-sm text-ghibli-stone mb-3">
-                      {course.instructor}
+                    <p className="text-sm text-ghibli-stone mb-3 flex items-center">
+                      <Robot className="h-4 w-4 mr-1 text-purple-500" /> {course.aiTutor}
                     </p>
                     <div className="flex items-center space-x-1 mb-4">
                       <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
@@ -144,9 +148,17 @@ const AICourses: React.FC = () => {
         
         {/* View all button */}
         <div className="flex justify-center mt-12">
-          <Link to="/top-courses" className="btn-primary">
-            인기 AI 강의 모두 보기
-          </Link>
+          <div className="bg-white p-6 rounded-xl shadow-md border border-ghibli-meadow/20 max-w-xl">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 rounded-full bg-purple-100">
+                <Robot className="h-8 w-8 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg text-ghibli-midnight">AI 튜터와의 강의란?</h3>
+                <p className="text-ghibli-stone">각 분야에 특화된 인공지능이 여러분의 학습 패턴을 분석하고 실시간으로 질문에 답변합니다. 맞춤형 피드백과 개인화된 학습경로로 더 효율적인 학습을 경험하세요.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
