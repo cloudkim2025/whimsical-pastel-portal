@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, Heart, BookmarkPlus } from 'lucide-react';
+import { Star, Heart, BookmarkPlus, PlusCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Mock categories and courses data
 const categories = [
@@ -31,6 +32,7 @@ const coursesData = Array(12).fill(null).map((_, idx) => ({
 const DevCourses: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
   const [bookmarkedCourses, setBookmarkedCourses] = useState<string[]>([]);
+  const { isInstructor } = useAuth();
   
   const toggleBookmark = (courseId: string) => {
     setBookmarkedCourses(prev => 
@@ -49,13 +51,24 @@ const DevCourses: React.FC = () => {
       <Header />
       
       <main className="container mx-auto pt-32 px-4 pb-16">
-        <motion.h1
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-handwritten text-center text-ghibli-forest mb-8"
+          className="flex justify-between items-center mb-8"
         >
-          개발강의
-        </motion.h1>
+          <h1 className="text-4xl font-handwritten text-ghibli-forest">
+            개발강의
+          </h1>
+          
+          {isInstructor && (
+            <Link to="/course-upload">
+              <Button className="btn-secondary flex items-center gap-2 font-korean">
+                <PlusCircle size={16} />
+                <span>강의 등록</span>
+              </Button>
+            </Link>
+          )}
+        </motion.div>
         
         {/* Categories */}
         <div className="flex flex-wrap justify-center gap-2 mb-10">
@@ -64,7 +77,7 @@ const DevCourses: React.FC = () => {
               key={category.id}
               variant={selectedCategory === category.id ? 'default' : 'outline'}
               className={`
-                rounded-full px-5 py-2 font-medium transition-all
+                rounded-full px-5 py-2 font-medium transition-all font-korean
                 ${selectedCategory === category.id 
                   ? 'bg-ghibli-meadow hover:bg-ghibli-forest text-white' 
                   : 'border-ghibli-meadow/50 text-ghibli-forest hover:border-ghibli-forest hover:bg-ghibli-cloud'}
@@ -112,14 +125,14 @@ const DevCourses: React.FC = () => {
                 <CardContent className="p-4">
                   <Link to={`/course/${course.id}`}>
                     <div className="mb-1">
-                      <span className="px-2 py-1 text-xs font-medium bg-ghibli-cloud text-ghibli-forest rounded-full">
+                      <span className="px-2 py-1 text-xs font-medium bg-ghibli-cloud text-ghibli-forest rounded-full font-korean">
                         {categories.find(c => c.id === course.category)?.name}
                       </span>
                     </div>
-                    <h3 className="font-semibold mb-2 text-ghibli-midnight hover:text-ghibli-forest transition-colors">
+                    <h3 className="font-semibold mb-2 text-ghibli-midnight hover:text-ghibli-forest transition-colors font-korean">
                       {course.title}
                     </h3>
-                    <p className="text-sm text-ghibli-stone mb-3">
+                    <p className="text-sm text-ghibli-stone mb-3 font-korean">
                       {course.instructor}
                     </p>
                     <div className="flex items-center space-x-1 mb-4">
@@ -127,7 +140,7 @@ const DevCourses: React.FC = () => {
                       <span className="text-sm font-medium">{course.rating}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="font-bold text-ghibli-midnight">₩{course.price}</span>
+                      <span className="font-bold text-ghibli-midnight font-korean">₩{course.price}</span>
                       <div className="flex items-center text-xs text-ghibli-stone">
                         <BookmarkPlus className="h-3 w-3 mr-1" /> {course.bookmarks}
                       </div>
@@ -141,7 +154,7 @@ const DevCourses: React.FC = () => {
         
         {/* View all button */}
         <div className="flex justify-center mt-12">
-          <Link to="/top-courses" className="btn-primary">
+          <Link to="/top-courses" className="btn-primary font-korean">
             인기 강의 모두 보기
           </Link>
         </div>

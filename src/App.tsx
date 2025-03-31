@@ -16,6 +16,7 @@ import CompanyInfo from "./pages/CompanyInfo";
 import CourseDetail from "./pages/CourseDetail";
 import Checkout from "./pages/Checkout";
 import TopCourses from "./pages/TopCourses";
+import CourseUpload from "./pages/CourseUpload";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/course/:courseId" element={<CourseDetail />} />
             <Route path="/checkout/:courseId" element={<Checkout />} />
             <Route path="/top-courses" element={<TopCourses />} />
+            <Route path="/course-upload" element={<CourseUpload />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

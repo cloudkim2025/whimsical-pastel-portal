@@ -82,7 +82,8 @@ export default {
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
-				handwritten: ['"Caveat"', 'cursive']
+				handwritten: ['"Caveat"', 'cursive'],
+				korean: ['"Noto Sans KR"', 'sans-serif']
 			},
 			keyframes: {
 				'accordion-down': {
