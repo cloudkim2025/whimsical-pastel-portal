@@ -6,9 +6,10 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, Heart, Share2, Clock, Users, Award, Bot } from 'lucide-react';
+import { Star, Heart, Share2, Clock, Users, Award, Bot, Play } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import VideoLectureModal from '@/components/VideoLectureModal';
 
 // Mock course data
 const getCourseData = (id: string) => ({
@@ -26,6 +27,7 @@ const getCourseData = (id: string) => ({
   duration: `${Math.floor(Math.random() * 20) + 10}시간`,
   level: ['입문', '초급', '중급', '고급'][Math.floor(Math.random() * 4)],
   isAI: id.includes('ai'),
+  isPurchased: Math.random() > 0.5, // Mock purchase status - would be from API in real app
   views: Math.floor(Math.random() * 10000) + 1000,
   description: `이 강의는 ${id.includes('ai') ? 'AI 기술' : '웹 개발'}의 기초부터 고급 기술까지 모든 것을 다루는 종합적인 과정입니다. 실습 위주의 학습을 통해 실무에 바로 적용할 수 있는 역량을 키울 수 있습니다.`,
   curriculum: [
@@ -47,6 +49,7 @@ const CourseDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState('intro');
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [showVideoModal, setShowVideoModal] = useState(false);
   
   useEffect(() => {
     if (courseId) {
@@ -72,6 +75,10 @@ const CourseDetail: React.FC = () => {
       return;
     }
     navigate(`/checkout/${courseId}`);
+  };
+  
+  const handleWatchLecture = () => {
+    setShowVideoModal(true);
   };
   
   if (!course) {
@@ -305,7 +312,11 @@ const CourseDetail: React.FC = () => {
                         <span className="text-sm text-ghibli-stone">({course.reviewCount} 리뷰)</span>
                       </div>
                       <div className="text-3xl font-bold text-ghibli-midnight mb-2">
-                        ₩{course.price}
+                        {course.isPurchased ? (
+                          <span className="text-green-600">구매 완료</span>
+                        ) : (
+                          <>₩{course.price}</>
+                        )}
                       </div>
                     </div>
                     
@@ -322,12 +333,21 @@ const CourseDetail: React.FC = () => {
                       )}
                     </div>
                     
-                    <Button 
-                      onClick={handleCheckout}
-                      className="w-full bg-ghibli-meadow hover:bg-ghibli-forest text-white transition-all duration-300"
-                    >
-                      결제하기
-                    </Button>
+                    {course.isPurchased ? (
+                      <Button 
+                        onClick={handleWatchLecture}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white transition-all duration-300 flex items-center justify-center gap-2"
+                      >
+                        <Play className="h-4 w-4" /> 강의 듣기
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={handleCheckout}
+                        className="w-full bg-ghibli-meadow hover:bg-ghibli-forest text-white transition-all duration-300"
+                      >
+                        결제하기
+                      </Button>
+                    )}
                   </div>
                   
                   <div className="bg-ghibli-cloud/50 p-4 text-center">
@@ -341,6 +361,13 @@ const CourseDetail: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Video Lecture Modal */}
+      <VideoLectureModal 
+        isOpen={showVideoModal} 
+        onClose={() => setShowVideoModal(false)} 
+        course={course} 
+      />
     </div>
   );
 };

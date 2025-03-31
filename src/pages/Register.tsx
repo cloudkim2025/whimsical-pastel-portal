@@ -6,7 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Mail, Home } from 'lucide-react';
+import { Mail, Home, Check } from 'lucide-react';
+import EmailVerificationModal from '@/components/EmailVerificationModal';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +15,8 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -21,8 +24,17 @@ const Register = () => {
     nickname?: string;
   }>({});
   
-  const { register, loginWithSocialMedia } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
+
+  const validateEmail = () => {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrors(prev => ({ ...prev, email: '유효한 이메일 주소를 입력해주세요.' }));
+      return false;
+    }
+    setErrors(prev => ({ ...prev, email: undefined }));
+    return true;
+  };
 
   const validateForm = () => {
     const newErrors: {
@@ -36,6 +48,12 @@ const Register = () => {
     // Email validation
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = '유효한 이메일 주소를 입력해주세요.';
+      isValid = false;
+    }
+
+    // Email verification check
+    if (!isEmailVerified) {
+      newErrors.email = '이메일 인증이 필요합니다.';
       isValid = false;
     }
 
@@ -61,6 +79,21 @@ const Register = () => {
     return isValid;
   };
 
+  const handleSendVerificationCode = () => {
+    if (validateEmail()) {
+      // In real app, this would make an API call to send verification code
+      toast.success(`${email}로 인증코드가 발송되었습니다.`);
+      setIsVerificationModalOpen(true);
+    }
+  };
+  
+  const handleVerificationResult = (success: boolean) => {
+    if (success) {
+      setIsEmailVerified(true);
+      toast.success('이메일이 성공적으로 인증되었습니다.');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -80,12 +113,6 @@ const Register = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSocialLogin = (provider: 'google' | 'naver' | 'kakao') => {
-    loginWithSocialMedia(provider);
-    // Redirect will happen after successful login via context effect
-    setTimeout(() => navigate('/'), 1500);
   };
 
   return (
@@ -109,20 +136,46 @@ const Register = () => {
               <label htmlFor="email" className="block text-sm font-medium text-ghibli-midnight">
                 이메일
               </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
-                className={`w-full border-ghibli-meadow/50 focus:border-ghibli-forest focus:ring focus:ring-ghibli-meadow/30 ${
-                  errors.email ? 'border-red-500' : ''
-                }`}
-              />
-              {errors.email && (
+              <div className="flex space-x-2">
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setIsEmailVerified(false);
+                  }}
+                  placeholder="your@email.com"
+                  required
+                  disabled={isEmailVerified}
+                  className={`border-ghibli-meadow/50 focus:border-ghibli-forest focus:ring focus:ring-ghibli-meadow/30 ${
+                    errors.email ? 'border-red-500' : ''
+                  }`}
+                />
+                <Button
+                  type="button"
+                  onClick={handleSendVerificationCode}
+                  disabled={isEmailVerified}
+                  className={`px-3 whitespace-nowrap ${
+                    isEmailVerified
+                      ? 'bg-green-500 hover:bg-green-600'
+                      : 'bg-ghibli-meadow hover:bg-ghibli-forest'
+                  }`}
+                >
+                  {isEmailVerified ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1" /> 인증됨
+                    </>
+                  ) : (
+                    '인증하기'
+                  )}
+                </Button>
+              </div>
+              {errors.email ? (
                 <p className="text-xs text-red-500 mt-1">{errors.email}</p>
-              )}
+              ) : isEmailVerified ? (
+                <p className="text-xs text-green-600 mt-1">이메일이 인증되었습니다.</p>
+              ) : null}
             </div>
 
             <div className="space-y-2">
@@ -187,50 +240,12 @@ const Register = () => {
 
             <Button 
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !isEmailVerified}
               className="w-full bg-ghibli-meadow hover:bg-ghibli-forest text-white transition-all duration-300 mt-6"
             >
               {isLoading ? '회원가입 중...' : '회원가입'}
             </Button>
           </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-ghibli-earth/30"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-ghibli-stone">또는 소셜 미디어로 가입</span>
-              </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              <button
-                type="button"
-                onClick={() => handleSocialLogin('google')}
-                className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-white hover:bg-gray-50 transition-all duration-300"
-              >
-                <span className="sr-only">Sign in with Google</span>
-                <span className="text-red-500 font-bold text-sm">G</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSocialLogin('naver')}
-                className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-[#03C75A] hover:bg-[#02AD4F] transition-all duration-300"
-              >
-                <span className="sr-only">Sign in with Naver</span>
-                <span className="text-white font-bold text-sm">N</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSocialLogin('kakao')}
-                className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-[#FEE500] hover:bg-[#FEDB00] transition-all duration-300"
-              >
-                <span className="sr-only">Sign in with Kakao</span>
-                <span className="text-[#3A1D1D] font-bold text-sm">K</span>
-              </button>
-            </div>
-          </div>
 
           <div className="mt-8 text-center">
             <div className="flex flex-col space-y-3">
@@ -249,6 +264,13 @@ const Register = () => {
           </div>
         </motion.div>
       </div>
+
+      <EmailVerificationModal
+        isOpen={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+        onVerify={handleVerificationResult}
+        email={email}
+      />
     </div>
   );
 };

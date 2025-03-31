@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -11,12 +11,44 @@ import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
-import { Settings, UserCircle, Bell, Lock } from 'lucide-react';
+import { Settings, UserCircle, Bell, Lock, BookOpen, Play } from 'lucide-react';
+
+// Mock purchased courses data
+const mockPurchasedCourses = [
+  {
+    id: 'course1',
+    title: '웹 개발의 모든 것',
+    instructor: '김강사 1',
+    image: 'https://api.dicebear.com/7.x/shapes/svg?seed=course1',
+    progress: 45,
+    totalLectures: 9,
+    completedLectures: 4
+  },
+  {
+    id: 'course2',
+    title: 'React 마스터 클래스',
+    instructor: '박강사',
+    image: 'https://api.dicebear.com/7.x/shapes/svg?seed=course2',
+    progress: 20,
+    totalLectures: 12,
+    completedLectures: 2
+  },
+  {
+    id: 'ai-course1',
+    title: '데이터 사이언스 기초 - AI 강의',
+    instructor: 'AI 튜터 1',
+    image: 'https://api.dicebear.com/7.x/shapes/svg?seed=ai-course1',
+    progress: 80,
+    totalLectures: 10,
+    completedLectures: 8
+  }
+];
 
 const Profile = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [nickname, setNickname] = useState(user?.nickname || '');
+  const [activeTab, setActiveTab] = useState('account');
 
   // If no user is logged in, redirect to login
   React.useEffect(() => {
@@ -89,7 +121,7 @@ const Profile = () => {
               
               {/* Settings Tabs */}
               <div className="w-full md:w-2/3">
-                <Tabs defaultValue="account" className="w-full">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="mb-6 bg-ghibli-cloud">
                     <TabsTrigger value="account" className="data-[state=active]:bg-ghibli-meadow data-[state=active]:text-white">
                       <UserCircle className="h-4 w-4 mr-2" />
@@ -102,6 +134,10 @@ const Profile = () => {
                     <TabsTrigger value="notifications" className="data-[state=active]:bg-ghibli-meadow data-[state=active]:text-white">
                       <Bell className="h-4 w-4 mr-2" />
                       알림
+                    </TabsTrigger>
+                    <TabsTrigger value="courses" className="data-[state=active]:bg-ghibli-meadow data-[state=active]:text-white">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      구매한 강의
                     </TabsTrigger>
                   </TabsList>
                   
@@ -186,35 +222,6 @@ const Profile = () => {
                             비밀번호 변경
                           </Button>
                         </form>
-                        
-                        <div className="mt-8 border-t border-ghibli-earth/10 pt-6">
-                          <h4 className="text-lg font-medium text-ghibli-forest mb-4">소셜 계정 연동</h4>
-                          <div className="flex flex-col space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 rounded-full bg-[#ea4335] flex items-center justify-center text-white mr-3">G</div>
-                                <span>Google</span>
-                              </div>
-                              <Button variant="outline" size="sm">연결</Button>
-                            </div>
-                            
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 rounded-full bg-[#03C75A] flex items-center justify-center text-white mr-3">N</div>
-                                <span>Naver</span>
-                              </div>
-                              <Button variant="outline" size="sm">연결</Button>
-                            </div>
-                            
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <div className="w-8 h-8 rounded-full bg-[#FEE500] flex items-center justify-center text-[#3A1D1D] mr-3">K</div>
-                                <span>Kakao</span>
-                              </div>
-                              <Button variant="outline" size="sm">연결</Button>
-                            </div>
-                          </div>
-                        </div>
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -266,6 +273,70 @@ const Profile = () => {
                         <Button className="mt-6 bg-ghibli-meadow hover:bg-ghibli-forest text-white">
                           설정 저장
                         </Button>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  
+                  <TabsContent value="courses">
+                    <Card className="border-ghibli-meadow/30 bg-white/80 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-ghibli-forest">구매한 강의</CardTitle>
+                        <CardDescription>
+                          결제 완료한 강의 목록과 진행 상황
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {mockPurchasedCourses.map((course) => (
+                            <div key={course.id} className="border border-ghibli-meadow/20 rounded-lg overflow-hidden">
+                              <div className="flex flex-col md:flex-row">
+                                <div className="md:w-1/4">
+                                  <img 
+                                    src={course.image} 
+                                    alt={course.title} 
+                                    className="h-40 md:h-full w-full object-cover"
+                                  />
+                                </div>
+                                
+                                <div className="flex-1 p-4">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <h3 className="font-medium text-ghibli-forest">{course.title}</h3>
+                                      <p className="text-sm text-ghibli-stone">{course.instructor}</p>
+                                    </div>
+                                    
+                                    <Link to={`/course/${course.id}`}>
+                                      <Button 
+                                        variant="outline" 
+                                        size="sm"
+                                        className="flex items-center gap-1 text-green-600 border-green-200 hover:bg-green-50"
+                                      >
+                                        <Play className="h-3 w-3" /> 강의 보기
+                                      </Button>
+                                    </Link>
+                                  </div>
+                                  
+                                  <div className="mt-4">
+                                    <div className="flex justify-between text-sm mb-1">
+                                      <span>진행률: {course.progress}%</span>
+                                      <span>{course.completedLectures}/{course.totalLectures} 강의 완료</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                      <div 
+                                        className="bg-ghibli-meadow h-2 rounded-full" 
+                                        style={{ width: `${course.progress}%` }}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="mt-4 text-sm text-ghibli-stone">
+                                    마지막 수강: 2023년 12월 15일
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </CardContent>
                     </Card>
                   </TabsContent>
