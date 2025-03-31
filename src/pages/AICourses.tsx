@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, Heart, BookmarkPlus, Robot, Cpu, Code, Database, Video, Palette } from 'lucide-react';
+import { Star, Heart, BookmarkPlus, Bot, Cpu, Code, Database, Video, Palette } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Mock categories and courses data
@@ -127,7 +127,7 @@ const AICourses: React.FC = () => {
                       {course.title}
                     </h3>
                     <p className="text-sm text-ghibli-stone mb-3 flex items-center">
-                      <Robot className="h-4 w-4 mr-1 text-purple-500" /> {course.aiTutor}
+                      <Bot className="h-4 w-4 mr-1 text-purple-500" /> {course.aiTutor}
                     </p>
                     <div className="flex items-center space-x-1 mb-4">
                       <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
@@ -151,7 +151,7 @@ const AICourses: React.FC = () => {
           <div className="bg-white p-6 rounded-xl shadow-md border border-ghibli-meadow/20 max-w-xl">
             <div className="flex items-center space-x-4">
               <div className="p-3 rounded-full bg-purple-100">
-                <Robot className="h-8 w-8 text-purple-600" />
+                <Bot className="h-8 w-8 text-purple-600" />
               </div>
               <div>
                 <h3 className="font-semibold text-lg text-ghibli-midnight">AI 튜터와의 강의란?</h3>

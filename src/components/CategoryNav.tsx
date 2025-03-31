@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Code, Database, Server, Cpu, PenTool, Video, Megaphone, Robot } from 'lucide-react';
+import { Code, Database, Server, Cpu, PenTool, Video, Megaphone, Bot } from 'lucide-react';
 
 const categories = [
   { 
@@ -29,7 +29,7 @@ const categories = [
   { 
     id: 'ai', 
     name: 'AI 강의', 
-    icon: Robot,
+    icon: Bot,
     color: 'bg-orange-100 text-orange-600',
     borderColor: 'border-orange-200',
   },
