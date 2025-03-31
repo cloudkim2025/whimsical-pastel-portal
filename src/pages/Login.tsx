@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Google, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -114,7 +114,7 @@ const Login = () => {
                 className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-white hover:bg-gray-50 transition-all duration-300"
               >
                 <span className="sr-only">Sign in with Google</span>
-                <Google className="h-5 w-5 text-red-500" />
+                <span className="text-red-500 font-bold text-sm">G</span>
               </button>
               <button
                 type="button"
