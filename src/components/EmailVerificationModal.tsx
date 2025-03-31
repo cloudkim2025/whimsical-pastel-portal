@@ -53,7 +53,7 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={() => onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-xl">이메일 인증</DialogTitle>
@@ -81,18 +81,19 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
           </div>
           
           {error && (
-            <p className="text-red-500 text-sm text-right mt-2">{error}</p>
+            <p className="text-red-500 text-sm text-center mt-2">{error}</p>
           )}
         </div>
         
         <DialogFooter className="flex justify-between items-center">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} type="button">
             취소
           </Button>
           <Button 
             onClick={handleVerify}
             disabled={verificationCode.length !== 6 || isVerifying}
             className="bg-ghibli-meadow hover:bg-ghibli-forest"
+            type="button"
           >
             {isVerifying ? "인증중..." : "인증하기"}
           </Button>
