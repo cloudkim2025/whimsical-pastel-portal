@@ -3,14 +3,16 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Cloud, Menu, X, UserCircle, Home } from 'lucide-react';
+import { Cloud, Menu, X, UserCircle, Home, Search } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
+import { Input } from '@/components/ui/input';
 
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const profileRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, user, logout } = useAuth();
   
@@ -35,15 +37,35 @@ const Header: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Implement search functionality
+    console.log('Searching for:', searchQuery);
+    // Could navigate to search results page
+  };
+
   return (
     <header className={cn(
       'fixed top-0 left-0 w-full z-50 transition-all duration-500',
       scrolled ? 'bg-white/80 backdrop-blur-md shadow-md py-3' : 'py-6'
     )}>
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Cloud className="h-8 w-8 text-ghibli-meadow animate-float" />
-          <h1 className="text-2xl font-handwritten font-bold text-ghibli-forest">Studio Dreamscape</h1>
+        <div className="flex items-center space-x-4 md:space-x-6 lg:space-x-8">
+          <Link to="/" className="flex items-center space-x-2">
+            <Cloud className="h-8 w-8 text-ghibli-meadow animate-float" />
+            <h1 className="text-2xl font-handwritten font-bold text-ghibli-forest">Studio Dreamscape</h1>
+          </Link>
+          
+          <form onSubmit={handleSearch} className="hidden md:flex items-center relative">
+            <Input
+              type="text"
+              placeholder="강의 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2 w-64 rounded-full border-ghibli-meadow/30 focus:border-ghibli-forest transition-all"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ghibli-stone" />
+          </form>
         </div>
         
         {/* Mobile Menu Button */}
@@ -57,9 +79,9 @@ const Header: React.FC = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <Link to="/" className="nav-link">Home</Link>
-          <Link to="/#features" className="nav-link">Features</Link>
-          <Link to="/#gallery" className="nav-link">Gallery</Link>
-          <Link to="/#contact" className="nav-link">Contact</Link>
+          <Link to="/dev-courses" className="nav-link">개발강의</Link>
+          <Link to="/ai-courses" className="nav-link">AI 강의</Link>
+          <Link to="/company-info" className="nav-link">회사정보</Link>
           
           {isAuthenticated ? (
             <div className="relative" ref={profileRef}>
@@ -136,11 +158,24 @@ const Header: React.FC = () => {
         'md:hidden fixed inset-x-0 bg-white/95 backdrop-blur-lg transition-all duration-300 ease-in-out transform shadow-lg',
         isMenuOpen ? 'top-[calc(100%)] opacity-100' : '-top-[400px] opacity-0'
       )}>
+        <div className="px-6 py-4">
+          <form onSubmit={handleSearch} className="flex items-center relative mb-4">
+            <Input
+              type="text"
+              placeholder="강의 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2 w-full rounded-full border-ghibli-meadow/30 focus:border-ghibli-forest transition-all"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ghibli-stone" />
+          </form>
+        </div>
+        
         <nav className="container mx-auto px-6 py-6 flex flex-col space-y-4">
           <Link to="/" className="nav-link text-lg py-2">Home</Link>
-          <Link to="/#features" className="nav-link text-lg py-2">Features</Link>
-          <Link to="/#gallery" className="nav-link text-lg py-2">Gallery</Link>
-          <Link to="/#contact" className="nav-link text-lg py-2">Contact</Link>
+          <Link to="/dev-courses" className="nav-link text-lg py-2">개발강의</Link>
+          <Link to="/ai-courses" className="nav-link text-lg py-2">AI 강의</Link>
+          <Link to="/company-info" className="nav-link text-lg py-2">회사정보</Link>
           
           {isAuthenticated ? (
             <div className="pt-2 border-t border-ghibli-earth/10">
