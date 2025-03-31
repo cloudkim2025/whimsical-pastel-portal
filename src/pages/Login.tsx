@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Mail } from 'lucide-react';
+import { Mail, Home } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -136,12 +136,19 @@ const Login = () => {
           </div>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-ghibli-stone">
-              계정이 없으신가요?{' '}
-              <Link to="/register" className="text-ghibli-forest hover:underline font-medium">
-                회원가입
+            <div className="flex flex-col space-y-3">
+              <p className="text-sm text-ghibli-stone">
+                계정이 없으신가요?{' '}
+                <Link to="/register" className="text-ghibli-forest hover:underline font-medium">
+                  회원가입
+                </Link>
+              </p>
+              
+              <Link to="/" className="flex items-center justify-center space-x-2 py-2.5 px-5 border border-ghibli-meadow text-ghibli-forest rounded-full hover:bg-ghibli-cloud transition-all duration-300">
+                <Home size={18} />
+                <span>메인으로 돌아가기</span>
               </Link>
-            </p>
+            </div>
           </div>
         </motion.div>
       </div>

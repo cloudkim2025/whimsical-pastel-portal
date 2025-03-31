@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Cloud, Menu, X, UserCircle } from 'lucide-react';
+import { Cloud, Menu, X, UserCircle, Home } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -120,8 +120,12 @@ const Header: React.FC = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
-              <Link to="/login" className="nav-link">로그인</Link>
-              <Link to="/register" className="btn-primary">회원가입</Link>
+              <Link to="/login" className="py-2.5 px-5 text-ghibli-forest border border-ghibli-meadow hover:bg-ghibli-cloud rounded-full transition-all duration-300">
+                로그인
+              </Link>
+              <Link to="/register" className="py-2.5 px-5 bg-ghibli-meadow hover:bg-ghibli-forest text-white rounded-full transition-all duration-300">
+                회원가입
+              </Link>
             </div>
           )}
         </nav>
@@ -172,10 +176,12 @@ const Header: React.FC = () => {
             </div>
           ) : (
             <div className="pt-2 border-t border-ghibli-earth/10 flex flex-col space-y-3">
-              <Link to="/login" className="py-2 px-4 text-ghibli-forest text-center border border-ghibli-meadow rounded-full hover:bg-ghibli-cloud">
+              <Link to="/login" className="py-2.5 px-5 text-ghibli-forest text-center border border-ghibli-meadow hover:bg-ghibli-cloud rounded-full transition-all duration-300">
                 로그인
               </Link>
-              <Link to="/register" className="btn-primary">회원가입</Link>
+              <Link to="/register" className="py-2.5 px-5 bg-ghibli-meadow hover:bg-ghibli-forest text-white text-center rounded-full transition-all duration-300">
+                회원가입
+              </Link>
             </div>
           )}
         </nav>
