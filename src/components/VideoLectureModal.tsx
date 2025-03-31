@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Volume2, VolumeX, SkipForward, SkipBack } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, SkipForward, SkipBack, MessageSquare, Save } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
 
 interface VideoLectureModalProps {
   isOpen: boolean;
@@ -18,10 +20,28 @@ const VideoLectureModal: React.FC<VideoLectureModalProps> = ({ isOpen, onClose, 
   const [playbackRate, setPlaybackRate] = useState(1);
   const [note, setNote] = useState('');
   const [notes, setNotes] = useState<Record<number, string[]>>({});
+  const [currentPlayTime, setCurrentPlayTime] = useState(0); // Track current video playback time
 
   // Toggle play/pause
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
+    // In a real implementation, we would control the video playback here
+    if (!isPlaying) {
+      // Start incrementing the play time as a simulation of video progression
+      const interval = setInterval(() => {
+        setCurrentPlayTime((time) => {
+          if (time < 750) { // 12:30 in seconds
+            return time + 1;
+          } else {
+            clearInterval(interval);
+            return time;
+          }
+        });
+      }, 1000);
+      
+      // Store the interval ID to clear it when pausing or unmounting
+      return () => clearInterval(interval);
+    }
   };
 
   // Toggle mute/unmute
@@ -43,12 +63,25 @@ const VideoLectureModal: React.FC<VideoLectureModalProps> = ({ isOpen, onClose, 
     
     setNotes(prevNotes => {
       const lectureNotes = prevNotes[currentLecture] || [];
+      // Add timestamp to the note
+      const formattedTime = formatTime(currentPlayTime);
+      const noteWithTimestamp = `[${formattedTime}] ${note}`;
+      
       return {
         ...prevNotes,
-        [currentLecture]: [...lectureNotes, note]
+        [currentLecture]: [...lectureNotes, noteWithTimestamp]
       };
     });
+    
+    toast.success('메모가 저장되었습니다.');
     setNote('');
+  };
+
+  // Format seconds into MM:SS
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
   return (
@@ -82,9 +115,12 @@ const VideoLectureModal: React.FC<VideoLectureModalProps> = ({ isOpen, onClose, 
             
             {/* Video Controls */}
             <div className="bg-black/90 p-4 space-y-2">
-              {/* Progress Bar (Placeholder) */}
+              {/* Progress Bar */}
               <div className="h-1 bg-gray-700 rounded overflow-hidden">
-                <div className="h-full bg-ghibli-meadow" style={{ width: '30%' }}></div>
+                <div 
+                  className="h-full bg-ghibli-meadow" 
+                  style={{ width: `${(currentPlayTime / 750) * 100}%` }}
+                ></div>
               </div>
               
               {/* Control Buttons */}
@@ -118,17 +154,25 @@ const VideoLectureModal: React.FC<VideoLectureModalProps> = ({ isOpen, onClose, 
                 </div>
                 
                 <div className="text-white text-sm">
-                  00:45 / 12:30
+                  {formatTime(currentPlayTime)} / 12:30
                 </div>
               </div>
             </div>
           </div>
           
           {/* Curriculum and Notes (Right side - 1/3) */}
-          <div className="md:col-span-1 flex flex-col h-full border-l border-gray-200">
+          <div className="md:col-span-1 flex flex-col h-full border-l border-gray-200 bg-white">
+            {/* Tabs for Curriculum and Notes */}
+            <div className="flex border-b border-gray-200">
+              <button 
+                className="flex-1 py-3 px-4 font-medium border-b-2 border-ghibli-meadow text-ghibli-forest"
+              >
+                강의 커리큘럼
+              </button>
+            </div>
+            
             {/* Curriculum */}
-            <div className="flex-grow overflow-y-auto bg-white p-4">
-              <h3 className="text-lg font-semibold mb-4 text-ghibli-forest">강의 커리큘럼</h3>
+            <div className="h-[45%] overflow-y-auto bg-white p-4">
               <div className="space-y-2">
                 {course?.curriculum?.map((section: any, sectionIndex: number) => (
                   <div key={sectionIndex} className="mb-4">
@@ -154,35 +198,72 @@ const VideoLectureModal: React.FC<VideoLectureModalProps> = ({ isOpen, onClose, 
               </div>
             </div>
             
-            {/* Notes */}
-            <div className="bg-gray-50 p-4 border-t border-gray-200 flex flex-col h-1/3">
-              <h3 className="text-sm font-semibold mb-2 text-ghibli-forest">강의 메모</h3>
-              
-              <div className="flex-grow overflow-y-auto mb-3 space-y-2">
-                {(notes[currentLecture] || []).map((note, index) => (
-                  <div key={index} className="bg-white p-2 rounded shadow-sm text-sm">
-                    {note}
-                  </div>
-                ))}
+            {/* Notes Section */}
+            <div className="flex flex-col h-[55%] border-t border-gray-200">
+              {/* Notes Header */}
+              <div className="bg-ghibli-cloud/30 p-3 flex justify-between items-center border-b border-gray-200">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-ghibli-forest" />
+                  <h3 className="text-sm font-semibold text-ghibli-forest">강의 메모</h3>
+                </div>
+                <div className="text-xs text-ghibli-stone">
+                  {(notes[currentLecture] || []).length}개의 메모
+                </div>
               </div>
               
-              <div className="flex">
-                <input
-                  type="text"
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="메모를 입력하세요..."
-                  className="flex-grow border rounded-l px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ghibli-meadow"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') addNote();
-                  }}
-                />
-                <Button 
-                  onClick={addNote}
-                  className="rounded-l-none bg-ghibli-meadow hover:bg-ghibli-forest"
-                >
-                  저장
-                </Button>
+              {/* Notes Display Area */}
+              <div className="flex-grow overflow-y-auto p-3 space-y-2 bg-gray-50">
+                {/* Future: Lecture Transcript with Notes */}
+                <div className="text-xs text-ghibli-stone mb-2">
+                  <p>* 추후 백엔드 연동 시 강의 프롬프트가 표시될 예정입니다</p>
+                </div>
+                
+                {/* Notes */}
+                {(notes[currentLecture] || []).length > 0 ? (
+                  (notes[currentLecture] || []).map((noteText, index) => (
+                    <div 
+                      key={index} 
+                      className="bg-white p-3 rounded shadow-sm text-sm border-l-2 border-ghibli-meadow animate-fadeIn"
+                    >
+                      {noteText}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-6 text-ghibli-stone">
+                    <p>아직 작성된 메모가 없습니다</p>
+                    <p className="text-xs mt-1">영상을 시청하며 메모를 작성해보세요</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Note Input */}
+              <div className="p-3 border-t border-gray-200 bg-white">
+                <div className="flex flex-col">
+                  <Textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="강의를 듣고 메모를 작성해보세요..."
+                    className="resize-none text-sm min-h-[80px] mb-2 border-ghibli-meadow/30 focus:border-ghibli-meadow"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.ctrlKey) {
+                        addNote();
+                      }
+                    }}
+                  />
+                  <div className="flex justify-between items-center">
+                    <div className="text-xs text-ghibli-stone">
+                      Ctrl+Enter로 빠르게 저장
+                    </div>
+                    <Button 
+                      onClick={addNote}
+                      disabled={!note.trim()}
+                      className="bg-ghibli-meadow hover:bg-ghibli-forest"
+                      size="sm"
+                    >
+                      <Save className="h-4 w-4 mr-1" /> 메모 저장
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

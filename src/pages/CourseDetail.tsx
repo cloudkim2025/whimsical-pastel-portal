@@ -6,10 +6,11 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, Heart, Share2, Clock, Users, Award, Bot, Play } from 'lucide-react';
+import { Star, Heart, Share2, Clock, Users, Award, Bot, Play, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import VideoLectureModal from '@/components/VideoLectureModal';
+import { Textarea } from '@/components/ui/textarea';
 
 // Mock course data
 const getCourseData = (id: string) => ({
@@ -51,6 +52,11 @@ const CourseDetail: React.FC = () => {
   const navigate = useNavigate();
   const [showVideoModal, setShowVideoModal] = useState(false);
   
+  // New state for review submission
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  
   useEffect(() => {
     if (courseId) {
       // In a real app, we would fetch course data from an API
@@ -79,6 +85,48 @@ const CourseDetail: React.FC = () => {
   
   const handleWatchLecture = () => {
     setShowVideoModal(true);
+  };
+  
+  const handleSubmitReview = () => {
+    if (!isAuthenticated) {
+      toast.error('수강평을 작성하려면 로그인이 필요합니다.');
+      return;
+    }
+    
+    if (!course.isPurchased) {
+      toast.error('강의를 구매한 후에 수강평을 작성할 수 있습니다.');
+      return;
+    }
+    
+    if (reviewComment.trim() === '') {
+      toast.error('수강평 내용을 입력해주세요.');
+      return;
+    }
+    
+    setIsSubmittingReview(true);
+    
+    // Simulate API call to submit review
+    setTimeout(() => {
+      // Add the new review to the course object
+      const newReview = {
+        name: '내 수강평', // In real app, use actual user name
+        rating: reviewRating,
+        comment: reviewComment
+      };
+      
+      setCourse((prevCourse: any) => ({
+        ...prevCourse,
+        reviews: [newReview, ...prevCourse.reviews],
+        reviewCount: prevCourse.reviewCount + 1
+      }));
+      
+      // Reset form
+      setReviewComment('');
+      setReviewRating(5);
+      setIsSubmittingReview(false);
+      
+      toast.success('수강평이 등록되었습니다.');
+    }, 1000);
   };
   
   if (!course) {
@@ -249,6 +297,54 @@ const CourseDetail: React.FC = () => {
                           <span className="text-ghibli-stone ml-2">({course.reviewCount} 리뷰)</span>
                         </div>
                       </div>
+                      
+                      {/* 수강평 작성 영역 */}
+                      {isAuthenticated && course.isPurchased && (
+                        <div className="mb-8 bg-ghibli-cloud/30 p-4 rounded-lg">
+                          <div className="flex items-center gap-2 mb-3">
+                            <MessageSquare className="h-5 w-5 text-ghibli-forest" />
+                            <h4 className="font-medium">수강평 작성</h4>
+                          </div>
+                          
+                          <div className="mb-3">
+                            <p className="text-sm text-ghibli-stone mb-2">별점</p>
+                            <div className="flex">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setReviewRating(star)}
+                                  className="p-1"
+                                >
+                                  <Star
+                                    className={`h-6 w-6 ${star <= reviewRating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                  />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div className="mb-3">
+                            <p className="text-sm text-ghibli-stone mb-2">내용</p>
+                            <Textarea
+                              placeholder="수강평을 작성해주세요..."
+                              className="resize-none"
+                              value={reviewComment}
+                              onChange={(e) => setReviewComment(e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className="flex justify-end">
+                            <Button 
+                              onClick={handleSubmitReview}
+                              disabled={isSubmittingReview || reviewComment.trim() === ''}
+                              className="bg-ghibli-meadow hover:bg-ghibli-forest"
+                            >
+                              {isSubmittingReview ? '제출 중...' : '수강평 등록'}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                       
                       <div className="space-y-6">
                         {course.reviews.map((review: any, index: number) => (
