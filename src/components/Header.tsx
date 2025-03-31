@@ -37,14 +37,6 @@ const Header: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
-  const handleStartFree = () => {
-    if (isAuthenticated) {
-      navigate('/');
-    } else {
-      navigate('/login');
-    }
-  };
 
   return (
     <header className={cn(
@@ -70,13 +62,6 @@ const Header: React.FC = () => {
           <Link to="/ai-courses" className="nav-link">AI 강의</Link>
           <Link to="/company-info" className="nav-link">회사정보</Link>
           
-          <Button 
-            onClick={handleStartFree}
-            className="py-2 px-4 bg-ghibli-meadow hover:bg-ghibli-forest text-white rounded-full transition-all duration-300"
-          >
-            무료로 시작하기
-          </Button>
-          
           {isAuthenticated ? (
             <div className="relative" ref={profileRef}>
               <button 
@@ -101,7 +86,7 @@ const Header: React.FC = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-ghibli-meadow/20 overflow-hidden"
+                    className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-ghibli-meadow/20 overflow-hidden z-50"
                   >
                     <div className="p-4 border-b border-ghibli-earth/10">
                       <p className="text-ghibli-forest font-medium">{user?.nickname}</p>
@@ -171,13 +156,6 @@ const Header: React.FC = () => {
           <Link to="/dev-courses" className="nav-link text-lg py-2">개발강의</Link>
           <Link to="/ai-courses" className="nav-link text-lg py-2">AI 강의</Link>
           <Link to="/company-info" className="nav-link text-lg py-2">회사정보</Link>
-          
-          <Button 
-            onClick={handleStartFree}
-            className="py-2.5 px-5 mt-2 bg-ghibli-meadow hover:bg-ghibli-forest text-white rounded-full transition-all duration-300 w-full"
-          >
-            무료로 시작하기
-          </Button>
           
           {isAuthenticated ? (
             <div className="pt-2 border-t border-ghibli-earth/10">

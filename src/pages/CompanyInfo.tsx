@@ -1,12 +1,25 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Cloud, Lightbulb, Users, Award, Target, Book, Code, Bot } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
 const CompanyInfo: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleStartFree = () => {
+    if (isAuthenticated) {
+      navigate('/');
+    } else {
+      navigate('/login');
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -207,9 +220,12 @@ const CompanyInfo: React.FC = () => {
               스튜디오 드림스케이프와 함께 당신의 기술 여정을 시작하세요. 
               우리는 당신이 꿈꾸는 미래로 가는 길을 밝혀줄 준비가 되어 있습니다.
             </p>
-            <Link to="/register" className="btn-primary inline-block">
+            <Button 
+              onClick={handleStartFree}
+              className="py-2.5 px-5 bg-ghibli-meadow hover:bg-ghibli-forest text-white rounded-full transition-all duration-300"
+            >
               무료로 시작하기
-            </Link>
+            </Button>
           </motion.div>
         </motion.div>
       </main>
