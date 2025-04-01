@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -47,7 +46,7 @@ const Header: React.FC = () => {
         <div className="flex items-center space-x-4 md:space-x-6 lg:space-x-8">
           <Link to="/" className="flex items-center space-x-2">
             <Cloud className="h-8 w-8 text-ghibli-meadow animate-float" />
-            <h1 className="text-2xl font-handwritten font-bold text-ghibli-forest">Studio Dreamscape</h1>
+            <h1 className="text-2xl font-handwritten font-bold text-ghibli-forest">Aigongbu</h1>
           </Link>
           
           <div className="hidden md:block w-64">

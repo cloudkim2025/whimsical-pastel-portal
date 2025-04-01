@@ -19,7 +19,7 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <Cloud className="h-6 w-6" />
-              <h3 className="text-2xl font-handwritten font-bold">Studio Dreamscape</h3>
+              <h3 className="text-2xl font-handwritten font-bold">Aigongbu</h3>
             </div>
             <p className="text-ghibli-cloud/90 mb-6 max-w-md">
               Creating magical worlds and heartwarming stories that inspire wonder and imagination in audiences of all ages.
@@ -77,7 +77,7 @@ const Footer: React.FC = () => {
         {/* Bottom section */}
         <div className="border-t border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-ghibli-cloud/90 text-sm mb-4 md:mb-0">
-            &copy; 2023 Studio Dreamscape. All rights reserved.
+            &copy; 2023 Aigongbu. All rights reserved.
           </p>
           <div className="flex items-center">
             <span className="text-ghibli-cloud/90 text-sm">Made with</span>
