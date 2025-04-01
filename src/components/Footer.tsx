@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
               <h3 className="text-2xl font-handwritten font-bold">Aigongbu</h3>
             </div>
             <p className="text-ghibli-cloud/90 mb-6 max-w-md">
-              Creating magical worlds and heartwarming stories that inspire wonder and imagination in audiences of all ages.
+              모든 연령층에게 상상력과 경이로움을 불러일으키는 마법 같은 세계와 감동적인 이야기를 만들어갑니다.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
@@ -45,31 +45,31 @@ const Footer: React.FC = () => {
           
           {/* Navigation */}
           <div>
-            <h4 className="text-lg font-bold mb-4">Navigation</h4>
+            <h4 className="text-lg font-bold mb-4">내비게이션</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-ghibli-cloud/90 hover:text-white transition-colors">Home</a>
+                <a href="#" className="text-ghibli-cloud/90 hover:text-white transition-colors">홈</a>
               </li>
               <li>
-                <a href="#features" className="text-ghibli-cloud/90 hover:text-white transition-colors">Features</a>
+                <a href="#features" className="text-ghibli-cloud/90 hover:text-white transition-colors">특징</a>
               </li>
               <li>
-                <a href="#gallery" className="text-ghibli-cloud/90 hover:text-white transition-colors">Gallery</a>
+                <a href="#gallery" className="text-ghibli-cloud/90 hover:text-white transition-colors">갤러리</a>
               </li>
               <li>
-                <a href="#contact" className="text-ghibli-cloud/90 hover:text-white transition-colors">Contact</a>
+                <a href="#contact" className="text-ghibli-cloud/90 hover:text-white transition-colors">연락처</a>
               </li>
             </ul>
           </div>
           
           {/* Contact */}
           <div>
-            <h4 className="text-lg font-bold mb-4">Contact Us</h4>
+            <h4 className="text-lg font-bold mb-4">연락처</h4>
             <ul className="space-y-2">
-              <li className="text-ghibli-cloud/90">123 Forest Path</li>
-              <li className="text-ghibli-cloud/90">Enchanted Valley, EV 12345</li>
-              <li className="text-ghibli-cloud/90">contact@studiodreamscape.com</li>
-              <li className="text-ghibli-cloud/90">(555) 123-4567</li>
+              <li className="text-ghibli-cloud/90">서울특별시 강남구 123</li>
+              <li className="text-ghibli-cloud/90">마법의 숲, 12345</li>
+              <li className="text-ghibli-cloud/90">contact@aigongbu.com</li>
+              <li className="text-ghibli-cloud/90">02-123-4567</li>
             </ul>
           </div>
         </div>
@@ -77,12 +77,12 @@ const Footer: React.FC = () => {
         {/* Bottom section */}
         <div className="border-t border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-ghibli-cloud/90 text-sm mb-4 md:mb-0">
-            &copy; 2023 Aigongbu. All rights reserved.
+            &copy; 2025 Aigongbu. All rights reserved.
           </p>
           <div className="flex items-center">
-            <span className="text-ghibli-cloud/90 text-sm">Made with</span>
+            <span className="text-ghibli-cloud/90 text-sm">사랑과</span>
             <Heart className="h-4 w-4 mx-1 text-ghibli-sunset" />
-            <span className="text-ghibli-cloud/90 text-sm">and imagination</span>
+            <span className="text-ghibli-cloud/90 text-sm">상상력으로 만들었습니다</span>
           </div>
         </div>
       </div>
