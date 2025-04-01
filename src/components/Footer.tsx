@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Cloud, Heart, ArrowUp } from 'lucide-react';
 
 const Footer: React.FC = () => {
@@ -45,19 +46,22 @@ const Footer: React.FC = () => {
           
           {/* Navigation */}
           <div>
-            <h4 className="text-lg font-bold mb-4">내비게이션</h4>
+            <h4 className="text-lg font-bold mb-4">Navigation</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-ghibli-cloud/90 hover:text-white transition-colors">홈</a>
+                <Link to="/" className="text-ghibli-cloud/90 hover:text-white transition-colors">Home</Link>
               </li>
               <li>
-                <a href="#features" className="text-ghibli-cloud/90 hover:text-white transition-colors">특징</a>
+                <Link to="/company-info" className="text-ghibli-cloud/90 hover:text-white transition-colors">Company Info</Link>
               </li>
               <li>
-                <a href="#gallery" className="text-ghibli-cloud/90 hover:text-white transition-colors">갤러리</a>
+                <Link to="/dev-courses" className="text-ghibli-cloud/90 hover:text-white transition-colors">Development Courses</Link>
               </li>
               <li>
-                <a href="#contact" className="text-ghibli-cloud/90 hover:text-white transition-colors">연락처</a>
+                <Link to="/ai-courses" className="text-ghibli-cloud/90 hover:text-white transition-colors">AI Courses</Link>
+              </li>
+              <li>
+                <Link to="/top-courses" className="text-ghibli-cloud/90 hover:text-white transition-colors">Top Courses</Link>
               </li>
             </ul>
           </div>
