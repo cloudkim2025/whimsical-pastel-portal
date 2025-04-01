@@ -1,4 +1,5 @@
 
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
@@ -57,6 +58,22 @@
   :lang(ko) {
     @apply font-korean;
   }
+  
+  /* 추가: 한글 텍스트를 위한 클래스 */
+  .korean-text {
+    @apply font-korean;
+  }
+  
+  /* 추가: 모든 한글 문자에 자동으로 폰트 적용 */
+  :is(*):has(> :lang(ko)), 
+  *:lang(ko) {
+    @apply font-korean;
+  }
+  
+  /* 추가: HTML 요소에 한국어가 포함된 경우 자동으로 폰트 적용 */
+  *:is(:not(script, style)):not(:empty) {
+    font-family: var(--current-font-family);
+  }
 }
 
 @layer components {
@@ -84,3 +101,4 @@
     @apply relative text-ghibli-midnight hover:text-ghibli-forest transition-colors duration-300 after:content-[''] after:absolute after:w-0 after:h-0.5 after:bg-ghibli-forest after:left-0 after:-bottom-1 after:transition-all hover:after:w-full;
   }
 }
+
