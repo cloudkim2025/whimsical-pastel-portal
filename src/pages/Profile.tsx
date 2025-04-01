@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
@@ -11,9 +10,8 @@ import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
-import { Settings, UserCircle, Bell, Lock, BookOpen, Play } from 'lucide-react';
+import { Settings, UserCircle, Bell, Lock, BookOpen, Play, LayoutDashboard } from 'lucide-react';
 
-// Mock purchased courses data
 const mockPurchasedCourses = [
   {
     id: 'course1',
@@ -50,7 +48,6 @@ const Profile = () => {
   const [nickname, setNickname] = useState(user?.nickname || '');
   const [activeTab, setActiveTab] = useState('account');
 
-  // If no user is logged in, redirect to login
   React.useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -59,11 +56,9 @@ const Profile = () => {
 
   const handleUpdateProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    // This would be an API call in a real app
     toast.success("프로필이 업데이트 되었습니다!");
   };
 
-  // If still loading or no user, show loading state
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -89,7 +84,6 @@ const Profile = () => {
             </p>
             
             <div className="flex flex-col md:flex-row gap-8">
-              {/* Profile Summary Card */}
               <div className="w-full md:w-1/3">
                 <Card className="border-ghibli-meadow/30 bg-white/80 backdrop-blur-sm">
                   <CardHeader className="text-center">
@@ -106,6 +100,18 @@ const Profile = () => {
                     </div>
                     <CardTitle className="text-xl text-ghibli-forest">{user.nickname}</CardTitle>
                     <CardDescription className="text-ghibli-stone">{user.email}</CardDescription>
+                    
+                    {user.role === 'admin' && (
+                      <Link to="/admin" className="mt-4 inline-flex items-center gap-2 text-ghibli-forest hover:text-ghibli-meadow transition-colors">
+                        <Button
+                          variant="outline"
+                          className="w-full border-ghibli-meadow text-ghibli-forest hover:bg-ghibli-meadow/10 hover:text-ghibli-forest mt-2"
+                        >
+                          <LayoutDashboard className="h-4 w-4 mr-2" />
+                          관리자 대시보드
+                        </Button>
+                      </Link>
+                    )}
                   </CardHeader>
                   <CardFooter>
                     <Button 
@@ -119,7 +125,6 @@ const Profile = () => {
                 </Card>
               </div>
               
-              {/* Settings Tabs */}
               <div className="w-full md:w-2/3">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="mb-6 bg-ghibli-cloud">
