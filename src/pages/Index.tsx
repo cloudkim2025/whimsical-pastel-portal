@@ -10,6 +10,7 @@ import CategoryNav from '@/components/CategoryNav';
 import PopularCoursesCarousel from '@/components/PopularCoursesCarousel';
 import TutorShorts from '@/components/TutorShorts';
 import ClassSections from '@/components/ClassSections';
+import InstructorRecruitment from '@/components/InstructorRecruitment';
 
 const Index = () => {
   return (
@@ -28,6 +29,7 @@ const Index = () => {
         <ClassSections />
       </div>
       <Features />
+      <InstructorRecruitment />
       <Gallery />
       <Footer />
     </div>

@@ -1,0 +1,45 @@
+
+import React, { useEffect, useState } from 'react';
+import { ArrowUp } from 'lucide-react';
+
+const ScrollToTop: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibility = () => {
+    if (window.pageYOffset > 300) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', toggleVisibility);
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility);
+    };
+  }, []);
+
+  return (
+    <>
+      {isVisible && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-ghibli-forest text-white shadow-lg hover:bg-ghibli-meadow transition-all duration-300 transform hover:-translate-y-1"
+          aria-label="맨 위로 이동"
+        >
+          <ArrowUp className="h-6 w-6" />
+        </button>
+      )}
+    </>
+  );
+};
+
+export default ScrollToTop;
