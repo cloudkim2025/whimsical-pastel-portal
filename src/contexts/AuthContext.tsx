@@ -15,6 +15,7 @@ type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
   isInstructor: boolean;
+  isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, nickname: string, role?: 'student' | 'instructor') => Promise<void>;
   logout: () => void;
@@ -24,11 +25,16 @@ type AuthContextType = {
 // Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Admin credentials
+const ADMIN_EMAIL = 'admin@naver.com';
+const ADMIN_PASSWORD = '123456';
+
 // Provider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isInstructor, setIsInstructor] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   // Check if user is already logged in (from localStorage)
   useEffect(() => {
@@ -38,14 +44,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(parsedUser);
       setIsAuthenticated(true);
       setIsInstructor(parsedUser.role === 'instructor' || parsedUser.role === 'admin');
+      setIsAdmin(parsedUser.role === 'admin');
     }
   }, []);
 
   // Mock login function
   const login = async (email: string, password: string) => {
     try {
-      // In a real app, you would make an API call here
-      // Mock successful login
+      // Admin login check
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        const adminUser: User = {
+          id: 'admin-123',
+          email: ADMIN_EMAIL,
+          nickname: '관리자',
+          avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
+          role: 'admin'
+        };
+        
+        setUser(adminUser);
+        setIsAuthenticated(true);
+        setIsInstructor(true);
+        setIsAdmin(true);
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        toast.success("관리자 계정으로 로그인 성공!");
+        return;
+      }
+      
+      // Regular user login
       if (email && password) {
         // 특정 이메일은 강사로 설정 (데모용)
         const isInstructorEmail = email.includes('instructor') || email.includes('teacher');
@@ -61,6 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(mockUser);
         setIsAuthenticated(true);
         setIsInstructor(isInstructorEmail);
+        setIsAdmin(false);
         localStorage.setItem('user', JSON.stringify(mockUser));
         toast.success("로그인 성공!");
         return;
@@ -75,7 +101,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Mock register function
   const register = async (email: string, password: string, nickname: string, role: 'student' | 'instructor' = 'student') => {
     try {
-      // In a real app, you would make an API call here
+      // Block registration with admin email
+      if (email === ADMIN_EMAIL) {
+        toast.error("이 이메일은 사용할 수 없습니다.");
+        throw new Error("이 이메일은 사용할 수 없습니다.");
+      }
+      
       // Mock successful registration
       const mockUser: User = {
         id: '123',
@@ -88,6 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(mockUser);
       setIsAuthenticated(true);
       setIsInstructor(role === 'instructor');
+      setIsAdmin(false);
       localStorage.setItem('user', JSON.stringify(mockUser));
       toast.success("회원가입 성공!");
     } catch (error) {
@@ -101,6 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setIsAuthenticated(false);
     setIsInstructor(false);
+    setIsAdmin(false);
     localStorage.removeItem('user');
     toast.info("로그아웃 되었습니다.");
   };
@@ -126,6 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(mockUser);
       setIsAuthenticated(true);
       setIsInstructor(isInstructor);
+      setIsAdmin(false);
       localStorage.setItem('user', JSON.stringify(mockUser));
       toast.success(`${provider} 로그인 성공!`);
     }, 1000);
@@ -135,6 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     isAuthenticated,
     isInstructor,
+    isAdmin,
     login,
     register,
     logout,

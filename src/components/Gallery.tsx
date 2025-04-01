@@ -10,40 +10,40 @@ import {
 
 const motivationImages = [
   {
-    url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05",
-    alt: "언덕 위의 사람",
-    title: "지속적인 노력",
-    message: "오늘 최선을 다해 노력한다면, 내일의 정상에서 더 넓은 세계를 볼 수 있습니다. 포기하지 말고 한 걸음씩 나아가세요."
+    url: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8",
+    alt: "코딩하는 사람들",
+    title: "함께 배워요",
+    message: "함께 배우면 더 빠르게 성장합니다. 주변의 동료들과 지식을 나누고, 서로의 아이디어를 발전시켜 나가세요. 협업은 개발의 핵심입니다."
   },
   {
-    url: "https://images.unsplash.com/photo-1433086966358-54859d0ed716",
-    alt: "폭포",
-    title: "변화의 흐름",
-    message: "지식은 폭포처럼 끊임없이 흐릅니다. 그 흐름에 몸을 맡기고 배움의 여정을 즐기세요. 당신의 성장에는 끝이 없습니다."
+    url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+    alt: "팀워크",
+    title: "지속적 성장",
+    message: "개발은 끊임없는 학습의 연속입니다. 오늘 배운 것을 내일 적용하고, 매일 조금씩 성장해 나가는 과정을 즐기세요. 작은 성취가 모여 큰 성공이 됩니다."
   },
   {
-    url: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9",
-    alt: "높은 나무들",
-    title: "성장의 높이",
-    message: "거대한 나무도 작은 씨앗에서 시작합니다. 오늘의 작은 학습이 내일의 큰 성취로 이어집니다. 꾸준함이 성공의 열쇠입니다."
+    url: "https://images.unsplash.com/photo-1531482615713-2afd69097998",
+    alt: "등반하는 사람",
+    title: "도전의 가치",
+    message: "어려움을 극복할 때 진정한 성장이 이루어집니다. 당장은 힘들더라도, 그 과정에서 얻는 경험과 지식은 평생의 자산이 됩니다. 포기하지 말고 계속 도전하세요."
   },
   {
-    url: "https://images.unsplash.com/photo-1518495973542-4542c06a5843",
-    alt: "숲 속 빛",
-    title: "통찰의 빛",
-    message: "어둠 속에서도 빛은 언제나 존재합니다. 문제에 막혀 있을 때에도 해결책은 분명히 있으니, 포기하지 말고 계속 도전하세요."
+    url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+    alt: "밤늦게 코딩",
+    title: "열정의 시간",
+    message: "열정은 모든 위대한 성취의 시작점입니다. 자신이 진정으로 좋아하는 일을 찾고, 그 안에서 기쁨을 발견하세요. 열정이 있다면 밤샘 코딩도 즐거운 여정이 됩니다."
   },
   {
-    url: "https://images.unsplash.com/photo-1472396961693-142e6e269027",
-    alt: "산 속의 사슴",
-    title: "자연스러운 배움",
-    message: "배움은 자연의 일부입니다. 스스로의 속도로 성장하며, 자신만의 고유한 길을 발견하세요. 남들과 비교하지 말고 자신의 여정을 즐기세요."
+    url: "https://images.unsplash.com/photo-1552664730-d307ca884978",
+    alt: "프레젠테이션",
+    title: "지식의 공유",
+    message: "배움은 나눌 때 더 큰 가치가 있습니다. 자신이 알게 된 것을 다른 사람과 공유하며 함께 성장해 나가세요. 가르치는 과정에서 더 깊이 이해할 수 있습니다."
   },
   {
-    url: "https://images.unsplash.com/photo-1616071264373-d9c2f3d0f690",
-    alt: "일본 사원 입구",
-    title: "지혜의 문",
-    message: "교육은 새로운 세계로 향하는 문을 여는 열쇠입니다. 지식을 통해 당신이 상상하지 못했던 가능성의 세계로 발걸음을 내딛으세요."
+    url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac",
+    alt: "성취의 기쁨",
+    title: "성취의 즐거움",
+    message: "목표를 달성했을 때의 성취감은 그 어떤 것과도 비교할 수 없습니다. 작은 승리를 축하하고, 그 기쁨을 원동력 삼아 더 높은 곳을 향해 나아가세요."
   }
 ];
 
@@ -71,7 +71,7 @@ const Gallery: React.FC = () => {
           {motivationImages.map((image, index) => (
             <div 
               key={index} 
-              className="img-hover-zoom opacity-0 shadow-lg cursor-pointer" 
+              className="img-hover-zoom opacity-0 shadow-lg cursor-pointer rounded-lg overflow-hidden" 
               style={{ 
                 animation: 'fade-in 1s ease-out forwards',
                 animationDelay: `${0.15 * index}s` 

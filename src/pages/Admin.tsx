@@ -9,12 +9,9 @@ import CourseManagement from '@/components/admin/CourseManagement';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Admin: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('instructors');
-
-  // 관리자 검증 (실제로는 백엔드 권한 검증이 필요함)
-  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     // URL 경로에서 현재 탭 확인
@@ -38,9 +35,14 @@ const Admin: React.FC = () => {
             <p className="text-ghibli-stone mb-6 korean-text">
               관리자 계정으로 로그인해야 이 페이지에 접근할 수 있습니다.
             </p>
-            <Link to="/" className="btn-primary korean-text">
-              홈으로 돌아가기
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/" className="btn-secondary korean-text">
+                홈으로 돌아가기
+              </Link>
+              <Link to="/login" className="btn-primary korean-text">
+                관리자 로그인하기
+              </Link>
+            </div>
           </div>
         </main>
         <Footer />
