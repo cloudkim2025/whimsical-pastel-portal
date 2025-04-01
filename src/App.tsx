@@ -19,6 +19,7 @@ import TopCourses from "./pages/TopCourses";
 import CourseUpload from "./pages/CourseUpload";
 import InstructorApply from "./pages/InstructorApply";
 import Admin from "./pages/Admin";
+import PaymentHistory from "./pages/PaymentHistory";
 import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/course-upload" element={<CourseUpload />} />
             <Route path="/instructor-apply" element={<InstructorApply />} />
             <Route path="/admin/*" element={<Admin />} />
+            <Route path="/payment-history" element={<PaymentHistory />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

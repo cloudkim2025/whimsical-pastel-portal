@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Mail, Home } from 'lucide-react';
+import { authAPI } from '@/services/api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login, loginWithSocialMedia } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,20 +21,38 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      await login(email, password);
-      navigate('/');
+      // API를 통한 로그인 요청
+      const response = await authAPI.login(email, password);
+      
+      if (response.data.loggedIn && response.data.accessToken) {
+        // 토큰을 로컬 스토리지에 저장
+        localStorage.setItem('accessToken', response.data.accessToken);
+        
+        // auth context 업데이트
+        await login(email, password);
+        
+        toast.success('로그인 성공!');
+        navigate('/');
+      } else {
+        toast.error('로그인에 실패했습니다.');
+      }
     } catch (error) {
-      // Error is already handled in the login function
       console.error('Login failed:', error);
+      toast.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSocialLogin = (provider: 'google' | 'naver' | 'kakao') => {
-    loginWithSocialMedia(provider);
-    // Redirect will happen after successful login via context effect
-    setTimeout(() => navigate('/'), 1500);
+    if (provider === 'naver') {
+      // 네이버 로그인의 경우 리다이렉션 방식 사용
+      window.location.href = '/oauth2/authorization/naver';
+    } else {
+      // 기존 로직 유지 (소셜 로그인 데모)
+      toast.info(`${provider} 로그인 준비 중...`);
+      setTimeout(() => navigate('/'), 1500);
+    }
   };
 
   return (

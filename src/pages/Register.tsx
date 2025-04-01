@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Mail, Home, Check } from 'lucide-react';
 import EmailVerificationModal from '@/components/EmailVerificationModal';
+import { authAPI } from '@/services/api';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +18,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -79,11 +81,22 @@ const Register = () => {
     return isValid;
   };
 
-  const handleSendVerificationCode = () => {
+  const handleSendVerificationCode = async () => {
     if (validateEmail()) {
-      // In real app, this would make an API call to send verification code
-      toast.success(`${email}로 인증코드가 발송되었습니다.`);
-      setIsVerificationModalOpen(true);
+      try {
+        setIsSendingCode(true);
+        
+        // 실제 API 호출로 인증 코드 발송
+        const response = await authAPI.sendVerificationCode(email);
+        
+        toast.success(`${email}로 인증코드가 발송되었습니다.`);
+        setIsVerificationModalOpen(true);
+      } catch (error) {
+        console.error('Failed to send verification code:', error);
+        toast.error('인증 코드 발송에 실패했습니다.');
+      } finally {
+        setIsSendingCode(false);
+      }
     }
   };
   
@@ -104,12 +117,18 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      await register(email, password, nickname);
-      toast.success('회원가입에 성공했습니다!');
-      navigate('/');
-    } catch (error) {
+      // API를 통한 회원가입 요청
+      const response = await authAPI.register(email, password, nickname);
+      
+      if (response.data.isSuccess) {
+        toast.success(response.data.message || '회원가입에 성공했습니다!');
+        navigate('/login');
+      } else {
+        toast.error(response.data.message || '회원가입에 실패했습니다.');
+      }
+    } catch (error: any) {
       console.error('Registration failed:', error);
-      // Error is already handled in the register function
+      toast.error(error.response?.data?.message || '회원가입에 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -149,20 +168,22 @@ const Register = () => {
                   required
                   disabled={isEmailVerified}
                   className={`border-ghibli-meadow/50 focus:border-ghibli-forest focus:ring focus:ring-ghibli-meadow/30 ${
-                    errors.email ? 'border-red-500' : ''
+                    errors.email ? 'border-red-500' : isEmailVerified ? 'border-green-500' : ''
                   }`}
                 />
                 <Button
                   type="button"
                   onClick={handleSendVerificationCode}
-                  disabled={isEmailVerified}
+                  disabled={isEmailVerified || isSendingCode}
                   className={`px-3 whitespace-nowrap ${
                     isEmailVerified
                       ? 'bg-green-500 hover:bg-green-600'
                       : 'bg-ghibli-meadow hover:bg-ghibli-forest'
                   }`}
                 >
-                  {isEmailVerified ? (
+                  {isSendingCode ? (
+                    '발송중...'
+                  ) : isEmailVerified ? (
                     <>
                       <Check className="h-4 w-4 mr-1" /> 인증됨
                     </>

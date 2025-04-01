@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { authAPI } from '@/services/api';
+import { toast } from 'sonner';
 
 interface EmailVerificationModalProps {
   isOpen: boolean;
@@ -26,7 +28,6 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
   const [verificationCode, setVerificationCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
-  const [mockCode] = useState("123456"); // In a real app, this would be generated on the backend
   
   useEffect(() => {
     // Reset state when modal opens
@@ -36,20 +37,26 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
     }
   }, [isOpen]);
   
-  const handleVerify = () => {
+  const handleVerify = async () => {
     setIsVerifying(true);
     setError("");
     
-    // Simulate API verification delay
-    setTimeout(() => {
-      if (verificationCode === mockCode) {
+    try {
+      const response = await authAPI.verifyCode(email, verificationCode);
+      
+      if (response.data) {
+        toast.success('이메일이 성공적으로 인증되었습니다.');
         onVerify(true);
         onClose();
       } else {
         setError("코드를 다시 확인해주세요");
       }
+    } catch (error) {
+      setError("인증에 실패했습니다. 다시 시도해주세요.");
+      toast.error('인증 코드 확인에 실패했습니다.');
+    } finally {
       setIsVerifying(false);
-    }, 1000);
+    }
   };
 
   return (

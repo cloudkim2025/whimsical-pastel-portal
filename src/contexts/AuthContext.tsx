@@ -1,6 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "sonner";
+import { authAPI } from '@/services/api';
+import { decodeToken, getUserRole, isAuthenticated, logout as authLogout } from '@/utils/auth';
 
 // Define types for user and authentication context
 export type User = {
@@ -8,7 +10,7 @@ export type User = {
   email: string;
   nickname: string;
   avatar?: string;
-  role?: 'student' | 'instructor' | 'admin';
+  role?: 'ADMIN' | 'INSTRUCTOR' | 'USER';
 };
 
 type AuthContextType = {
@@ -17,17 +19,13 @@ type AuthContextType = {
   isInstructor: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, nickname: string, role?: 'student' | 'instructor') => Promise<void>;
+  register: (email: string, password: string, nickname: string, role?: 'USER' | 'INSTRUCTOR') => Promise<void>;
   logout: () => void;
   loginWithSocialMedia: (provider: 'google' | 'naver' | 'kakao') => void;
 };
 
 // Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Admin credentials
-const ADMIN_EMAIL = 'admin@naver.com';
-const ADMIN_PASSWORD = '123456';
 
 // Provider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -36,92 +34,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isInstructor, setIsInstructor] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-  // Check if user is already logged in (from localStorage)
+  // Check if user is already logged in (from token)
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setIsAuthenticated(true);
-      setIsInstructor(parsedUser.role === 'instructor' || parsedUser.role === 'admin');
-      setIsAdmin(parsedUser.role === 'admin');
+    const token = localStorage.getItem('accessToken');
+    if (token && isAuthenticated) {
+      const decodedToken = decodeToken(token);
+      if (decodedToken) {
+        setUser({
+          id: decodedToken.sub || '',
+          email: decodedToken.email || '',
+          nickname: decodedToken.nickname || '',
+          role: decodedToken.role
+        });
+        setIsAuthenticated(true);
+        setIsInstructor(['INSTRUCTOR', 'ADMIN'].includes(decodedToken.role));
+        setIsAdmin(decodedToken.role === 'ADMIN');
+      }
     }
   }, []);
 
-  // Mock login function
+  // 실제 API 로그인 함수
   const login = async (email: string, password: string) => {
     try {
-      // Admin login check
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        const adminUser: User = {
-          id: 'admin-123',
-          email: ADMIN_EMAIL,
-          nickname: '관리자',
-          avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
-          role: 'admin'
-        };
-        
-        setUser(adminUser);
-        setIsAuthenticated(true);
-        setIsInstructor(true);
-        setIsAdmin(true);
-        localStorage.setItem('user', JSON.stringify(adminUser));
-        toast.success("관리자 계정으로 로그인 성공!");
-        return;
-      }
+      // API 로그인 시도
+      const response = await authAPI.login(email, password);
       
-      // Regular user login
-      if (email && password) {
-        // 특정 이메일은 강사로 설정 (데모용)
-        const isInstructorEmail = email.includes('instructor') || email.includes('teacher');
+      if (response.data.loggedIn && response.data.accessToken) {
+        const token = response.data.accessToken;
+        localStorage.setItem('accessToken', token);
         
-        const mockUser: User = {
-          id: '123',
-          email,
-          nickname: email.split('@')[0], // Use part of email as nickname
-          avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + email,
-          role: isInstructorEmail ? 'instructor' : 'student'
-        };
+        // 토큰 디코딩
+        const decodedToken = decodeToken(token);
         
-        setUser(mockUser);
-        setIsAuthenticated(true);
-        setIsInstructor(isInstructorEmail);
-        setIsAdmin(false);
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        toast.success("로그인 성공!");
-        return;
+        if (decodedToken) {
+          const userRole = decodedToken.role;
+          
+          const user: User = {
+            id: decodedToken.sub || '',
+            email: decodedToken.email || email,
+            nickname: decodedToken.nickname || email.split('@')[0],
+            role: userRole
+          };
+          
+          setUser(user);
+          setIsAuthenticated(true);
+          setIsInstructor(['INSTRUCTOR', 'ADMIN'].includes(userRole));
+          setIsAdmin(userRole === 'ADMIN');
+          toast.success("로그인 성공!");
+        }
+      } else {
+        throw new Error('로그인 정보가 올바르지 않습니다.');
       }
-      throw new Error('로그인 정보가 올바르지 않습니다.');
     } catch (error) {
       toast.error("로그인에 실패했습니다.");
       throw error;
     }
   };
 
-  // Mock register function
-  const register = async (email: string, password: string, nickname: string, role: 'student' | 'instructor' = 'student') => {
+  // 회원가입 함수
+  const register = async (email: string, password: string, nickname: string, role: 'USER' | 'INSTRUCTOR' = 'USER') => {
     try {
-      // Block registration with admin email
-      if (email === ADMIN_EMAIL) {
-        toast.error("이 이메일은 사용할 수 없습니다.");
-        throw new Error("이 이메일은 사용할 수 없습니다.");
+      // API 회원가입 시도
+      const response = await authAPI.register(email, password, nickname, role);
+      
+      if (response.data.isSuccess) {
+        toast.success(response.data.message || "회원가입 성공!");
+      } else {
+        toast.error(response.data.message || "회원가입에 실패했습니다.");
+        throw new Error(response.data.message || "회원가입에 실패했습니다.");
       }
-      
-      // Mock successful registration
-      const mockUser: User = {
-        id: '123',
-        email,
-        nickname,
-        avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + email,
-        role
-      };
-      
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      setIsInstructor(role === 'instructor');
-      setIsAdmin(false);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      toast.success("회원가입 성공!");
     } catch (error) {
       toast.error("회원가입에 실패했습니다.");
       throw error;
@@ -130,39 +111,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Logout function
   const logout = () => {
+    authLogout();
     setUser(null);
     setIsAuthenticated(false);
     setIsInstructor(false);
     setIsAdmin(false);
-    localStorage.removeItem('user');
     toast.info("로그아웃 되었습니다.");
   };
 
-  // Mock social media login
+  // 소셜 로그인
   const loginWithSocialMedia = (provider: 'google' | 'naver' | 'kakao') => {
-    // In a real app, you would redirect to OAuth flow
-    toast.info(`${provider} 로그인 준비 중...`);
-    
-    // Mock successful social login after a delay
-    setTimeout(() => {
-      // Kakao 로그인은 강사로 설정 (데모용)
-      const isInstructor = provider === 'kakao';
+    if (provider === 'naver') {
+      // 네이버 로그인 리다이렉션
+      window.location.href = '/oauth2/authorization/naver';
+    } else {
+      // 기타 소셜 로그인 (데모)
+      toast.info(`${provider} 로그인 준비 중...`);
       
-      const mockUser: User = {
-        id: '456',
-        email: `user@${provider}.com`,
-        nickname: `${provider}User`,
-        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${provider}`,
-        role: isInstructor ? 'instructor' : 'student'
-      };
-      
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      setIsInstructor(isInstructor);
-      setIsAdmin(false);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      toast.success(`${provider} 로그인 성공!`);
-    }, 1000);
+      // 데모 소셜 로그인 (실제로는 제거하고 리다이렉션만 처리)
+      setTimeout(() => {
+        const mockToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NTYiLCJlbWFpbCI6InVzZXJAJHtwcm92aWRlcn0uY29tIiwibmlja25hbWUiOiIke3Byb3ZpZGVyfVVzZXIiLCJyb2xlIjoiVVNFUiIsImV4cCI6MTkxNjIzOTAyMn0.NIP6oGJVsls-D-J8JmsCFXEUxsNGBzUYlwPjouvQVm0`;
+        localStorage.setItem('accessToken', mockToken);
+        
+        const user: User = {
+          id: '456',
+          email: `user@${provider}.com`,
+          nickname: `${provider}User`,
+          role: provider === 'kakao' ? 'INSTRUCTOR' : 'USER'
+        };
+        
+        setUser(user);
+        setIsAuthenticated(true);
+        setIsInstructor(provider === 'kakao');
+        setIsAdmin(false);
+        toast.success(`${provider} 로그인 성공!`);
+      }, 1000);
+    }
   };
 
   const value = {
