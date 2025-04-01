@@ -101,16 +101,10 @@ const Profile = () => {
                     <CardTitle className="text-xl text-ghibli-forest">{user.nickname}</CardTitle>
                     <CardDescription className="text-ghibli-stone">{user.email}</CardDescription>
                     
-                    {user.role === 'admin' && (
-                      <Link to="/admin" className="mt-4 inline-flex items-center gap-2 text-ghibli-forest hover:text-ghibli-meadow transition-colors">
-                        <Button
-                          variant="outline"
-                          className="w-full border-ghibli-meadow text-ghibli-forest hover:bg-ghibli-meadow/10 hover:text-ghibli-forest mt-2"
-                        >
-                          <LayoutDashboard className="h-4 w-4 mr-2" />
-                          관리자 대시보드
-                        </Button>
-                      </Link>
+                    {user.role === "ADMIN" && (
+                      <Button variant="outline" onClick={() => navigate('/admin')}>
+                        관리자 페이지
+                      </Button>
                     )}
                   </CardHeader>
                   <CardFooter>
