@@ -1,18 +1,22 @@
 
 import React, { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation();
   const [isVisible, setIsVisible] = useState(false);
 
+  // Effect for scroll to top button visibility
   const toggleVisibility = () => {
-    if (window.pageYOffset > 300) {
+    if (window.scrollY > 300) {
       setIsVisible(true);
     } else {
       setIsVisible(false);
     }
   };
 
+  // Manual scroll to top function for the button
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -20,6 +24,12 @@ const ScrollToTop: React.FC = () => {
     });
   };
 
+  // Effect to scroll to top when the route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  // Effect for scroll button visibility
   useEffect(() => {
     window.addEventListener('scroll', toggleVisibility);
     return () => {
