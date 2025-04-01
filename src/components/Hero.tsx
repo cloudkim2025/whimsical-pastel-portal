@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ArrowDown, BookOpen } from 'lucide-react';
-import { Link } from 'react-scroll';
+import { Link as ScrollLink } from 'react-scroll';
 
 const Hero: React.FC = () => {
   return (
@@ -25,12 +25,12 @@ const Hero: React.FC = () => {
             새로운 기술을 배우는 가장 효율적인 방법을 경험해보세요.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 animate-slide-up opacity-0" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
-            <Link to="features" smooth={true} duration={500} className="btn-primary flex items-center gap-2 cursor-pointer">
+            <ScrollLink to="features" smooth={true} duration={500} className="btn-primary flex items-center gap-2 cursor-pointer">
               <span className="korean-text">왜 선택해야 할까요</span> <ArrowDown className="h-4 w-4" />
-            </Link>
-            <Link to="motivation" smooth={true} duration={500} className="btn-secondary flex items-center gap-2 cursor-pointer">
+            </ScrollLink>
+            <ScrollLink to="motivation" smooth={true} duration={500} className="btn-secondary flex items-center gap-2 cursor-pointer">
               <span className="korean-text">동기부여 갤러리</span> <BookOpen className="h-4 w-4" />
-            </Link>
+            </ScrollLink>
           </div>
         </div>
         
