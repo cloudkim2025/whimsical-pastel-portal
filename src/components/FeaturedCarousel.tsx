@@ -180,7 +180,7 @@ const FeaturedCarousel: React.FC = () => {
         </div>
       </div>
       
-      <div className="absolute top-1/2 -translate-y-1/2 left-4 right-4 flex justify-between z-20">
+      <div className="absolute top-1/2 -translate-y-1/2 flex justify-between w-full z-20 px-4">
         <Button
           variant="outline"
           size="icon"

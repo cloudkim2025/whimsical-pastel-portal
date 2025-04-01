@@ -19,7 +19,9 @@ const Index = () => {
       <Hero />
       <div className="container mx-auto px-4 md:px-6">
         <FeaturedCarousel />
-        <CategoryNav />
+        <div className="py-12">
+          <CategoryNav />
+        </div>
         <PopularCoursesCarousel />
       </div>
       <div className="container mx-auto px-4 md:px-6 mt-8">
@@ -28,9 +30,9 @@ const Index = () => {
       <div className="container mx-auto px-4 md:px-6">
         <ClassSections />
       </div>
-      <Features />
       <InstructorRecruitment />
       <Gallery />
+      <Features />
       <Footer />
     </div>
   );
