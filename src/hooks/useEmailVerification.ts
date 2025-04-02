@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { authAPI } from '@/services/api';
+import { authAPI } from '@/api/auth';
 
 interface UseEmailVerificationReturn {
   email: string;
