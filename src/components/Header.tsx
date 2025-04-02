@@ -56,7 +56,7 @@ const Header: React.FC = () => {
         <nav className="hidden md:flex items-center space-x-8">
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/dev-lectures" className="nav-link">개발강의</Link>
-          <Link to="/ai-courses" className="nav-link">AI 강의</Link>
+          <Link to="/ai-lectures" className="nav-link">AI 강의</Link>
           <Link to="/company-info" className="nav-link">회사정보</Link>
           
           {isAuthenticated ? (
@@ -149,7 +149,7 @@ const Header: React.FC = () => {
         <nav className="container mx-auto px-6 py-6 flex flex-col space-y-4">
           <Link to="/" className="nav-link text-lg py-2">Home</Link>
           <Link to="/dev-lectures" className="nav-link text-lg py-2">개발강의</Link>
-          <Link to="/ai-courses" className="nav-link text-lg py-2">AI 강의</Link>
+          <Link to="/ai-lectures" className="nav-link text-lg py-2">AI 강의</Link>
           <Link to="/company-info" className="nav-link text-lg py-2">회사정보</Link>
           
           {isAuthenticated ? (
