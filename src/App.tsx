@@ -14,7 +14,7 @@ import DevCourses from "./pages/DevCourses"; // Updated path
 import AICourses from "./pages/AICourses"; // Updated path
 import CompanyInfo from "./pages/CompanyInfo";
 import CourseDetail from "./pages/CourseDetail"; // Updated path
-import Checkout from "./pages/payment/PaymentHistory"; // Updated path
+import Checkout from "./pages/payment/Checkout"; // Updated to use our new Checkout component
 import TopCourses from "./pages/TopCourses"; // Updated path
 import CourseUpload from "./pages/CourseUpload"; // Updated path
 import InstructorApply from "./pages/instructor/InstructorApply";
