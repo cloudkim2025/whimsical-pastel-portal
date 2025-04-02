@@ -21,7 +21,7 @@ export const usePayment = ({ courseId }: UsePaymentProps) => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // 결제 성공 시 백엔드로 결제 정보 저장
-      await paymentAPI.processPayment({
+      await paymentAPI.savePayment({
         courseId,
         paymentMethod: 'KAKAO_PAY',
         amount: parseInt(course.price.replace(/,/g, '')),
