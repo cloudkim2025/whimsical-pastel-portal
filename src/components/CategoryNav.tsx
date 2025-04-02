@@ -83,9 +83,9 @@ const CategoryNav: React.FC = () => {
   
   const handleCategoryClick = (categoryId: string) => {
     if (categoryId === 'ai') {
-      navigate('/ai-courses');
+      navigate('/ai-lectures');  // Updated to match the correct route in App.tsx
     } else {
-      navigate('/dev-courses', { state: { selectedCategory: categoryId } });
+      navigate('/dev-lectures', { state: { selectedCategory: categoryId } });
     }
   };
   
