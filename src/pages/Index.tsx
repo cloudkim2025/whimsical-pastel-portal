@@ -5,9 +5,9 @@ import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import Gallery from '@/components/Gallery';
 import Footer from '@/components/Footer';
-import FeaturedCarousel from '@/components/FeaturedCarousel';
+import FeaturedLecturesCarousel from '@/components/FeaturedLecturesCarousel';
 import CategoryNav from '@/components/CategoryNav';
-import PopularCoursesCarousel from '@/components/PopularCoursesCarousel';
+import PopularLecturesCarousel from '@/components/PopularLecturesCarousel';
 import TutorShorts from '@/components/TutorShorts';
 import ClassSections from '@/components/ClassSections';
 import InstructorRecruitment from '@/components/InstructorRecruitment';
@@ -18,11 +18,11 @@ const Index = () => {
       <Header />
       <Hero />
       <div className="container mx-auto px-4 md:px-6">
-        <FeaturedCarousel />
+        <FeaturedLecturesCarousel />
         <div className="py-12">
           <CategoryNav />
         </div>
-        <PopularCoursesCarousel />
+        <PopularLecturesCarousel />
       </div>
       <div className="container mx-auto px-4 md:px-6 mt-8">
         <TutorShorts />

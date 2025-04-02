@@ -5,8 +5,8 @@ import { Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-// Mock featured courses data
-const featuredCourses = [
+// Mock featured lectures data
+const featuredLectures = [
   {
     id: 'featured-1',
     title: '현직자와 함께하는 웹 개발 완전 정복',
@@ -54,17 +54,17 @@ const featuredCourses = [
   },
 ];
 
-const FeaturedCarousel: React.FC = () => {
+const FeaturedLecturesCarousel: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % featuredCourses.length);
+    setCurrentSlide((prev) => (prev + 1) % featuredLectures.length);
   }, []);
   
   const prevSlide = () => {
     setCurrentSlide((prev) => 
-      prev === 0 ? featuredCourses.length - 1 : prev - 1
+      prev === 0 ? featuredLectures.length - 1 : prev - 1
     );
   };
   
@@ -88,10 +88,10 @@ const FeaturedCarousel: React.FC = () => {
       <div className="absolute inset-0 bg-pattern-dots opacity-10 z-0" />
       
       <AnimatePresence mode="wait">
-        {featuredCourses.map((course, index) => (
+        {featuredLectures.map((lecture, index) => (
           currentSlide === index && (
             <motion.div
-              key={course.id}
+              key={lecture.id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -101,10 +101,10 @@ const FeaturedCarousel: React.FC = () => {
               <div className="md:w-1/2 w-full h-full p-6 md:p-12 flex flex-col justify-center z-10">
                 <span className="px-3 py-1 bg-ghibli-forest text-white rounded-full inline-block mb-4 w-fit">인기 강의</span>
                 <h2 className="text-2xl md:text-4xl font-bold text-ghibli-midnight mb-4">
-                  {course.title}
+                  {lecture.title}
                 </h2>
                 <p className="text-ghibli-stone mb-6 md:text-lg">
-                  {course.description}
+                  {lecture.description}
                 </p>
                 <div className="flex items-center mb-6">
                   <div className="flex">
@@ -112,7 +112,7 @@ const FeaturedCarousel: React.FC = () => {
                       <svg
                         key={i}
                         className={`w-5 h-5 ${
-                          i < Math.floor(course.rating)
+                          i < Math.floor(lecture.rating)
                             ? "text-yellow-400 fill-yellow-400"
                             : "text-gray-300 fill-gray-300"
                         }`}
@@ -124,22 +124,22 @@ const FeaturedCarousel: React.FC = () => {
                     ))}
                   </div>
                   <span className="ml-2 text-ghibli-stone">
-                    {course.rating.toFixed(1)}
+                    {lecture.rating.toFixed(1)}
                   </span>
                   <span className="mx-2 text-ghibli-stone">•</span>
                   <span className="font-bold text-ghibli-midnight">
-                    ₩{course.price}
+                    ₩{lecture.price}
                   </span>
                 </div>
                 <div className="flex gap-4">
                   <Link
-                    to={`/course/${course.id}`}
+                    to={`/lecture/${lecture.id}`}
                     className="px-6 py-3 bg-ghibli-meadow hover:bg-ghibli-forest text-white rounded-full transition-colors"
                   >
                     강의 보기
                   </Link>
                   <Link
-                    to={`/course/${course.id}`}
+                    to={`/lecture/${lecture.id}`}
                     className="px-6 py-3 border border-ghibli-meadow text-ghibli-forest hover:bg-ghibli-cloud rounded-full transition-colors"
                   >
                     더 알아보기
@@ -149,8 +149,8 @@ const FeaturedCarousel: React.FC = () => {
               <div className="md:w-1/2 w-full h-64 md:h-full relative">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <img
-                    src={course.image}
-                    alt={course.title}
+                    src={lecture.image}
+                    alt={lecture.title}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
@@ -176,7 +176,7 @@ const FeaturedCarousel: React.FC = () => {
           )}
         </Button>
         <div className="text-sm text-ghibli-midnight bg-white/70 backdrop-blur-sm px-3 py-1 rounded-full">
-          {currentSlide + 1}/{featuredCourses.length}
+          {currentSlide + 1}/{featuredLectures.length}
         </div>
       </div>
       
@@ -202,4 +202,4 @@ const FeaturedCarousel: React.FC = () => {
   );
 };
 
-export default FeaturedCarousel;
+export default FeaturedLecturesCarousel;

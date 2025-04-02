@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, Heart, BookmarkPlus, Bot, Cpu, Code, Database, Video, Palette } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Footer from '@/components/Footer';
 
 // Mock categories and lectures data
 const categories = [
@@ -161,6 +162,7 @@ const AILectures: React.FC = () => {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

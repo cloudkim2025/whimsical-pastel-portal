@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { List, ListItem } from 'lucide-react';
+import { List } from 'lucide-react';
 
 interface CurriculumPreviewProps {
   curriculum: string[];
