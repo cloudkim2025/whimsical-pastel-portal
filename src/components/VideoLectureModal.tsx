@@ -84,6 +84,18 @@ const VideoLectureModal: React.FC<VideoLectureModalProps> = ({ isOpen, onClose, 
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
+  // Safely get the curriculum for the current lecture
+  const getLectureCurriculum = () => {
+    // Make sure course and course.lectureContent exist before accessing them
+    if (!course || !course.lectureContent) {
+      return [];
+    }
+    return course.lectureContent;
+  };
+
+  // Use safer access to curriculum data
+  const curriculum = getLectureCurriculum();
+
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
       <DialogContent className="max-w-6xl p-0 h-[80vh] overflow-hidden">
@@ -174,27 +186,37 @@ const VideoLectureModal: React.FC<VideoLectureModalProps> = ({ isOpen, onClose, 
             {/* Curriculum */}
             <div className="h-[45%] overflow-y-auto bg-white p-4">
               <div className="space-y-2">
-                {course?.curriculum?.map((section: any, sectionIndex: number) => (
-                  <div key={sectionIndex} className="mb-4">
-                    <h4 className="text-sm font-medium mb-2">{section.title}</h4>
-                    {section.lectures.map((lecture: string, lectureIndex: number) => {
-                      const globalLectureIndex = course.curriculum.slice(0, sectionIndex).reduce(
-                        (acc: number, s: any) => acc + s.lectures.length, 0
-                      ) + lectureIndex;
-                      
-                      return (
-                        <Button 
-                          key={lectureIndex}
-                          variant={currentLecture === globalLectureIndex ? "default" : "outline"}
-                          className={`w-full justify-start text-left mb-1 ${currentLecture === globalLectureIndex ? 'bg-ghibli-meadow text-white' : 'text-ghibli-midnight'}`}
-                          onClick={() => setCurrentLecture(globalLectureIndex)}
-                        >
-                          <span className="truncate">{lecture}</span>
-                        </Button>
-                      );
-                    })}
+                {curriculum && curriculum.length > 0 ? (
+                  curriculum.map((section: any, sectionIndex: number) => (
+                    <div key={sectionIndex} className="mb-4">
+                      <h4 className="text-sm font-medium mb-2">{section.title}</h4>
+                      {section.lectures && section.lectures.length > 0 ? (
+                        section.lectures.map((lecture: string, lectureIndex: number) => {
+                          const globalLectureIndex = curriculum
+                            .slice(0, sectionIndex)
+                            .reduce((acc: number, s: any) => acc + (s.lectures?.length || 0), 0) + lectureIndex;
+                          
+                          return (
+                            <Button 
+                              key={lectureIndex}
+                              variant={currentLecture === globalLectureIndex ? "default" : "outline"}
+                              className={`w-full justify-start text-left mb-1 ${currentLecture === globalLectureIndex ? 'bg-ghibli-meadow text-white' : 'text-ghibli-midnight'}`}
+                              onClick={() => setCurrentLecture(globalLectureIndex)}
+                            >
+                              <span className="truncate">{lecture}</span>
+                            </Button>
+                          );
+                        })
+                      ) : (
+                        <p className="text-sm text-gray-500">No lectures available</p>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500">No curriculum available</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
             
