@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -100,7 +101,7 @@ const PaymentHistory = () => {
               {payments.map((payment) => (
                 <Card key={payment.id} className="overflow-hidden">
                   <CardHeader className="pb-4">
-                    <CardTitle className="text-lg">{payment.courseName}</CardTitle>
+                    <CardTitle className="text-lg">{payment.lectureName}</CardTitle>
                     <CardDescription>주문번호: {payment.id}</CardDescription>
                   </CardHeader>
                   <CardContent className="pb-4">
@@ -124,7 +125,7 @@ const PaymentHistory = () => {
                   </CardContent>
                   <CardFooter className="pt-0">
                     <Button 
-                      onClick={() => navigate(`/course/${payment.courseId}`)}
+                      onClick={() => navigate(`/lecture/${payment.lectureId}`)}
                       variant="outline" 
                       className="w-full"
                     >
