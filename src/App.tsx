@@ -8,17 +8,17 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import Profile from "./pages/auth/Profile";
+import Profile from "./pages/Profile"; // Updated path
 import NotFound from "./pages/NotFound";
-import DevCourses from "./pages/courses/DevCourses";
-import AICourses from "./pages/courses/AICourses";
+import DevCourses from "./pages/DevCourses"; // Updated path
+import AICourses from "./pages/AICourses"; // Updated path
 import CompanyInfo from "./pages/CompanyInfo";
-import CourseDetail from "./pages/courses/CourseDetail";
-import Checkout from "./pages/payment/Checkout";
-import TopCourses from "./pages/courses/TopCourses";
-import CourseUpload from "./pages/instructor/CourseUpload";
+import CourseDetail from "./pages/CourseDetail"; // Updated path
+import Checkout from "./pages/payment/PaymentHistory"; // Updated path
+import TopCourses from "./pages/TopCourses"; // Updated path
+import CourseUpload from "./pages/CourseUpload"; // Updated path
 import InstructorApply from "./pages/instructor/InstructorApply";
-import Admin from "./pages/admin/Admin";
+import Admin from "./pages/Admin"; // Updated path
 import PaymentHistory from "./pages/payment/PaymentHistory";
 import ScrollToTop from "./components/ScrollToTop";
 
