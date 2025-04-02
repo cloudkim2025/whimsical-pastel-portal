@@ -26,7 +26,8 @@ const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoName, setVideoName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const { isAnalyzing, generateCurriculum, curriculum } = useAiCurriculum();
+  
+  const { curriculum, isAnalyzing, generateCurriculum } = useAiCurriculum();
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -107,7 +108,7 @@ const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="category" className="korean-text">강�� 카테고리</Label>
+          <Label htmlFor="category" className="korean-text">강의 카테고리</Label>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="카테고리 선택" />
