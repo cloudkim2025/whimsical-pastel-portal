@@ -136,7 +136,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose }) => {
                 {filteredCourses.map(course => (
                   <Link 
                     key={course.id}
-                    to={`/course/${course.id}`} 
+                    to={`/lecture/${course.id}`} 
                     className="flex items-start p-3 hover:bg-ghibli-cloud/30 transition-colors rounded-md"
                     onClick={() => setIsModalOpen(false)}
                   >
