@@ -111,7 +111,7 @@ const Checkout: React.FC = () => {
         name: course.title, // 강의 제목을 상품 이름으로
         amount: amount, // 강의 금액
         buyer_email: user?.email || "guest@example.com", // 구매자 정보
-        buyer_name: user?.name || "게스트",
+        buyer_name: user?.nickname || "게스트", // Fixed: Changed user?.name to user?.nickname
       },
       function (response: any) {
         // 성공했을 때 로직
