@@ -1,5 +1,5 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,10 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, UploadCloud } from 'lucide-react';
+import { Loader2, UploadCloud, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useAuth } from '@/contexts/AuthContext';
+import { lectureAPI } from '@/api/lecture';
 
 const categories = [
   { id: 'frontend', name: '프론트엔드' },
@@ -26,6 +29,8 @@ const categories = [
 
 const CourseUpload: React.FC = () => {
   const { toast } = useToast();
+  const { user, isInstructor } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [thumbnailImage, setThumbnailImage] = useState<File | null>(null);
@@ -36,6 +41,17 @@ const CourseUpload: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [generatedCurriculum, setGeneratedCurriculum] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!isInstructor) {
+      toast({
+        variant: "destructive",
+        title: "접근 권한 없음",
+        description: "강사 계정만 강의를 등록할 수 있습니다."
+      });
+      navigate('/');
+    }
+  }, [isInstructor, navigate, toast]);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -65,7 +81,6 @@ const CourseUpload: React.FC = () => {
 
     setIsAnalyzing(true);
 
-    // 시뮬레이션: 실제로는 서버에서 AI 분석을 수행할 것입니다
     setTimeout(() => {
       const fakeCurriculum = [
         "1. 강의 소개 및 환경 설정 (0:00 - 5:30)",
@@ -90,7 +105,6 @@ const CourseUpload: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 유효성 검사
     if (!name || !description || !category || !thumbnailImage || !videoFile) {
       toast({
         variant: "destructive",
@@ -103,33 +117,64 @@ const CourseUpload: React.FC = () => {
     setIsUploading(true);
     
     try {
-      // 여기서 실제 서버 API 호출 대신 성공 메시지 표시
-      setTimeout(() => {
-        toast({
-          title: "강의 업로드 완료",
-          description: "강의가 성공적으로 업로드되었습니다. 검토 후 게시됩니다."
-        });
-        
-        // 폼 초기화
-        setName('');
-        setDescription('');
-        setThumbnailImage(null);
-        setThumbnailPreview(null);
-        setCategory('');
-        setVideoFile(null);
-        setVideoName('');
-        setGeneratedCurriculum([]);
-        setIsUploading(false);
-      }, 2000);
+      const courseData = {
+        name,
+        description,
+        category,
+        curriculum: generatedCurriculum,
+        instructorId: user?.id
+      };
+      
+      await lectureAPI.createCourse(courseData);
+      
+      toast({
+        title: "강의 업로드 완료",
+        description: "강의가 성공적으로 업로드되었습니다. 검토 후 게시됩니다."
+      });
+      
+      setName('');
+      setDescription('');
+      setThumbnailImage(null);
+      setThumbnailPreview(null);
+      setCategory('');
+      setVideoFile(null);
+      setVideoName('');
+      setGeneratedCurriculum([]);
     } catch (error) {
       toast({
         variant: "destructive",
         title: "업로드 실패",
         description: "오류가 발생했습니다. 다시 시도해주세요."
       });
+    } finally {
       setIsUploading(false);
     }
   };
+
+  if (!isInstructor) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="max-w-md w-full p-6">
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>접근 권한 없음</AlertTitle>
+              <AlertDescription>
+                강의 등록은 강사 계정만 이용할 수 있습니다.
+                <div className="mt-4">
+                  <Button onClick={() => navigate('/')} variant="outline">
+                    홈으로 돌아가기
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -139,6 +184,7 @@ const CourseUpload: React.FC = () => {
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-ghibli-midnight mb-6" lang="ko">강의 등록</h1>
             <p className="text-ghibli-stone mb-8 korean-text">
+              {user?.nickname} 강사님, 새로운 강의를 등록해주세요.
               강의를 업로드하면 AI가 자동으로 영상을 분석하여 커리큘럼을 생성합니다. 
               업로드된 강의는 검토 후 승인되면 플랫폼에 공개됩니다.
             </p>

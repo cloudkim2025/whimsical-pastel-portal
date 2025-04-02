@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "sonner";
-import { authAPI } from '@/services/api';
+import { authAPI } from '@/api/auth';
 import { decodeToken, getUserRole, isAuthenticated, logout as authLogout } from '@/utils/auth';
 
 // Define types for user and authentication context
@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Check if user is already logged in (from token)
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if (token && isAuthenticated) {
+    if (token) {
       const decodedToken = decodeToken(token);
       if (decodedToken) {
         setUser({
@@ -80,7 +80,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setIsAuthenticated(true);
           setIsInstructor(['INSTRUCTOR', 'ADMIN'].includes(userRole));
           setIsAdmin(userRole === 'ADMIN');
-          toast.success("로그인 성공!");
+          
+          // 강사 또는 관리자 로그인 시 특별한 메시지 표시
+          if (userRole === 'INSTRUCTOR') {
+            toast.success("강사 계정으로 로그인 되었습니다!");
+          } else if (userRole === 'ADMIN') {
+            toast.success("관리자 계정으로 로그인 되었습니다!");
+          } else {
+            toast.success("로그인 성공!");
+          }
         }
       } else {
         throw new Error('로그인 정보가 올바르지 않습니다.');
