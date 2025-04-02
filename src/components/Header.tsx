@@ -25,7 +25,6 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
-  // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -54,10 +53,9 @@ const Header: React.FC = () => {
           </div>
         </div>
         
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <Link to="/" className="nav-link">Home</Link>
-          <Link to="/dev-courses" className="nav-link">개발강의</Link>
+          <Link to="/dev-lectures" className="nav-link">개발강의</Link>
           <Link to="/ai-courses" className="nav-link">AI 강의</Link>
           <Link to="/company-info" className="nav-link">회사정보</Link>
           
@@ -130,7 +128,6 @@ const Header: React.FC = () => {
           )}
         </nav>
         
-        {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center space-x-4">
           <button 
             className="text-ghibli-forest"
@@ -141,7 +138,6 @@ const Header: React.FC = () => {
         </div>
       </div>
       
-      {/* Mobile Navigation */}
       <div className={cn(
         'md:hidden fixed inset-x-0 bg-white/95 backdrop-blur-lg transition-all duration-300 ease-in-out transform shadow-lg',
         isMenuOpen ? 'top-[calc(100%)] opacity-100' : '-top-[400px] opacity-0'
@@ -152,7 +148,7 @@ const Header: React.FC = () => {
         
         <nav className="container mx-auto px-6 py-6 flex flex-col space-y-4">
           <Link to="/" className="nav-link text-lg py-2">Home</Link>
-          <Link to="/dev-courses" className="nav-link text-lg py-2">개발강의</Link>
+          <Link to="/dev-lectures" className="nav-link text-lg py-2">개발강의</Link>
           <Link to="/ai-courses" className="nav-link text-lg py-2">AI 강의</Link>
           <Link to="/company-info" className="nav-link text-lg py-2">회사정보</Link>
           

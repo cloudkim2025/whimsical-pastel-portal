@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Star, Heart, BookmarkPlus, PlusCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import Footer from '@/components/Footer';
 
 // Mock categories and lectures data
 const categories = [
@@ -123,7 +124,7 @@ const DevLectures: React.FC = () => {
                   </button>
                 </div>
                 <CardContent className="p-4">
-                  <Link to={`/lecture/${lecture.id}`}>
+                  <Link to={`/course/${lecture.id}`}>
                     <div className="mb-1">
                       <span className="px-2 py-1 text-xs font-medium bg-ghibli-cloud text-ghibli-forest rounded-full font-korean">
                         {categories.find(c => c.id === lecture.category)?.name}
@@ -159,6 +160,8 @@ const DevLectures: React.FC = () => {
           </Link>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 };

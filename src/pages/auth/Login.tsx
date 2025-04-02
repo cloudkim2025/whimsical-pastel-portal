@@ -88,7 +88,7 @@ const Login = () => {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-handwritten text-ghibli-forest mb-2">로그인</h1>
             <p className="text-ghibli-stone">
-              Studio Dreamscape에 오신 것을 환영합니다
+              Aigongbu에 오신 것을 환영합니다
             </p>
           </div>
 

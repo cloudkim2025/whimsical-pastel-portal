@@ -18,7 +18,7 @@ const Register = () => {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-handwritten text-ghibli-forest mb-2">회원가입</h1>
             <p className="text-ghibli-stone">
-              Studio Dreamscape의 여정을 함께해요
+              Aigongbu의 여정을 함께해요
             </p>
           </div>
 

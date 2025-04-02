@@ -8,17 +8,17 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import Profile from "./pages/Profile"; // Updated path
+import Profile from "./pages/Profile"; 
 import NotFound from "./pages/NotFound";
-import DevLectures from "./pages/DevLectures"; // Updated name
-import AICourses from "./pages/AICourses"; // Updated path
+import DevLectures from "./pages/lectures/DevLectures"; // Updated path
+import AICourses from "./pages/AICourses"; 
 import CompanyInfo from "./pages/CompanyInfo";
-import CourseDetail from "./pages/CourseDetail"; // Updated path
-import Checkout from "./pages/payment/Checkout"; // Updated to use our new Checkout component
-import TopLectures from "./pages/TopLectures"; // Updated name
-import LectureUpload from "./pages/LectureUpload"; // Updated name
+import CourseDetail from "./pages/CourseDetail"; 
+import Checkout from "./pages/payment/Checkout"; 
+import TopLectures from "./pages/lectures/TopLectures"; // Updated path
+import LectureUpload from "./pages/lectures/LectureUpload"; // Updated path
 import InstructorApply from "./pages/instructor/InstructorApply";
-import Admin from "./pages/Admin"; // Updated path
+import Admin from "./pages/admin/Admin"; // Updated path
 import PaymentHistory from "./pages/payment/PaymentHistory";
 import ScrollToTop from "./components/ScrollToTop";
 
