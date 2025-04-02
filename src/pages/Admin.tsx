@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InstructorManagement from '@/components/admin/InstructorManagement';
-import CourseManagement from '@/components/admin/CourseManagement';
+import LectureManagement from '@/components/admin/LectureManagement';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -21,8 +21,8 @@ const Admin: React.FC = () => {
   useEffect(() => {
     // URL 경로에서 현재 탭 확인
     const path = location.pathname.split('/').pop();
-    if (path === 'courses') {
-      setActiveTab('courses');
+    if (path === 'lectures') {
+      setActiveTab('lectures');
     } else {
       setActiveTab('instructors');
     }
@@ -77,15 +77,15 @@ const Admin: React.FC = () => {
               <TabsTrigger value="instructors" className="flex-1" asChild>
                 <Link to="/admin/instructors" className="korean-text w-full">강사 관리</Link>
               </TabsTrigger>
-              <TabsTrigger value="courses" className="flex-1" asChild>
-                <Link to="/admin/courses" className="korean-text w-full">강의 관리</Link>
+              <TabsTrigger value="lectures" className="flex-1" asChild>
+                <Link to="/admin/lectures" className="korean-text w-full">강의 관리</Link>
               </TabsTrigger>
             </TabsList>
             
             <Routes>
               <Route path="/" element={<Navigate to="instructors" replace />} />
               <Route path="instructors" element={<InstructorManagement />} />
-              <Route path="courses" element={<CourseManagement />} />
+              <Route path="lectures" element={<LectureManagement />} />
             </Routes>
           </Tabs>
         </div>
