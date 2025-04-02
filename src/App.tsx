@@ -10,15 +10,15 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Profile from "./pages/Profile"; 
 import NotFound from "./pages/NotFound";
-import DevLectures from "./pages/lectures/DevLectures"; // Updated path
-import AICourses from "./pages/AICourses"; 
+import DevLectures from "./pages/lectures/DevLectures"; 
+import AILectures from "./pages/lectures/AILectures"; 
 import CompanyInfo from "./pages/CompanyInfo";
-import CourseDetail from "./pages/CourseDetail"; 
+import LectureDetail from "./pages/lectures/LectureDetail"; 
 import Checkout from "./pages/payment/Checkout"; 
-import TopLectures from "./pages/lectures/TopLectures"; // Updated path
-import LectureUpload from "./pages/lectures/LectureUpload"; // Updated path
+import TopLectures from "./pages/lectures/TopLectures";
+import LectureUpload from "./pages/lectures/LectureUpload";
 import InstructorApply from "./pages/instructor/InstructorApply";
-import Admin from "./pages/admin/Admin"; // Updated path
+import Admin from "./pages/admin/Admin";
 import PaymentHistory from "./pages/payment/PaymentHistory";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -38,10 +38,10 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/dev-lectures" element={<DevLectures />} />
-            <Route path="/ai-courses" element={<AICourses />} />
+            <Route path="/ai-lectures" element={<AILectures />} />
             <Route path="/company-info" element={<CompanyInfo />} />
-            <Route path="/course/:courseId" element={<CourseDetail />} />
-            <Route path="/checkout/:courseId" element={<Checkout />} />
+            <Route path="/lecture/:lectureId" element={<LectureDetail />} />
+            <Route path="/checkout/:lectureId" element={<Checkout />} />
             <Route path="/top-lectures" element={<TopLectures />} />
             <Route path="/lecture-upload" element={<LectureUpload />} />
             <Route path="/instructor-apply" element={<InstructorApply />} />

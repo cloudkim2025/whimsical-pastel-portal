@@ -23,8 +23,8 @@ const loadPortoneScript = () => {
   };
 };
 
-// Mock course data (실제 앱에서는 API에서 데이터 가져옴)
-const getCourseData = (id: string) => ({
+// Mock lecture data (실제 앱에서는 API에서 데이터 가져옴)
+const getLectureData = (id: string) => ({
   id,
   title: `웹 개발의 모든 것 ${id.includes('ai') ? '- AI 강의' : ''}`,
   instructor: id.includes('ai') ? `AI 튜터 ${id.slice(-1)}` : `김강사 ${id.slice(-1)}`,
@@ -35,14 +35,14 @@ const getCourseData = (id: string) => ({
 });
 
 const Checkout: React.FC = () => {
-  const { courseId } = useParams<{ courseId: string }>();
-  const [course, setCourse] = useState<any>(null);
+  const { lectureId } = useParams<{ lectureId: string }>();
+  const [lecture, setLecture] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('kakao');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { isProcessing, setIsProcessing, processKakaoPayment, simulatePayment } = usePayment({
-    courseId: courseId || ''
+    lectureId: lectureId || ''
   });
   
   useEffect(() => {
@@ -56,13 +56,13 @@ const Checkout: React.FC = () => {
       return;
     }
     
-    if (courseId) {
+    if (lectureId) {
       // 실제 앱에서는 API에서 강의 데이터를 가져옴
-      setCourse(getCourseData(courseId));
+      setLecture(getLectureData(lectureId));
     }
 
     return cleanup;
-  }, [courseId, isAuthenticated, navigate]);
+  }, [lectureId, isAuthenticated, navigate]);
   
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +72,7 @@ const Checkout: React.FC = () => {
       return;
     }
 
-    if (!course) {
+    if (!lecture) {
       toast.error('강의 정보를 불러오는 데 실패했습니다.');
       return;
     }
@@ -80,14 +80,14 @@ const Checkout: React.FC = () => {
     setIsProcessing(true);
     
     if (paymentMethod === 'kakao') {
-      processKakaoPayment(course);
+      processKakaoPayment(lecture);
     } else {
       // 다른 결제 방식에 대한 처리
       simulatePayment();
     }
   };
   
-  if (!course) {
+  if (!lecture) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -111,7 +111,7 @@ const Checkout: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* 왼쪽: 주문 요약 */}
           <div className="lg:col-span-4">
-            <OrderSummary course={course} />
+            <OrderSummary lecture={lecture} />
           </div>
           
           {/* 가운데: 결제 수단 */}
@@ -125,7 +125,7 @@ const Checkout: React.FC = () => {
           {/* 오른쪽: 최종 결제 */}
           <div className="lg:col-span-4">
             <CheckoutSummary 
-              price={course.price}
+              price={lecture.price}
               agreedToTerms={agreedToTerms}
               setAgreedToTerms={setAgreedToTerms}
               isProcessing={isProcessing}
