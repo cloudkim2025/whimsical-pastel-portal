@@ -1,15 +1,13 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 
 interface CheckoutSummaryProps {
   price: string;
   agreedToTerms: boolean;
-  setAgreedToTerms: (value: boolean) => void;
+  setAgreedToTerms: (agreed: boolean) => void;
   isProcessing: boolean;
   onCheckout: (e: React.FormEvent) => void;
 }
@@ -22,53 +20,50 @@ const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
   onCheckout
 }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
-      <Card className="border border-ghibli-meadow/20">
-        <CardContent className="p-6">
-          <h2 className="text-xl font-medium text-ghibli-forest mb-6">최종 결제</h2>
-          
-          <div className="border-b border-ghibli-earth/10 pb-4 mb-4">
-            <div className="flex justify-between text-lg font-bold">
-              <span>총 결제금액</span>
-              <span className="text-ghibli-forest">₩{price}</span>
-            </div>
-          </div>
-          
-          <div className="mb-6">
-            <div className="flex items-center space-x-2 mb-2">
-              <Checkbox 
-                id="terms" 
-                checked={agreedToTerms} 
-                onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
-              />
-              <Label 
-                htmlFor="terms" 
-                className="text-sm cursor-pointer"
-              >
-                이용약관 및 환불 정책에 동의합니다.
-              </Label>
-            </div>
-            <p className="text-xs text-ghibli-stone">
-              결제 완료 후 14일 이내 환불 가능합니다.
-            </p>
-          </div>
-          
-          <form onSubmit={onCheckout}>
-            <Button 
-              type="submit"
-              disabled={isProcessing || !agreedToTerms}
-              className="w-full bg-ghibli-meadow hover:bg-ghibli-forest text-white transition-all duration-300"
-            >
-              {isProcessing ? '처리 중...' : '결제 완료하기'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </motion.div>
+    <Card className="bg-white/80 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="text-xl text-ghibli-forest">최종 결제</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex justify-between items-center pb-4 border-b border-gray-200">
+          <span className="font-medium">최종 결제 금액</span>
+          <span className="font-bold text-2xl text-ghibli-forest">{price}원</span>
+        </div>
+        
+        <div className="flex items-start space-x-2 pt-2">
+          <Checkbox 
+            id="terms" 
+            checked={agreedToTerms}
+            onCheckedChange={(checked) => setAgreedToTerms(!!checked)}
+          />
+          <label
+            htmlFor="terms"
+            className="text-sm leading-tight cursor-pointer"
+          >
+            주문 내용을 확인하였으며, 결제진행에 동의합니다.
+            <span className="block text-xs text-ghibli-stone mt-1">
+              이용약관, 개인정보 처리방침, 환불 정책에 동의합니다.
+            </span>
+          </label>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button 
+          onClick={onCheckout}
+          disabled={!agreedToTerms || isProcessing}
+          className="w-full bg-ghibli-meadow hover:bg-ghibli-forest transition-colors"
+        >
+          {isProcessing ? (
+            <>
+              <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></span>
+              처리중...
+            </>
+          ) : (
+            '결제 완료하기'
+          )}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 
