@@ -3,15 +3,15 @@ export type PaymentStatus = 'COMPLETED' | 'PENDING' | 'FAILED';
 
 export interface PaymentItem {
   id: string;
-  courseId: string;
-  courseName: string;
+  lectureId: string;
+  lectureName: string;
   amount: number;
   paymentDate: string;
   status: PaymentStatus;
 }
 
 export interface PaymentRequest {
-  courseId: string;
+  lectureId: string;
   amount: number;
   paymentMethod: string;
 }

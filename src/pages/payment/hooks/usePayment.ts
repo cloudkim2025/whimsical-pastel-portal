@@ -22,7 +22,7 @@ export const usePayment = ({ lectureId }: UsePaymentProps) => {
       
       // 결제 성공 시 백엔드로 결제 정보 저장
       await paymentAPI.savePayment({
-        lectureId,
+        lectureId: lectureId,
         paymentMethod: 'KAKAO_PAY',
         amount: parseInt(lecture.price.replace(/,/g, '')),
       });
