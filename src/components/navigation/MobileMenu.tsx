@@ -24,11 +24,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isMenuOpen, onClose }) => {
       </div>
       
       <nav className="container mx-auto px-6 py-6 flex flex-col space-y-4">
-        <Link to="/" className="nav-link text-lg py-2">Home</Link>
-        <Link to="/company-info" className="nav-link text-lg py-2">Company Info</Link>
-        <Link to="/dev-lectures" className="nav-link text-lg py-2">Development Courses</Link>
-        <Link to="/ai-lectures" className="nav-link text-lg py-2">AI Courses</Link>
-        <Link to="/top-lectures" className="nav-link text-lg py-2">Top Courses</Link>
+        <Link to="/" className="nav-link text-lg py-2">홈</Link>
+        <Link to="/company-info" className="nav-link text-lg py-2">회사정보</Link>
+        <Link to="/dev-lectures" className="nav-link text-lg py-2">개발강의</Link>
+        <Link to="/ai-lectures" className="nav-link text-lg py-2">AI 강의</Link>
+        <Link to="/top-lectures" className="nav-link text-lg py-2">인기강의</Link>
         
         {isAuthenticated ? (
           <div className="pt-2 border-t border-ghibli-earth/10">

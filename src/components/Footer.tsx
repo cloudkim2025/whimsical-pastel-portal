@@ -37,22 +37,22 @@ const Footer: React.FC = () => {
           
           {/* Navigation */}
           <div>
-            <h4 className="text-lg font-bold mb-4">Navigation</h4>
+            <h4 className="text-lg font-bold mb-4">내비게이션</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-ghibli-cloud/90 hover:text-white transition-colors">Home</Link>
+                <Link to="/" className="text-ghibli-cloud/90 hover:text-white transition-colors">홈</Link>
               </li>
               <li>
-                <Link to="/company-info" className="text-ghibli-cloud/90 hover:text-white transition-colors">Company Info</Link>
+                <Link to="/company-info" className="text-ghibli-cloud/90 hover:text-white transition-colors">회사정보</Link>
               </li>
               <li>
-                <Link to="/dev-lectures" className="text-ghibli-cloud/90 hover:text-white transition-colors">Development Courses</Link>
+                <Link to="/dev-lectures" className="text-ghibli-cloud/90 hover:text-white transition-colors">개발강의</Link>
               </li>
               <li>
-                <Link to="/ai-lectures" className="text-ghibli-cloud/90 hover:text-white transition-colors">AI Courses</Link>
+                <Link to="/ai-lectures" className="text-ghibli-cloud/90 hover:text-white transition-colors">AI 강의</Link>
               </li>
               <li>
-                <Link to="/top-lectures" className="text-ghibli-cloud/90 hover:text-white transition-colors">Top Courses</Link>
+                <Link to="/top-lectures" className="text-ghibli-cloud/90 hover:text-white transition-colors">인기강의</Link>
               </li>
             </ul>
           </div>
