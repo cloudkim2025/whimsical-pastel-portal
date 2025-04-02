@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,6 +12,7 @@ import { lectureAPI } from '@/api/lecture';
 import { categories } from '@/data/lectureCategories';
 import CurriculumPreview from '@/components/lectures/CurriculumPreview';
 import { useAiCurriculum } from '@/hooks/useAiCurriculum';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface LectureFormProps {
   userId?: string;
@@ -26,6 +28,7 @@ const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoName, setVideoName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const { curriculum, isAnalyzing, generateCurriculum } = useAiCurriculum();
 
@@ -47,6 +50,7 @@ const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (!name || !description || !category || !thumbnailImage || !videoFile) {
       toast({
@@ -60,21 +64,44 @@ const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
     setIsUploading(true);
     
     try {
-      const lectureData = {
-        name,
-        description,
-        category,
-        curriculum: curriculum,
-        instructorId: userId
-      };
+      // FormData 객체 생성 및 데이터 추가
+      const formData = new FormData();
+      formData.append('title', name);
+      formData.append('description', description);
+      formData.append('category', category);
       
-      await lectureAPI.createLecture(lectureData);
+      // 강사 ID가 있는 경우에만 추가
+      if (userId) {
+        formData.append('instructorId', userId);
+      }
+      
+      // 커리큘럼 데이터 JSON 문자열로 변환하여 추가
+      if (curriculum && curriculum.length > 0) {
+        const curriculumJson = JSON.stringify(curriculum);
+        formData.append('curriculum', curriculumJson);
+      }
+      
+      // 썸네일 이미지 추가
+      if (thumbnailImage) {
+        formData.append('thumbnailFile', thumbnailImage);
+      }
+      
+      // 강의 영상 추가
+      if (videoFile) {
+        formData.append('videoFile', videoFile);
+      }
+      
+      // API 호출
+      const response = await lectureAPI.createLecture(formData);
+      
+      console.log('강의 등록 응답:', response);
       
       toast({
         title: "강의 업로드 완료",
         description: "강의가 성공적으로 업로드되었습니다. 검토 후 게시됩니다."
       });
       
+      // 폼 초기화
       setName('');
       setDescription('');
       setThumbnailImage(null);
@@ -82,11 +109,20 @@ const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
       setCategory('');
       setVideoFile(null);
       setVideoName('');
-    } catch (error) {
+    } catch (error: any) {
+      console.error('강의 업로드 오류:', error);
+      
+      // 오류 메시지 처리
+      const errorMessage = error.response?.data?.message || 
+                           error.response?.data?.error || 
+                           '강의 업로드 중 오류가 발생했습니다.';
+      
+      setError(errorMessage);
+      
       toast({
         variant: "destructive",
         title: "업로드 실패",
-        description: "오류가 발생했습니다. 다시 시도해주세요."
+        description: errorMessage
       });
     } finally {
       setIsUploading(false);
@@ -95,6 +131,12 @@ const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="name" className="korean-text">강의 제목</Label>

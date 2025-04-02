@@ -11,6 +11,9 @@ export interface CourseType {
   thumbnailUrl: string;
   publishedAt: string;
   status: CourseStatus;
+  price?: number;
+  curriculum?: string[];
+  instructorId?: string;
 }
 
 export interface LectureType {
@@ -21,4 +24,15 @@ export interface LectureType {
   videoUrl: string;
   duration: number;
   order: number;
+}
+
+export interface LectureUploadResponse {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  thumbnailUrl: string;
+  videoUrl: string;
+  status: CourseStatus;
+  message?: string;
 }

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { tokenManager } from './tokenManager';
 
 const API = axios.create({
-  baseURL: 'http://localhost:9000',  // Edge-service gateway 주소 
+  baseURL: 'http://localhost:9000',  // Edge-service gateway 주소 (필요시 수정)
   headers: {
     'Content-Type': 'application/json',
   },
@@ -17,6 +17,12 @@ API.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+    
+    // FormData인 경우 Content-Type을 자동으로 처리하도록 설정
+    if (config.data instanceof FormData) {
+      config.headers['Content-Type'] = 'multipart/form-data';
+    }
+    
     return config;
   },
   (error) => {
@@ -31,6 +37,14 @@ API.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    
+    // 에러 상세 정보 콘솔에 기록 (디버깅용)
+    console.error('API 오류 발생:', {
+      url: originalRequest?.url,
+      method: originalRequest?.method,
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message
+    });
     
     // 401 에러이고 토큰 만료인 경우 리프레시 토큰으로 갱신 시도
     if (error.response?.status === 401 && !originalRequest._retry) {

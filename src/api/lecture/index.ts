@@ -14,7 +14,11 @@ export const lectureAPI = {
   },
   
   // 강의 등록 (강사용)
-  createLecture: (lectureData: Partial<CourseType>) => {
-    return API.post('/lectures', lectureData);
+  createLecture: (lectureFormData: FormData) => {
+    return API.post('/api/lectures', lectureFormData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 };
