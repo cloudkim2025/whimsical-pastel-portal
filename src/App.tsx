@@ -10,13 +10,13 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Profile from "./pages/Profile"; // Updated path
 import NotFound from "./pages/NotFound";
-import DevCourses from "./pages/DevCourses"; // Updated path
+import DevLectures from "./pages/DevLectures"; // Updated name
 import AICourses from "./pages/AICourses"; // Updated path
 import CompanyInfo from "./pages/CompanyInfo";
 import CourseDetail from "./pages/CourseDetail"; // Updated path
 import Checkout from "./pages/payment/Checkout"; // Updated to use our new Checkout component
-import TopCourses from "./pages/TopCourses"; // Updated path
-import CourseUpload from "./pages/CourseUpload"; // Updated path
+import TopLectures from "./pages/TopLectures"; // Updated name
+import LectureUpload from "./pages/LectureUpload"; // Updated name
 import InstructorApply from "./pages/instructor/InstructorApply";
 import Admin from "./pages/Admin"; // Updated path
 import PaymentHistory from "./pages/payment/PaymentHistory";
@@ -37,13 +37,13 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/dev-courses" element={<DevCourses />} />
+            <Route path="/dev-lectures" element={<DevLectures />} />
             <Route path="/ai-courses" element={<AICourses />} />
             <Route path="/company-info" element={<CompanyInfo />} />
             <Route path="/course/:courseId" element={<CourseDetail />} />
             <Route path="/checkout/:courseId" element={<Checkout />} />
-            <Route path="/top-courses" element={<TopCourses />} />
-            <Route path="/course-upload" element={<CourseUpload />} />
+            <Route path="/top-lectures" element={<TopLectures />} />
+            <Route path="/lecture-upload" element={<LectureUpload />} />
             <Route path="/instructor-apply" element={<InstructorApply />} />
             <Route path="/admin/*" element={<Admin />} />
             <Route path="/payment-history" element={<PaymentHistory />} />

@@ -6,30 +6,30 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Search, Filter, Eye, X, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CourseType } from '@/types/admin';
 
 const CourseManagement: React.FC = () => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null);
+  const [selectedLecture, setSelectedLecture] = useState<CourseType | null>(null);
 
   // 임시 데이터
-  const mockCourses: CourseType[] = [
+  const mockLectures: CourseType[] = [
     {
       id: 1,
       title: "React 완전정복 - 기초부터 실전까지",
       description: "React의 핵심 개념과 실전 프로젝트를 통해 프론트엔드 개발을 마스터하세요.",
       instructor: "김개발",
       category: "프론트엔드",
-      thumbnailUrl: "https://via.placeholder.com/300x200?text=React+Course",
+      thumbnailUrl: "https://via.placeholder.com/300x200?text=React+Lecture",
       publishedAt: "2023-05-15",
       status: "published"
     },
     {
       id: 2,
       title: "Python으로 시작하는 AI 개발",
-      description: "파이썬을 활용한 AI 개발의 기초부터 머신러닝, 딥러닝까지 배워보세요.",
+      description: "파이썬을 활용한 AI 개발의 기초부터 머신러닝, 딥러닝까지 한 번에 배워보세요.",
       instructor: "이인공",
       category: "AI",
       thumbnailUrl: "https://via.placeholder.com/300x200?text=Python+AI",
@@ -48,15 +48,15 @@ const CourseManagement: React.FC = () => {
     },
   ];
 
-  const filteredCourses = mockCourses.filter(course => {
-    if (filter !== 'all' && course.status !== filter) return false;
-    if (searchTerm && !course.title.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+  const filteredLectures = mockLectures.filter(lecture => {
+    if (filter !== 'all' && lecture.status !== filter) return false;
+    if (searchTerm && !lecture.title.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     return true;
   });
 
-  const handleStatusChange = (courseId: number, newStatus: CourseType['status']) => {
+  const handleStatusChange = (lectureId: number, newStatus: CourseType['status']) => {
     // 실제 구현에서는 API 호출 필요
-    console.log(`Course ${courseId} status changed to ${newStatus}`);
+    console.log(`Lecture ${lectureId} status changed to ${newStatus}`);
     // 상태 변경 후 목업 데이터 업데이트 로직 (실제 구현에서는 API 응답 후 상태 업데이트)
   };
 
@@ -90,45 +90,45 @@ const CourseManagement: React.FC = () => {
 
         <TabsContent value={filter} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCourses.map(course => (
-              <Card key={course.id} className="overflow-hidden">
+            {filteredLectures.map(lecture => (
+              <Card key={lecture.id} className="overflow-hidden">
                 <div className="relative h-40">
                   <img 
-                    src={course.thumbnailUrl} 
-                    alt={course.title}
+                    src={lecture.thumbnailUrl} 
+                    alt={lecture.title}
                     className="w-full h-full object-cover"
                   />
                   <Badge 
                     className={`absolute top-2 right-2 ${
-                      course.status === 'published' ? 'bg-green-500' : 'bg-amber-500'
+                      lecture.status === 'published' ? 'bg-green-500' : 'bg-amber-500'
                     }`}
                   >
-                    {course.status === 'published' ? '승인됨' : '대기중'}
+                    {lecture.status === 'published' ? '승인됨' : '대기중'}
                   </Badge>
                 </div>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-1 korean-text">{course.title}</h3>
+                  <h3 className="font-semibold text-lg mb-1 korean-text">{lecture.title}</h3>
                   <p className="text-sm text-muted-foreground mb-2 korean-text">
-                    {course.instructor} • {course.category}
+                    {lecture.instructor} • {lecture.category}
                   </p>
-                  <p className="text-sm line-clamp-2 mb-4 korean-text">{course.description}</p>
+                  <p className="text-sm line-clamp-2 mb-4 korean-text">{lecture.description}</p>
                   <div className="flex justify-between items-center">
                     <Button
                       variant="outline"
                       size="sm"
                       className="flex items-center gap-1"
-                      onClick={() => setSelectedCourse(course)}
+                      onClick={() => setSelectedLecture(lecture)}
                     >
                       <Eye className="h-3.5 w-3.5" />
                       <span className="text-xs korean-text">상세보기</span>
                     </Button>
-                    {course.status === 'pending' && (
+                    {lecture.status === 'pending' && (
                       <div className="flex gap-1">
                         <Button 
                           size="sm" 
                           variant="outline" 
                           className="p-1 h-8 w-8"
-                          onClick={() => handleStatusChange(course.id, 'published')}
+                          onClick={() => handleStatusChange(lecture.id, 'published')}
                         >
                           <Check className="h-4 w-4 text-green-500" />
                         </Button>
@@ -136,7 +136,7 @@ const CourseManagement: React.FC = () => {
                           size="sm" 
                           variant="outline" 
                           className="p-1 h-8 w-8"
-                          onClick={() => console.log(`Reject course ${course.id}`)}
+                          onClick={() => console.log(`Reject lecture ${lecture.id}`)}
                         >
                           <X className="h-4 w-4 text-red-500" />
                         </Button>
@@ -148,7 +148,7 @@ const CourseManagement: React.FC = () => {
             ))}
           </div>
 
-          {filteredCourses.length === 0 && (
+          {filteredLectures.length === 0 && (
             <div className="text-center py-12 korean-text">
               <p className="text-muted-foreground">검색 결과가 없습니다</p>
             </div>
@@ -156,39 +156,39 @@ const CourseManagement: React.FC = () => {
         </TabsContent>
       </Tabs>
 
-      {selectedCourse && (
-        <Dialog open={!!selectedCourse} onOpenChange={(open) => !open && setSelectedCourse(null)}>
+      {selectedLecture && (
+        <Dialog open={!!selectedLecture} onOpenChange={(open) => !open && setSelectedLecture(null)}>
           <DialogContent className="max-w-3xl">
             <DialogHeader>
-              <DialogTitle className="korean-text">{selectedCourse.title}</DialogTitle>
+              <DialogTitle className="korean-text">{selectedLecture.title}</DialogTitle>
               <DialogDescription className="korean-text">
-                {selectedCourse.instructor} • {selectedCourse.category} • {new Date(selectedCourse.publishedAt).toLocaleDateString()}
+                {selectedLecture.instructor} • {selectedLecture.category} • {new Date(selectedLecture.publishedAt).toLocaleDateString()}
               </DialogDescription>
             </DialogHeader>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <img 
-                  src={selectedCourse.thumbnailUrl} 
-                  alt={selectedCourse.title}
+                  src={selectedLecture.thumbnailUrl} 
+                  alt={selectedLecture.title}
                   className="w-full h-48 object-cover rounded-md"
                 />
               </div>
               <div>
                 <h4 className="font-semibold mb-2 korean-text">강의 설명</h4>
-                <p className="text-sm text-muted-foreground korean-text">{selectedCourse.description}</p>
+                <p className="text-sm text-muted-foreground korean-text">{selectedLecture.description}</p>
               </div>
             </div>
 
             <DialogFooter>
-              {selectedCourse.status === 'pending' ? (
+              {selectedLecture.status === 'pending' ? (
                 <div className="flex gap-2">
                   <Button 
                     variant="outline" 
                     className="flex items-center gap-2"
                     onClick={() => {
-                      handleStatusChange(selectedCourse.id, 'published');
-                      setSelectedCourse(null);
+                      handleStatusChange(selectedLecture.id, 'published');
+                      setSelectedLecture(null);
                     }}
                   >
                     <Check className="h-4 w-4" />
@@ -198,8 +198,8 @@ const CourseManagement: React.FC = () => {
                     variant="destructive" 
                     className="flex items-center gap-2"
                     onClick={() => {
-                      console.log(`Reject course ${selectedCourse.id}`);
-                      setSelectedCourse(null);
+                      console.log(`Reject lecture ${selectedLecture.id}`);
+                      setSelectedLecture(null);
                     }}
                   >
                     <X className="h-4 w-4" />
@@ -209,7 +209,7 @@ const CourseManagement: React.FC = () => {
               ) : (
                 <Button
                   variant="outline"
-                  onClick={() => setSelectedCourse(null)}
+                  onClick={() => setSelectedLecture(null)}
                   className="korean-text"
                 >
                   닫기

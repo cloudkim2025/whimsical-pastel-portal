@@ -27,7 +27,7 @@ const categories = [
   { id: 'other', name: '기타' }
 ];
 
-const CourseUpload: React.FC = () => {
+const LectureUpload: React.FC = () => {
   const { toast } = useToast();
   const { user, isInstructor } = useAuth();
   const navigate = useNavigate();
@@ -117,7 +117,7 @@ const CourseUpload: React.FC = () => {
     setIsUploading(true);
     
     try {
-      const courseData = {
+      const lectureData = {
         name,
         description,
         category,
@@ -125,7 +125,7 @@ const CourseUpload: React.FC = () => {
         instructorId: user?.id
       };
       
-      await lectureAPI.createCourse(courseData);
+      await lectureAPI.createLecture(lectureData);
       
       toast({
         title: "강의 업로드 완료",
@@ -329,4 +329,4 @@ const CourseUpload: React.FC = () => {
   );
 };
 
-export default CourseUpload;
+export default LectureUpload;

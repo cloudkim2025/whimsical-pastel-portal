@@ -1,20 +1,20 @@
 
 import API from '@/utils/apiClient';
-import { CourseType } from '@/types/course';
+import { CourseType } from '@/types/lecture';
 
 export const lectureAPI = {
   // 강의 목록 조회
-  getCourses: (category?: string) => {
-    return API.get('/courses', { params: { category } });
+  getLectures: (category?: string) => {
+    return API.get('/lectures', { params: { category } });
   },
 
   // 강의 상세 조회
-  getCourseDetail: (courseId: string) => {
-    return API.get(`/courses/${courseId}`);
+  getLectureDetail: (lectureId: string) => {
+    return API.get(`/lectures/${lectureId}`);
   },
   
   // 강의 등록 (강사용)
-  createCourse: (courseData: Partial<CourseType>) => {
-    return API.post('/courses', courseData);
+  createLecture: (lectureData: Partial<CourseType>) => {
+    return API.post('/lectures', lectureData);
   }
 };

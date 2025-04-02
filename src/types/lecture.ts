@@ -1,5 +1,5 @@
 
-// Type definitions for courses
+// Type definitions for lectures
 export type CourseStatus = 'pending' | 'published';
 
 export interface CourseType {
