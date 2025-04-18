@@ -1,8 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from "sonner";
+import { tokenManager } from '@/utils/tokenManager';
 import { authAPI } from '@/api/auth';
-import { decodeToken, getUserRole, isAuthenticated, logout as authLogout } from '@/utils/auth';
 
 // Define types for user and authentication context
 export type User = {
@@ -18,8 +18,8 @@ type AuthContextType = {
   isAuthenticated: boolean;
   isInstructor: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, nickname: string, role?: 'USER' | 'INSTRUCTOR') => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (formData: FormData) => Promise<boolean>;
   logout: () => void;
   loginWithSocialMedia: (provider: 'google' | 'naver' | 'kakao') => void;
 };
@@ -34,127 +34,161 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isInstructor, setIsInstructor] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
+  // 토큰 유효성 검증 및 사용자 정보 설정
+  const checkAuthentication = async () => {
+    const token = tokenManager.getToken();
+    if (!token) return;
+    
+    try {
+      // 토큰 유효성 검증 API 호출
+      const response = await authAPI.validateToken();
+      
+      if (response.data.isValid) {
+        const userInfo = tokenManager.getUserInfo();
+        if (userInfo) {
+          setUser({
+            id: userInfo.sub || '',
+            email: userInfo.email || '',
+            nickname: userInfo.nickname || '',
+            avatar: userInfo.profileImage,
+            role: userInfo.role
+          });
+          setIsAuthenticated(true);
+          setIsInstructor(['INSTRUCTOR', 'ADMIN'].includes(userInfo.role));
+          setIsAdmin(userInfo.role === 'ADMIN');
+        }
+      } else {
+        // 토큰이 만료되었으면 갱신 시도
+        try {
+          const refreshResponse = await authAPI.refreshToken();
+          if (refreshResponse.data.success && refreshResponse.data.accessToken) {
+            tokenManager.setToken(refreshResponse.data.accessToken);
+            checkAuthentication(); // 갱신 후 다시 인증 체크
+          } else {
+            handleLogout();
+          }
+        } catch (refreshError) {
+          console.error('Token refresh failed:', refreshError);
+          handleLogout();
+        }
+      }
+    } catch (error) {
+      console.error('Token validation error:', error);
+      // 토큰 검증 실패 시 로그아웃 처리
+      handleLogout();
+    }
+  };
+
   // Check if user is already logged in (from token)
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const decodedToken = decodeToken(token);
-      if (decodedToken) {
-        setUser({
-          id: decodedToken.sub || '',
-          email: decodedToken.email || '',
-          nickname: decodedToken.nickname || '',
-          role: decodedToken.role
-        });
-        setIsAuthenticated(true);
-        setIsInstructor(['INSTRUCTOR', 'ADMIN'].includes(decodedToken.role));
-        setIsAdmin(decodedToken.role === 'ADMIN');
-      }
-    }
+    checkAuthentication();
   }, []);
 
   // 실제 API 로그인 함수
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       // API 로그인 시도
       const response = await authAPI.login(email, password);
       
       if (response.data.loggedIn && response.data.accessToken) {
         const token = response.data.accessToken;
-        localStorage.setItem('accessToken', token);
+        tokenManager.setToken(token);
+        
+        // refreshToken이 있으면 저장
+        if (response.data.refreshToken) {
+          tokenManager.setRefreshToken(response.data.refreshToken);
+        }
         
         // 토큰 디코딩
-        const decodedToken = decodeToken(token);
+        const userInfo = tokenManager.getUserInfo();
         
-        if (decodedToken) {
-          const userRole = decodedToken.role;
-          
+        if (userInfo) {
           const user: User = {
-            id: decodedToken.sub || '',
-            email: decodedToken.email || email,
-            nickname: decodedToken.nickname || email.split('@')[0],
-            role: userRole
+            id: userInfo.sub || '',
+            email: userInfo.email || email,
+            nickname: userInfo.nickname || email.split('@')[0],
+            avatar: userInfo.profileImage,
+            role: userInfo.role
           };
           
           setUser(user);
           setIsAuthenticated(true);
-          setIsInstructor(['INSTRUCTOR', 'ADMIN'].includes(userRole));
-          setIsAdmin(userRole === 'ADMIN');
+          setIsInstructor(['INSTRUCTOR', 'ADMIN'].includes(userInfo.role));
+          setIsAdmin(userInfo.role === 'ADMIN');
           
-          // 강사 또는 관리자 로그인 시 특별한 메시지 표시
-          if (userRole === 'INSTRUCTOR') {
-            toast.success("강사 계정으로 로그인 되었습니다!");
-          } else if (userRole === 'ADMIN') {
-            toast.success("관리자 계정으로 로그인 되었습니다!");
-          } else {
-            toast.success("로그인 성공!");
-          }
+          toast.success(response.data.message || "로그인 성공!");
+          return true;
         }
-      } else {
-        throw new Error('로그인 정보가 올바르지 않습니다.');
-      }
-    } catch (error) {
-      toast.error("로그인에 실패했습니다.");
+      } 
+      
+      return false;
+    } catch (error: any) {
+      // 로그인 실패 시 에러 처리는 호출자에게 위임
       throw error;
     }
   };
 
   // 회원가입 함수
-  const register = async (email: string, password: string, nickname: string, role: 'USER' | 'INSTRUCTOR' = 'USER') => {
+  const register = async (formData: FormData): Promise<boolean> => {
     try {
       // API 회원가입 시도
-      const response = await authAPI.register(email, password, nickname, role);
+      const response = await authAPI.register(formData);
       
-      if (response.data.isSuccess) {
-        toast.success(response.data.message || "회원가입 성공!");
-      } else {
-        toast.error(response.data.message || "회원가입에 실패했습니다.");
-        throw new Error(response.data.message || "회원가입에 실패했습니다.");
+      if (response.data.success) {
+        // 회원가입 성공 시 자동 로그인 (accessToken이 있는 경우)
+        if (response.data.accessToken) {
+          tokenManager.setToken(response.data.accessToken);
+          
+          const userInfo = tokenManager.getUserInfo();
+          if (userInfo) {
+            setUser({
+              id: userInfo.sub || '',
+              email: userInfo.email || '',
+              nickname: userInfo.nickname || '',
+              avatar: userInfo.profileImage,
+              role: userInfo.role
+            });
+            setIsAuthenticated(true);
+            setIsInstructor(['INSTRUCTOR', 'ADMIN'].includes(userInfo.role));
+            setIsAdmin(userInfo.role === 'ADMIN');
+          }
+        }
+        
+        return true;
       }
+      
+      return false;
     } catch (error) {
-      toast.error("회원가입에 실패했습니다.");
+      // 회원가입 실패 시 에러 처리는 호출자에게 위임
       throw error;
     }
   };
 
   // Logout function
-  const logout = () => {
-    authLogout();
+  const handleLogout = () => {
+    tokenManager.clearTokens();
     setUser(null);
     setIsAuthenticated(false);
     setIsInstructor(false);
     setIsAdmin(false);
-    toast.info("로그아웃 되었습니다.");
+  };
+  
+  // API 통합 로그아웃
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+      handleLogout();
+      toast.success("로그아웃 되었습니다.");
+    } catch (error) {
+      console.error('Logout error:', error);
+      handleLogout();
+      toast.info("로그아웃 되었습니다.");
+    }
   };
 
   // 소셜 로그인
   const loginWithSocialMedia = (provider: 'google' | 'naver' | 'kakao') => {
-    if (provider === 'naver') {
-      // 네이버 로그인 리다이렉션
-      window.location.href = '/oauth2/authorization/naver';
-    } else {
-      // 기타 소셜 로그인 (데모)
-      toast.info(`${provider} 로그인 준비 중...`);
-      
-      // 데모 소셜 로그인 (실제로는 제거하고 리다이렉션만 처리)
-      setTimeout(() => {
-        const mockToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NTYiLCJlbWFpbCI6InVzZXJAJHtwcm92aWRlcn0uY29tIiwibmlja25hbWUiOiIke3Byb3ZpZGVyfVVzZXIiLCJyb2xlIjoiVVNFUiIsImV4cCI6MTkxNjIzOTAyMn0.NIP6oGJVsls-D-J8JmsCFXEUxsNGBzUYlwPjouvQVm0`;
-        localStorage.setItem('accessToken', mockToken);
-        
-        const user: User = {
-          id: '456',
-          email: `user@${provider}.com`,
-          nickname: `${provider}User`,
-          role: provider === 'kakao' ? 'INSTRUCTOR' : 'USER'
-        };
-        
-        setUser(user);
-        setIsAuthenticated(true);
-        setIsInstructor(provider === 'kakao');
-        setIsAdmin(false);
-        toast.success(`${provider} 로그인 성공!`);
-      }, 1000);
-    }
+    window.location.href = `/oauth2/authorization/${provider}`;
   };
 
   const value = {

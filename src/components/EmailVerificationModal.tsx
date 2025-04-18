@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { authAPI } from '@/services/api';
+import { authAPI } from '@/api/auth';
 import { toast } from 'sonner';
 
 interface EmailVerificationModalProps {
@@ -38,22 +38,40 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
   }, [isOpen]);
   
   const handleVerify = async () => {
+    if (verificationCode.length !== 6) {
+      setError("6자리 인증 코드를 입력해주세요.");
+      return;
+    }
+    
     setIsVerifying(true);
     setError("");
     
     try {
       const response = await authAPI.verifyCode(email, verificationCode);
       
-      if (response.data) {
+      if (response.data.success) {
         toast.success('이메일이 성공적으로 인증되었습니다.');
         onVerify(true);
         onClose();
       } else {
-        setError("코드를 다시 확인해주세요");
+        setError("인증에 실패했습니다. 코드를 다시 확인해주세요.");
       }
-    } catch (error) {
-      setError("인증에 실패했습니다. 다시 시도해주세요.");
-      toast.error('인증 코드 확인에 실패했습니다.');
+    } catch (error: any) {
+      console.error('Verification error:', error);
+      
+      const errorMsg = 
+        error.response?.data?.message || 
+        "인증에 실패했습니다. 다시 시도해주세요.";
+      
+      setError(errorMsg);
+      
+      // 코드가 만료된 경우 (시간 초과)
+      if (errorMsg.includes('시간이 초과')) {
+        toast.error('인증 시간이 초과되었습니다. 코드를 다시 발송해주세요.');
+        onClose();
+      } else {
+        toast.error('인증 코드 확인에 실패했습니다.');
+      }
     } finally {
       setIsVerifying(false);
     }

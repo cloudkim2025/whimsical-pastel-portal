@@ -7,7 +7,8 @@ const API = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000 // 10초
+  timeout: 10000, // 10초
+  withCredentials: true, // 쿠키 전송을 위해 필요
 });
 
 // 요청 인터셉터 - 토큰 추가
@@ -51,13 +52,23 @@ API.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
-        // 토큰 갱신 로직 (실제 백엔드 API에 맞게 수정 필요)
-        // const refreshToken = tokenManager.getRefreshToken();
-        // const response = await API.post('/auths/refresh-token', { refreshToken });
-        // const newToken = response.data.accessToken;
-        // tokenManager.setToken(newToken);
-        // originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-        // return API(originalRequest);
+        // 토큰 갱신 API 호출
+        const response = await API.post('/auths/refresh');
+        
+        if (response.data.success && response.data.accessToken) {
+          const newToken = response.data.accessToken;
+          tokenManager.setToken(newToken);
+          
+          // 원래 요청의 헤더에 새 토큰 설정
+          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          
+          // 원래 요청 다시 실행
+          return API(originalRequest);
+        } else {
+          // 갱신 실패 시 로그아웃
+          tokenManager.clearTokens();
+          window.location.href = '/login';
+        }
       } catch (refreshError) {
         // 토큰 갱신 실패 시 로그아웃 처리
         tokenManager.clearTokens();

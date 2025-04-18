@@ -1,20 +1,20 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Mail, Check } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Mail, Check, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { authAPI } from '@/services/api';
+import { useAuth } from '@/hooks/useAuth';
 import { useEmailVerification } from '@/hooks/useEmailVerification';
 import EmailVerificationModal from '@/components/EmailVerificationModal';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface FormErrors {
   email?: string;
   password?: string;
   confirmPassword?: string;
   nickname?: string;
+  profileImage?: string;
 }
 
 const RegistrationForm: React.FC = () => {
@@ -34,11 +34,13 @@ const RegistrationForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   
   const { register } = useAuth();
-  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateForm = () => {
     const newErrors: FormErrors = {};
@@ -56,9 +58,10 @@ const RegistrationForm: React.FC = () => {
       isValid = false;
     }
 
-    // Password validation
-    if (!password || password.length < 6) {
-      newErrors.password = '비밀번호는 최소 6자 이상이어야 합니다.';
+    // Password validation - 8~20자, 특수문자+숫자 포함
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/;
+    if (!password || !passwordRegex.test(password)) {
+      newErrors.password = '비밀번호는 8~20자 사이의 영문, 숫자, 특수문자를 포함해야 합니다.';
       isValid = false;
     }
 
@@ -68,10 +71,27 @@ const RegistrationForm: React.FC = () => {
       isValid = false;
     }
 
-    // Nickname validation
-    if (!nickname || nickname.length < 2) {
-      newErrors.nickname = '닉네임은 최소 2자 이상이어야 합니다.';
+    // Nickname validation - 2~10자의 한글, 영문, 숫자만
+    const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,10}$/;
+    if (!nickname || !nicknameRegex.test(nickname)) {
+      newErrors.nickname = '닉네임은 2~10자 사이의 한글, 영문, 숫자만 사용 가능합니다.';
       isValid = false;
+    }
+
+    // Profile image validation (optional)
+    if (profileImage) {
+      // Check file size (max 1MB)
+      if (profileImage.size > 1024 * 1024) {
+        newErrors.profileImage = '프로필 이미지는 최대 1MB까지만 업로드할 수 있습니다.';
+        isValid = false;
+      }
+      
+      // Check file type
+      const fileType = profileImage.type;
+      if (!fileType.includes('image/jpeg') && !fileType.includes('image/png')) {
+        newErrors.profileImage = '이미지는 JPG, PNG 형식만 가능합니다.';
+        isValid = false;
+      }
     }
 
     setErrors(newErrors);
@@ -88,26 +108,78 @@ const RegistrationForm: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // API를 통한 회원가입 요청
-      const response = await authAPI.register(email, password, nickname);
+      // FormData 객체 생성
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('password', password);
+      formData.append('nickname', nickname);
       
-      if (response.data.isSuccess) {
-        toast.success(response.data.message || '회원가입에 성공했습니다!');
-        navigate('/login');
-      } else {
-        toast.error(response.data.message || '회원가입에 실패했습니다.');
+      // 프로필 이미지가 있는 경우에만 추가
+      if (profileImage) {
+        formData.append('profileImage', profileImage);
       }
-    } catch (error: any) {
+      
+      // 회원가입 API 호출
+      await register(formData);
+    } catch (error) {
       console.error('Registration failed:', error);
-      toast.error(error.response?.data?.message || '회원가입에 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // 파일 미리보기 생성
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfilePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+    
+    setProfileImage(file);
+  };
+
+  const handleProfileImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="mb-6 flex flex-col items-center">
+          <div 
+            className="relative cursor-pointer group"
+            onClick={handleProfileImageClick}
+          >
+            <Avatar className="h-24 w-24 border-2 border-ghibli-meadow">
+              {profilePreview ? (
+                <AvatarImage src={profilePreview} alt="프로필 이미지" />
+              ) : (
+                <AvatarFallback className="bg-ghibli-cloud text-ghibli-forest text-xl">
+                  {nickname ? nickname.slice(0, 2).toUpperCase() : 'UP'}
+                </AvatarFallback>
+              )}
+            </Avatar>
+            <div className="absolute inset-0 bg-black/30 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+              <Upload className="h-8 w-8 text-white" />
+            </div>
+          </div>
+          <input
+            type="file"
+            className="hidden"
+            accept="image/jpeg, image/png"
+            ref={fileInputRef}
+            onChange={handleProfileImageChange}
+          />
+          <p className="text-sm text-ghibli-stone mt-2">프로필 이미지 (선택사항)</p>
+          {errors.profileImage && (
+            <p className="text-xs text-red-500 mt-1">{errors.profileImage}</p>
+          )}
+        </div>
+
         <div className="space-y-2">
           <label htmlFor="email" className="block text-sm font-medium text-ghibli-midnight">
             이메일

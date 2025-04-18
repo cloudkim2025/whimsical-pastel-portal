@@ -1,8 +1,16 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AuthButtons: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  
+  // 인증 여부에 따라 다른 버튼 세트를 표시
+  if (isAuthenticated) {
+    return null;
+  }
+  
   return (
     <div className="flex items-center space-x-4">
       <Link to="/login" className="py-2.5 px-5 text-ghibli-forest border border-ghibli-meadow hover:bg-ghibli-cloud rounded-full transition-all duration-300">

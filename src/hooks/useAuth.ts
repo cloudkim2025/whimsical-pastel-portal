@@ -24,68 +24,157 @@ export const useAuth = () => {
           tokenManager.setRefreshToken(response.data.refreshToken);
         }
         
-        toast.success('로그인 성공!');
-        navigate('/');
+        toast.success(response.data.message || '로그인 성공!');
+        
+        // 역할에 따라 다른 페이지로 리디렉션
+        const userInfo = tokenManager.getUserInfo();
+        if (userInfo?.role === 'ADMIN') {
+          navigate('/admin');
+        } else if (userInfo?.role === 'INSTRUCTOR') {
+          navigate('/course-upload');
+        } else {
+          navigate('/');
+        }
+        
         return true;
       } else {
-        toast.error('로그인에 실패했습니다.');
+        toast.error(response.data.message || '로그인에 실패했습니다.');
         return false;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error);
-      toast.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+      
+      // 다른 브라우저에서 로그인 중인 경우 (409)
+      if (error.response?.status === 409) {
+        const confirmForce = window.confirm(error.response.data.message);
+        if (confirmForce) {
+          return await forceLogin(email, password);
+        }
+      } else {
+        toast.error(error.response?.data?.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+      }
+      
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const forceLogin = async (email: string, password: string) => {
+    setIsLoading(true);
+    
+    try {
+      const response = await authAPI.forceLogin(email, password);
+      
+      if (response.data.loggedIn && response.data.accessToken) {
+        tokenManager.setToken(response.data.accessToken);
+        
+        if (response.data.refreshToken) {
+          tokenManager.setRefreshToken(response.data.refreshToken);
+        }
+        
+        toast.success(response.data.message || '로그인 성공!');
+        
+        // 역할에 따라 다른 페이지로 리디렉션
+        const userInfo = tokenManager.getUserInfo();
+        if (userInfo?.role === 'ADMIN') {
+          navigate('/admin');
+        } else if (userInfo?.role === 'INSTRUCTOR') {
+          navigate('/course-upload');
+        } else {
+          navigate('/');
+        }
+        
+        return true;
+      } else {
+        toast.error(response.data.message || '로그인에 실패했습니다.');
+        return false;
+      }
+    } catch (error: any) {
+      console.error('Force login failed:', error);
+      toast.error(error.response?.data?.message || '로그인에 실패했습니다.');
       return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const register = async (registerData: RegisterRequest) => {
+  const register = async (formData: FormData) => {
     setIsLoading(true);
     
     try {
-      const response = await authAPI.register(
-        registerData.email, 
-        registerData.password, 
-        registerData.nickname,
-        registerData.role || 'USER'
-      );
+      const response = await authAPI.register(formData);
       
-      if (response.data.isSuccess) {
-        toast.success(response.data.message || '가입이 완료되었습니다.');
-        navigate('/login');
+      if (response.data.success) {
+        // 회원가입 성공 시 자동 로그인될 경우
+        if (response.data.accessToken) {
+          tokenManager.setToken(response.data.accessToken);
+          toast.success(response.data.message || '회원가입 및 로그인 성공!');
+          navigate('/');
+        } else {
+          // 자동 로그인이 안될 경우
+          toast.success(response.data.message || '회원가입 성공! 로그인해주세요.');
+          navigate('/login');
+        }
         return true;
       } else {
         toast.error(response.data.message || '회원가입에 실패했습니다.');
+        
+        // 유효성 검증 에러가 있는 경우
+        if (response.data.errors) {
+          if (!response.data.errors.passwordValid) {
+            toast.error('비밀번호는 8~20자 사이의 영문, 숫자, 특수문자를 포함해야 합니다.');
+          }
+          if (!response.data.errors.nicknameValid) {
+            toast.error('닉네임은 2~10자 사이의 한글, 영문, 숫자만 사용 가능합니다.');
+          }
+        }
+        
         return false;
       }
     } catch (error: any) {
       console.error('Registration failed:', error);
-      toast.error(error.response?.data?.message || '회원가입에 실패했습니다.');
+      
+      // 에러 코드에 따른 처리
+      if (error.response?.status === 409) {
+        toast.error('이미 가입된 이메일입니다.');
+      } else if (error.response?.status === 422) {
+        toast.error('사용할 수 없는 닉네임입니다.');
+      } else if (error.response?.status === 401) {
+        toast.error('이메일 인증이 완료되지 않았습니다.');
+      } else if (error.response?.status === 400 && error.response.data.message.includes('이미지')) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error(error.response?.data?.message || '회원가입에 실패했습니다.');
+      }
+      
       return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    tokenManager.clearTokens();
-    toast.success('로그아웃 되었습니다.');
-    navigate('/login');
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+      tokenManager.clearTokens();
+      toast.success('로그아웃 되었습니다.');
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      tokenManager.clearTokens(); // 에러가 있어도 토큰 제거
+      toast.info('로그아웃 되었습니다.');
+      navigate('/login');
+    }
   };
 
   const socialLogin = (provider: 'google' | 'naver' | 'kakao') => {
-    if (provider === 'naver') {
-      window.location.href = '/oauth2/authorization/naver';
-    } else if (provider === 'google') {
-      window.location.href = '/oauth2/authorization/google';
-    } else if (provider === 'kakao') {
-      window.location.href = '/oauth2/authorization/kakao';
-    }
+    window.location.href = `/oauth2/authorization/${provider}`;
   };
 
   return {
     login,
+    forceLogin,
     register,
     logout,
     socialLogin,

@@ -1,21 +1,6 @@
 
 import API from '@/utils/apiClient';
-
-// 테스트용 계정 정보
-const TEST_ACCOUNTS = {
-  instructor: {
-    email: 'instructor@example.com',
-    password: '123456',
-    nickname: 'Instructor',
-    role: 'INSTRUCTOR'
-  },
-  admin: {
-    email: 'manager@example.com',
-    password: '123456',
-    nickname: 'Manager',
-    role: 'ADMIN'
-  }
-};
+import { RegisterRequest, LoginRequest } from '@/types/auth';
 
 export const authAPI = {
   // 이메일 인증 코드 발송
@@ -29,63 +14,46 @@ export const authAPI = {
   },
   
   // 회원가입 
-  register: (email: string, password: string, nickname: string, role: string = 'USER') => {
-    return API.post('/auths/join', { email, password, nickname, role });
+  register: (formData: FormData) => {
+    return API.post('/auths/join', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
   
-  // 로그인 - 테스트 계정 기능 추가
+  // 로그인
   login: (email: string, password: string) => {
-    // 테스트 계정 로그인 처리
-    if (email === TEST_ACCOUNTS.instructor.email && password === TEST_ACCOUNTS.instructor.password) {
-      // 강사 계정 로그인 성공 처리
-      const token = generateMockToken(TEST_ACCOUNTS.instructor);
-      return Promise.resolve({
-        data: {
-          loggedIn: true,
-          accessToken: token,
-          message: '강사 계정으로 로그인되었습니다.'
-        }
-      });
-    } 
-    
-    if (email === TEST_ACCOUNTS.admin.email && password === TEST_ACCOUNTS.admin.password) {
-      // 관리자 계정 로그인 성공 처리
-      const token = generateMockToken(TEST_ACCOUNTS.admin);
-      return Promise.resolve({
-        data: {
-          loggedIn: true,
-          accessToken: token,
-          message: '관리자 계정으로 로그인되었습니다.'
-        }
-      });
-    }
-    
-    // 일반 API 로그인 요청 (기존 코드)
     return API.post('/auths/login', { email, password });
   },
   
-  // 네이버 로그인 처리
-  naverLogin: () => {
-    return API.get('/auths/naverlogin');
+  // 강제 로그인 (다른 브라우저에서 이미 로그인된 경우)
+  forceLogin: (email: string, password: string) => {
+    return API.post('/auths/force-login', { email, password });
+  },
+  
+  // 로그아웃
+  logout: () => {
+    return API.delete('/auths/logout');
+  },
+  
+  // 토큰 유효성 검증
+  validateToken: () => {
+    return API.post('/auths/valid-token');
+  },
+  
+  // 토큰 재발급
+  refreshToken: () => {
+    return API.post('/auths/refresh');
+  },
+  
+  // 소셜 로그인 정보 조회
+  getSocialInfo: () => {
+    return API.get('/oauth2/info');
+  },
+  
+  // 소셜 계정 연동
+  linkSocialAccount: () => {
+    return API.post('/oauth2/link');
   }
 };
-
-// 테스트 계정용 토큰 생성
-function generateMockToken(user: any) {
-  // 실제 토큰 대신 인코딩된 JWT 형태의 문자열 생성
-  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-  const currentTime = Math.floor(Date.now() / 1000);
-  
-  const payload = btoa(JSON.stringify({
-    sub: `user-${Date.now()}`,
-    email: user.email,
-    nickname: user.nickname,
-    role: user.role,
-    iat: currentTime,
-    exp: currentTime + 86400 // 24시간 유효
-  }));
-  
-  const signature = btoa('mockSignature');
-  
-  return `${header}.${payload}.${signature}`;
-}

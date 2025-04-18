@@ -1,79 +1,34 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Home } from 'lucide-react';
 import { toast } from 'sonner';
-import { Mail, Home, Info } from 'lucide-react';
-import { authAPI } from '@/api/auth';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/hooks/useAuth';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      // API를 통한 로그인 요청
-      const response = await authAPI.login(email, password);
-      
-      if (response.data.loggedIn && response.data.accessToken) {
-        // 토큰을 로컬 스토리지에 저장
-        localStorage.setItem('accessToken', response.data.accessToken);
-        
-        // auth context 업데이트
-        await login(email, password);
-        
-        toast.success('로그인 성공!');
-        
-        // 역할에 따라 다른 페이지로 리디렉션
-        if (response.data.message?.includes('관리자')) {
-          navigate('/admin');
-        } else if (response.data.message?.includes('강사')) {
-          navigate('/course-upload');
-        } else {
-          navigate('/');
-        }
-      } else {
-        toast.error('로그인에 실패했습니다.');
-      }
+      await login(email, password);
     } catch (error) {
-      console.error('Login failed:', error);
-      toast.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSocialLogin = (provider: 'google' | 'naver' | 'kakao') => {
-    if (provider === 'naver') {
-      // 네이버 로그인의 경우 리다이렉션 방식 사용
-      window.location.href = '/oauth2/authorization/naver';
-    } else {
-      // 기존 로직 유지 (소셜 로그인 데모)
-      toast.info(`${provider} 로그인 준비 중...`);
-      setTimeout(() => navigate('/'), 1500);
-    }
-  };
-
-  const fillTestAccount = (type: 'instructor' | 'admin') => {
-    if (type === 'instructor') {
-      setEmail('instructor@example.com');
-      setPassword('123456');
-      toast.info('강사 테스트 계정이 입력되었습니다.');
-    } else {
-      setEmail('manager@example.com');
-      setPassword('123456');
-      toast.info('관리자 테스트 계정이 입력되었습니다.');
-    }
+    window.location.href = `/oauth2/authorization/${provider}`;
   };
 
   return (
@@ -91,27 +46,6 @@ const Login = () => {
               Aigongbu에 오신 것을 환영합니다
             </p>
           </div>
-
-          <Alert className="mb-6 bg-blue-50 border border-blue-100">
-            <Info className="h-4 w-4 text-blue-500" />
-            <AlertDescription className="text-xs text-blue-700">
-              테스트 계정: 
-              <button 
-                onClick={() => fillTestAccount('instructor')} 
-                className="mx-1 text-blue-600 underline hover:text-blue-800"
-              >
-                강사 계정
-              </button>
-              또는 
-              <button 
-                onClick={() => fillTestAccount('admin')} 
-                className="mx-1 text-blue-600 underline hover:text-blue-800"
-              >
-                관리자 계정
-              </button>
-              을 사용해보세요.
-            </AlertDescription>
-          </Alert>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
