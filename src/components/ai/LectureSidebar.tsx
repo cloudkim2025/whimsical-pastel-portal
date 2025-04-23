@@ -12,6 +12,9 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarTrigger
 } from "@/components/ui/sidebar";
 import { Bot, Code, History, FileCode, ChevronRight } from "lucide-react";
@@ -116,4 +119,3 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
 };
 
 export default LectureSidebar;
-
