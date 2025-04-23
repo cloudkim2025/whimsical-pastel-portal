@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -128,11 +127,17 @@ export function useCounter() {
   }
 ];
 
+// Define a proper MessageType to include all possible roles
+interface MessageType {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
 const AILectures = () => {
   const [activeSession, setActiveSession] = useState(mockSessions[0]);
-  const [chatMessages, setChatMessages] = useState([
+  const [chatMessages, setChatMessages] = useState<MessageType[]>([
     {
-      role: "system" as const,
+      role: "system",
       content: "안녕하세요! AI 코드 분석 튜터입니다. 코드에 대해 어떤 질문이 있으신가요?",
     },
   ]);
@@ -145,15 +150,15 @@ const AILectures = () => {
   const handleSendMessage = async () => {
     if (!userInput.trim() || isProcessing) return;
 
-    const newMessage = { role: "user" as const, content: userInput };
+    const newMessage: MessageType = { role: "user", content: userInput };
     setChatMessages((prev) => [...prev, newMessage]);
     setUserInput("");
     setIsProcessing(true);
 
     try {
       setTimeout(() => {
-        const aiResponse = {
-          role: "assistant" as const,
+        const aiResponse: MessageType = {
+          role: "assistant",
           content: `이 코드는 ${activeSession.title}에 관한 패턴을 보여주고 있습니다. 주요 포인트는 다음과 같습니다:
 
 1. 효율적인 상태 관리를 위한 메모이제이션 기법을 사용했습니다.
@@ -170,7 +175,7 @@ const AILectures = () => {
       setChatMessages((prev) => [
         ...prev,
         {
-          role: "assistant" as const,
+          role: "assistant",
           content: "죄송합니다. 오류가 발생했습니다. 다시 시도해 주세요.",
         },
       ]);
@@ -182,7 +187,7 @@ const AILectures = () => {
     setActiveSession(session);
     setChatMessages([
       {
-        role: "system" as const,
+        role: "system",
         content: `${session.title}에 대한 분석을 시작합니다. 어떤 질문이 있으신가요?`,
       },
     ]);
@@ -257,4 +262,3 @@ const AILectures = () => {
 };
 
 export default AILectures;
-

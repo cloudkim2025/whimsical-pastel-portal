@@ -1,4 +1,3 @@
-
 import React from "react";
 import { MessageSquare, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ interface Message {
   role: "system" | "user" | "assistant";
   content: string;
 }
+
 interface LectureChatPanelProps {
   messages: Message[];
   userInput: string;
@@ -15,6 +15,7 @@ interface LectureChatPanelProps {
   onSendMessage: () => void;
   onRefresh?: () => void;
 }
+
 const LectureChatPanel: React.FC<LectureChatPanelProps> = ({
   messages,
   userInput,
