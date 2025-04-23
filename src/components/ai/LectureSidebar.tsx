@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Tabs,
@@ -55,26 +54,19 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
         </div>
         <SidebarTrigger />
       </SidebarHeader>
-      <SidebarContent
-        className="overflow-y-auto"
-        style={{
-          height: "fit-content",
-          maxHeight: "calc(100vh - 160px)"
-        }}
-      >
+      <SidebarContent className="pt-2 px-2">
         <Tabs value={sidebarView} className="w-full" onValueChange={setSidebarView}>
-          <div className="px-2">
-            <TabsList className="w-full">
-              <TabsTrigger value="history" className="flex-1">
-                <History className="h-4 w-4 mr-1" />
-                기록
-              </TabsTrigger>
-              <TabsTrigger value="outline" className="flex-1">
-                <FileCode className="h-4 w-4 mr-1" />
-                개요
-              </TabsTrigger>
-            </TabsList>
-          </div>
+          <TabsList className="w-full">
+            <TabsTrigger value="history" className="flex-1">
+              <History className="h-4 w-4 mr-1" />
+              기록
+            </TabsTrigger>
+            <TabsTrigger value="outline" className="flex-1">
+              <FileCode className="h-4 w-4 mr-1" />
+              개요
+            </TabsTrigger>
+          </TabsList>
+
           <TabsContent value="history" className="mt-0">
             <SidebarGroup>
               <SidebarGroupLabel>최근 분석</SidebarGroupLabel>
@@ -94,6 +86,7 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
               </SidebarMenu>
             </SidebarGroup>
           </TabsContent>
+
           <TabsContent value="outline" className="mt-0">
             <SidebarGroup>
               <SidebarGroupLabel>코드 구조</SidebarGroupLabel>
@@ -122,4 +115,3 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
 };
 
 export default LectureSidebar;
-
