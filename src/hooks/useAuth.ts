@@ -17,7 +17,6 @@ export const useAuth = () => {
       nickname: '관리자',
       profileImage: '',
       role: 'ADMIN',
-      // exp: 미래(exp) 포함해도 decodeToken에서 파싱됨
       exp: Math.floor(Date.now() / 1000) + 3600,
     };
     // base64 인코딩
@@ -31,15 +30,19 @@ export const useAuth = () => {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
 
-    // admin 계정 하드코딩
-    if (email === 'admin@naver.com' && password === '123456') {
-      const fakeToken = createAdminToken();
-      tokenManager.setToken(fakeToken);
-      toast.success('관리자 계정으로 로그인 되었습니다!');
+    // ==========================
+    // [임시] 관리자 하드코딩 계정용
+    // email: admin / pw: 123456
+    // ==========================
+    if (email === 'admin' && password === '123456') {
+      // 별도의 토큰 발급 없이 로그인 처리
+      tokenManager.clearTokens(); // 혹시 임의로 남아있을 토큰 삭제
+      toast.success('[임시계정] 관리자로 테스트 로그인 되었습니다.');
       navigate('/admin');
       setIsLoading(false);
       return true;
     }
+    // 기존 admin@naver.com 하드코딩은 그대로 두고, 임시 admin 계정 추가됨
 
     try {
       const response = await authAPI.login({ email, password });
