@@ -1,27 +1,55 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { authAPI } from '@/api/auth';
 import { tokenManager } from '@/utils/tokenManager';
-import { LoginRequest, RegisterRequest } from '@/types/auth';
+import { LoginRequest, RegisterRequest, UserRole } from '@/types/auth';
 
 export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  // 하드코딩 admin 계정 토큰 생성 함수
+  const createAdminToken = () => {
+    // 실제 JWT가 아닌, 최소한의 가짜 페이로드(기존 토큰 파싱 로직과 맞추기)
+    const payload = {
+      sub: '1',
+      nickname: '관리자',
+      profileImage: '',
+      role: 'ADMIN',
+      // exp: 미래(exp) 포함해도 decodeToken에서 파싱됨
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    };
+    // base64 인코딩
+    const base64Payload = btoa(
+      unescape(encodeURIComponent(JSON.stringify(payload)))
+    );
+    // JWT는 header.payload.signature(임시로 header/signature dummy)
+    return `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${base64Payload}.admindummysig`;
+  };
+
   const login = async (email: string, password: string) => {
     setIsLoading(true);
-    
+
+    // admin 계정 하드코딩
+    if (email === 'admin' && password === '123456') {
+      const fakeToken = createAdminToken();
+      tokenManager.setToken(fakeToken);
+      toast.success('관리자 계정으로 로그인 되었습니다!');
+      navigate('/admin');
+      setIsLoading(false);
+      return true;
+    }
+
     try {
       const response = await authAPI.login({ email, password });
-      
+
       if (response.data.loggedIn && response.data.accessToken) {
         // 토큰을 로컬 스토리지에 저장
         tokenManager.setToken(response.data.accessToken);
-        
+
         toast.success(response.data.message || '로그인 성공!');
-        
+
         // 역할에 따라 다른 페이지로 리디렉션
         const userInfo = tokenManager.getUserInfo();
         if (userInfo?.role === 'ADMIN') {
@@ -31,7 +59,7 @@ export const useAuth = () => {
         } else {
           navigate('/');
         }
-        
+
         return true;
       } else {
         toast.error(response.data.message || '로그인에 실패했습니다.');
@@ -39,7 +67,7 @@ export const useAuth = () => {
       }
     } catch (error: any) {
       console.error('Login failed:', error);
-      
+
       // 다른 브라우저에서 로그인 중인 경우 (409)
       if (error.response?.status === 409) {
         const confirmForce = window.confirm(error.response.data.message);
@@ -49,24 +77,24 @@ export const useAuth = () => {
       } else {
         toast.error(error.response?.data?.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
       }
-      
+
       return false;
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const forceLogin = async (email: string, password: string) => {
     setIsLoading(true);
-    
+
     try {
       const response = await authAPI.forceLogin({ email, password });
-      
+
       if (response.data.loggedIn && response.data.accessToken) {
         tokenManager.setToken(response.data.accessToken);
-        
+
         toast.success(response.data.message || '로그인 성공!');
-        
+
         // 역할에 따라 다른 페이지로 리디렉션
         const userInfo = tokenManager.getUserInfo();
         if (userInfo?.role === 'ADMIN') {
@@ -76,7 +104,7 @@ export const useAuth = () => {
         } else {
           navigate('/');
         }
-        
+
         return true;
       } else {
         toast.error(response.data.message || '로그인에 실패했습니다.');
@@ -93,10 +121,10 @@ export const useAuth = () => {
 
   const register = async (formData: FormData) => {
     setIsLoading(true);
-    
+
     try {
       const response = await authAPI.register(formData);
-      
+
       if (response.data.success) {
         // 회원가입 성공 시 자동 로그인될 경우
         if (response.data.accessToken) {
