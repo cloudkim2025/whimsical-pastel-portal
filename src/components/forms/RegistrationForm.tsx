@@ -1,5 +1,6 @@
+// forms/RegistrationForm
 import React, { useState, useRef } from 'react';
-import { Mail, Check, Upload } from 'lucide-react';
+import { Check, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,8 +20,7 @@ const RegistrationForm: React.FC = () => {
     setIsVerificationModalOpen,
     handleSendVerificationCode,
     handleVerificationResult,
-    emailError,
-    setEmailError
+    emailError
   } = useEmailVerification();
 
   const [password, setPassword] = useState('');
@@ -31,8 +31,7 @@ const RegistrationForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const { register: registerUser } = useAuthWithRedirect(); // 훅 변경됨
-
+  const { register: registerUser } = useAuthWithRedirect();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateForm = (): boolean => {
@@ -87,18 +86,18 @@ const RegistrationForm: React.FC = () => {
 
     try {
       const success = await registerUser(
-        {
-          email,
-          password,
-          nickname,
-          profileImage: profileImage || undefined,
-        },
-        (field, message) => {
-          if (field && message) {
-            setErrors((prev) => ({ ...prev, [field]: message }));
-          }
-        },
-        setErrors
+          {
+            email,
+            password,
+            nickname,
+            profileImage: profileImage || undefined
+          },
+          (field, message) => {
+            if (field && message) {
+              setErrors((prev) => ({ ...prev, [field]: message }));
+            }
+          },
+          setErrors
       );
 
       if (!success) toast.error('회원가입에 실패했습니다.');
@@ -155,9 +154,7 @@ const RegistrationForm: React.FC = () => {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                  }}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
                   disabled={isEmailVerified}
