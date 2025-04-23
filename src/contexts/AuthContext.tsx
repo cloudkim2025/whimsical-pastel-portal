@@ -1,6 +1,4 @@
 
-// AuthContext.tsx
-
 import React, {createContext, type ReactNode, useContext, useEffect, useState,} from 'react';
 import {toast} from 'sonner';
 import {tokenManager} from '@/utils/tokenManager';
@@ -39,7 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(userInfo || null);
   };
 
-  // Check user role on initial render
+  // Check user role on initial render and when user changes
   useEffect(() => {
     const checkUserRole = async () => {
       if (user) {

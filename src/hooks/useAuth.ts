@@ -65,7 +65,6 @@ export const useAuth = () => {
       if (response.data.loggedIn && response.data.accessToken) {
         tokenManager.setToken(response.data.accessToken);
         
-        
         toast.success(response.data.message || '로그인 성공!');
         
         // 역할에 따라 다른 페이지로 리디렉션
