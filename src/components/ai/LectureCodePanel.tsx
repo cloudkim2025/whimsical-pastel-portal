@@ -1,0 +1,37 @@
+
+import React from "react";
+import { FileCode, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface LectureCodePanelProps {
+  title: string;
+  code: string;
+  onRefresh?: () => void;
+}
+
+const LectureCodePanel: React.FC<LectureCodePanelProps> = ({
+  title,
+  code,
+  onRefresh,
+}) => (
+  <div className="h-full flex flex-col">
+    <div className="border-b border-border p-2 flex justify-between items-center bg-ghibli-midnight/5">
+      <div className="flex items-center">
+        <FileCode className="h-4 w-4 mr-2 text-ghibli-forest" />
+        <span className="text-sm font-medium">{title}</span>
+      </div>
+      <div>
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onRefresh}>
+          <RefreshCw className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+    <div className="flex-1 overflow-auto bg-[#1E1E1E]">
+      <pre className="p-4 text-[#D4D4D4] font-mono text-sm whitespace-pre overflow-x-auto">
+        <code>{code}</code>
+      </pre>
+    </div>
+  </div>
+);
+
+export default LectureCodePanel;
