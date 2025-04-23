@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Tabs,
@@ -45,7 +46,7 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
     <Sidebar
       collapsible="icon"
       variant="sidebar"
-      className="h-fit max-h-[calc(100vh-160px)]"
+      className="h-fit max-h-[calc(100vh-200px)] mt-4"
     >
       <SidebarHeader className="h-14 flex items-center justify-between px-4">
         <div className="flex items-center">
