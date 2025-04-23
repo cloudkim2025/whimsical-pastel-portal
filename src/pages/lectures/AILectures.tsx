@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -128,11 +127,18 @@ export function useCounter() {
   }
 ];
 
+type MessageRole = "system" | "user" | "assistant";
+
+interface Message {
+  role: MessageRole;
+  content: string;
+}
+
 const AILectures = () => {
   const [activeSession, setActiveSession] = useState(mockSessions[0]);
-  const [chatMessages, setChatMessages] = useState([
+  const [chatMessages, setChatMessages] = useState<Message[]>([
     {
-      role: "system" as const,
+      role: "system",
       content: "안녕하세요! AI 코드 분석 튜터입니다. 코드에 대해 어떤 질문이 있으신가요?",
     },
   ]);
@@ -145,15 +151,15 @@ const AILectures = () => {
   const handleSendMessage = async () => {
     if (!userInput.trim() || isProcessing) return;
 
-    const newMessage = { role: "user" as const, content: userInput };
+    const newMessage: Message = { role: "user", content: userInput };
     setChatMessages((prev) => [...prev, newMessage]);
     setUserInput("");
     setIsProcessing(true);
 
     try {
       setTimeout(() => {
-        const aiResponse = {
-          role: "assistant" as const,
+        const aiResponse: Message = {
+          role: "assistant",
           content: `이 코드는 ${activeSession.title}에 관한 패턴을 보여주고 있습니다. 주요 포인트는 다음과 같습니다:
 
 1. 효율적인 상태 관리를 위한 메모이제이션 기법을 사용했습니다.
@@ -170,7 +176,7 @@ const AILectures = () => {
       setChatMessages((prev) => [
         ...prev,
         {
-          role: "assistant" as const,
+          role: "assistant",
           content: "죄송합니다. 오류가 발생했습니다. 다시 시도해 주세요.",
         },
       ]);
@@ -182,7 +188,7 @@ const AILectures = () => {
     setActiveSession(session);
     setChatMessages([
       {
-        role: "system" as const,
+        role: "system",
         content: `${session.title}에 대한 분석을 시작합니다. 어떤 질문이 있으신가요?`,
       },
     ]);
@@ -192,11 +198,11 @@ const AILectures = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <div className="pt-[72px] lg:pt-[92px] px-0"> {/* 헤더와 겹치지 않게 패딩 조정 */}
+      <main className="flex-grow pt-[72px] lg:pt-[92px]">
         <SidebarProvider defaultOpen={true}>
-          <div className="flex min-h-[calc(100vh-5.5rem)] w-full">
+          <div className="flex w-full h-[calc(100vh-72px-60px)] lg:h-[calc(100vh-92px-60px)]">
             <LectureSidebar
               sessions={mockSessions}
               activeSession={activeSession}
@@ -205,18 +211,16 @@ const AILectures = () => {
               selectSession={selectSession}
             />
             <SidebarInset>
-              <div className="flex flex-col md:flex-row h-full">
-                {/* Code Editor Panel */}
+              <div className="flex flex-col md:flex-row h-full overflow-auto">
                 <div className="w-full md:w-1/2 border-r border-border flex flex-col"
-                  style={{ maxHeight: "70vh", minHeight: "420px", height: "70vh" }}>
+                  style={{ maxHeight: "100%", minHeight: "420px", height: "100%" }}>
                   <LectureCodePanel
                     title={activeSession.title}
                     code={activeSession.code}
                   />
                 </div>
-                {/* Chat Panel */}
                 <div className="w-full md:w-1/2 flex flex-col h-full"
-                  style={{ maxHeight: "70vh", minHeight: "420px", height: "70vh" }}>
+                  style={{ maxHeight: "100%", minHeight: "420px", height: "100%" }}>
                   <LectureChatPanel
                     messages={chatMessages}
                     userInput={userInput}
@@ -229,7 +233,7 @@ const AILectures = () => {
             </SidebarInset>
           </div>
         </SidebarProvider>
-      </div>
+      </main>
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-[300px] p-0">
           <AIHistorySidebar
@@ -245,4 +249,3 @@ const AILectures = () => {
 };
 
 export default AILectures;
-
