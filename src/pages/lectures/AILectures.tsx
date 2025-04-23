@@ -205,7 +205,7 @@ const AILectures = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="pt-20">
+      <div className="pt-24 md:pt-20">  {/* Increased top padding to prevent header overlap */}
         <SidebarProvider defaultOpen={true}>
           <div className="flex min-h-[calc(100vh-5rem)] w-full">
             {/* History Sidebar */}
