@@ -1,26 +1,25 @@
+// AuthContext.tsx
 
-import React, { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { tokenManager } from '@/utils/tokenManager';
-import { authAPI } from '@/api/auth';
-import type { RegisterRequest, User } from '@/types/auth';
-import { FormErrors } from "@/components/forms/RegistrationForm.types";
+import React, {createContext, type ReactNode, useContext, useEffect, useState,} from 'react';
+import {toast} from 'sonner';
+import {tokenManager} from '@/utils/tokenManager';
+import {authAPI} from '@/api/auth';
+import type {RegisterRequest, User} from '@/types/auth';
+import {FormErrors} from "@/components/forms/RegistrationForm.types";
+
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string, onSuccess?: () => void) => Promise<boolean>;
   forceLogin: (email: string, password: string, onSuccess?: () => void) => Promise<boolean>;
   register: (
-    form: RegisterRequest,
-    onMessage?: (field: keyof FormErrors, message: string) => void,
-    setErrors?: React.Dispatch<React.SetStateAction<FormErrors>>
+      form: RegisterRequest,
+      onSuccess?: () => void,
+      setErrors?: React.Dispatch<React.SetStateAction<FormErrors>>
   ) => Promise<boolean>;
   logout: () => void;
   loginWithSocialMedia: (provider: 'google' | 'naver' | 'kakao') => void;
   updateUserFromToken: () => void;
-  isAuthenticated: () => boolean;
-  isAdmin: () => boolean;
-  isInstructor: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,12 +39,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (
-    email: string,
-    password: string,
-    onSuccess?: () => void
+      email: string,
+      password: string,
+      onSuccess?: () => void
   ): Promise<boolean> => {
     try {
       const { data } = await authAPI.login({ email, password });
+
       if (data?.loggedIn && data.accessToken) {
         tokenManager.setToken(data.accessToken);
         updateUserFromToken();
@@ -53,11 +53,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         onSuccess?.();
         return true;
       }
+
       toast.error(data.message || '로그인에 실패했습니다.');
       return false;
     } catch (error: any) {
       const status = error.response?.status;
       const msg = error.response?.data?.message;
+
       if (status === 409) {
         toast.error('해당 계정은 다른 브라우저나 기기에서 로그인된 상태입니다. 지금 로그인하면 기존 세션은 만료됩니다. 계속하시겠습니까?');
       } else {
@@ -68,9 +70,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const forceLogin = async (
-    email: string,
-    password: string,
-    onSuccess?: () => void
+      email: string,
+      password: string,
+      onSuccess?: () => void
   ): Promise<boolean> => {
     try {
       const { data } = await authAPI.forceLogin({ email, password });
@@ -90,22 +92,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const register = async (
-    form: RegisterRequest,
-    onMessage?: (field: keyof FormErrors, message: string) => void,
-    setErrors?: React.Dispatch<React.SetStateAction<FormErrors>>
+      form: RegisterRequest,
+      onMessage?: (field: keyof FormErrors, message: string) => void,
+      setErrors?: React.Dispatch<React.SetStateAction<FormErrors>>
   ): Promise<boolean> => {
     try {
-      // FormData에 JSON + 파일 동시 처리
       const formData = new FormData();
       const userPayload = {
         email: form.email,
         password: form.password,
         nickname: form.nickname,
       };
+
       formData.append('user', new Blob([JSON.stringify(userPayload)], { type: 'application/json' }));
+
       if (form.profileImage) {
         formData.append('profileImage', form.profileImage);
       }
+
       const { data } = await authAPI.register(formData);
 
       if (data?.success) {
@@ -132,15 +136,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return false;
     } catch (error: any) {
       const responseData = error?.response?.data;
+
       if (responseData?.errors && setErrors) {
         setErrors((prev) => ({
           ...prev,
           ...responseData.errors,
         }));
       }
+
       if (!responseData?.errors && responseData?.message && onMessage) {
         onMessage('nicknameError', responseData.message);
       }
+
       toast.error(responseData?.message || '회원가입 중 오류가 발생했습니다.');
       return false;
     }
@@ -162,18 +169,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = `/oauth2/authorization/${provider}`;
   };
 
-  const isAuthenticated = (): boolean => {
-    return user !== null;
-  };
-
-  const isAdmin = (): boolean => {
-    return user?.role === 'ADMIN';
-  };
-
-  const isInstructor = (): boolean => {
-    return user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
-  };
-
   const value: AuthContextType = {
     user,
     login,
@@ -182,9 +177,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     logout,
     loginWithSocialMedia,
     updateUserFromToken,
-    isAuthenticated,
-    isAdmin,
-    isInstructor,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
