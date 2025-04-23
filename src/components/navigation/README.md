@@ -59,24 +59,24 @@ import ProfileDropdown from './navigation/ProfileDropdown';
 import MobileMenu from './navigation/MobileMenu';
 
 const Header = () => {
-  const { isAuthenticated } = useAuth();
+  const {isAuthenticated} = useAuthWithRedirect();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header>
-      <Logo />
-      
-      {/* 데스크톱 내비게이션 */}
-      <nav className="hidden md:flex">
-        <NavigationLinks />
-      </nav>
-      
-      {/* 인증 관련 UI */}
-      {isAuthenticated ? <ProfileDropdown /> : <AuthButtons />}
-      
-      {/* 모바일 메뉴 */}
-      <MobileMenu isMenuOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-    </header>
+          <header>
+            <Logo/>
+
+            {/* 데스크톱 내비게이션 */}
+            <nav className="hidden md:flex">
+              <NavigationLinks/>
+            </nav>
+
+            {/* 인증 관련 UI */}
+            {isAuthenticated ? <ProfileDropdown/> : <AuthButtons/>}
+
+            {/* 모바일 메뉴 */}
+            <MobileMenu isMenuOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)}/>
+          </header>
   );
 };
 ```

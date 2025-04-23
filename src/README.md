@@ -44,7 +44,7 @@ src/
 │   └── AuthContext.tsx   # 인증 관련 컨텍스트 (로그인 상태, 사용자 정보 등)
 │
 ├── hooks/                # 커스텀 훅 정의
-│   ├── useAuth.ts        # 인증 관련 훅 (로그인, 로그아웃, 인증 상태 확인)
+│   ├── useAuthWithRedirect.ts        # 인증 관련 훅 (로그인, 로그아웃, 인증 상태 확인)
 │   ├── useEmailVerification.ts # 이메일 인증 관련 훅
 │   ├── use-mobile.tsx    # 모바일 화면 감지 훅
 │   ├── use-toast.ts      # 토스트 알림 표시 훅
@@ -111,10 +111,10 @@ const userInfo = tokenManager.getUserInfo();
 ## 전역 상태 접근 예시 (Global State Access Example)
 
 ```typescript
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthWithRedirect } from '@/contexts/AuthContext';
 
 const MyComponent = () => {
-  const { isAuthenticated, user, login, logout } = useAuth();
+  const { isAuthenticated, user, login, logout } = useAuthWithRedirect();
   
   // 인증 상태에 따른 UI 렌더링
   return isAuthenticated ? <AuthenticatedUI user={user} /> : <LoginForm onLogin={login} />;

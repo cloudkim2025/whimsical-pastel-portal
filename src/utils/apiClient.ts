@@ -1,84 +1,58 @@
-
+//utils/apiClient.ts
 import axios from 'axios';
 import { tokenManager } from './tokenManager';
+// import { toast } from 'react-toastify'; // UI 알림 라이브러리 쓸 경우
 
 const API = axios.create({
-  baseURL: 'http://localhost:9000',  // Edge-service gateway 주소 (필요시 수정)
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 10000, // 10초
-  withCredentials: true, // 쿠키 전송을 위해 필요
+    baseURL: 'http://localhost:9000',  // ✅ Gateway 주소 (.env로 분리 추천)
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    timeout: 10000,
+    withCredentials: true, // ✅ 쿠키 기반 리프레시 토큰 처리 지원
 });
 
-// 요청 인터셉터 - 토큰 추가
+// 요청 인터셉터 - 액세스 토큰 헤더 설정
 API.interceptors.request.use(
-  (config) => {
-    const token = tokenManager.getToken();
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    
-    // FormData인 경우 Content-Type을 자동으로 처리하도록 설정
-    if (config.data instanceof FormData) {
-      config.headers['Content-Type'] = 'multipart/form-data';
-    }
-    
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+    (config) => {
+        const token = tokenManager.getToken();
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        // FormData 요청일 경우 Content-Type 제거 → 브라우저가 자동 설정
+        if (config.data instanceof FormData) {
+            delete config.headers['Content-Type'];
+        }
+
+        return config;
+    },
+    (error) => Promise.reject(error)
 );
 
-// 응답 인터셉터 - 에러 처리 및 토큰 갱신
+// 응답 인터셉터 - 에러 처리 및 자동 로그아웃 등
 API.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  async (error) => {
-    const originalRequest = error.config;
-    
-    // 에러 상세 정보 콘솔에 기록 (디버깅용)
-    console.error('API 오류 발생:', {
-      url: originalRequest?.url,
-      method: originalRequest?.method,
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message
-    });
-    
-    // 401 에러이고 토큰 만료인 경우 리프레시 토큰으로 갱신 시도
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      
-      try {
-        // 토큰 갱신 API 호출
-        const response = await API.post('/auths/refresh');
-        
-        if (response.data.success && response.data.accessToken) {
-          const newToken = response.data.accessToken;
-          tokenManager.setToken(newToken);
-          
-          // 원래 요청의 헤더에 새 토큰 설정
-          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-          
-          // 원래 요청 다시 실행
-          return API(originalRequest);
-        } else {
-          // 갱신 실패 시 로그아웃
-          tokenManager.clearTokens();
-          window.location.href = '/login';
+    (response) => response,
+    (error) => {
+        const originalRequest = error.config;
+
+        console.error('🌐 API 오류 발생:', {
+            url: originalRequest?.url,
+            method: originalRequest?.method,
+            status: error.response?.status,
+            message: error.response?.data?.message || error.message,
+        });
+
+        // 에러 메시지 사용자에게 표시하고 싶으면 toast 사용
+        // toast.error(error.response?.data?.message || "에러가 발생했습니다");
+
+        if (error.response?.status === 401) {
+            tokenManager.clearTokens();
+            window.location.href = '/login';
         }
-      } catch (refreshError) {
-        // 토큰 갱신 실패 시 로그아웃 처리
-        tokenManager.clearTokens();
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
+
+        return Promise.reject(error);
     }
-    
-    return Promise.reject(error);
-  }
 );
 
 export default API;

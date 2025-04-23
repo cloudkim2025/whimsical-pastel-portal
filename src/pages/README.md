@@ -189,23 +189,23 @@ pages/
 
 4. **라우팅 통합**: 모든 페이지 컴포넌트는 `App.tsx`의 React Router 설정에 등록되어야 합니다.
 
-5. **권한 관리**: 인증이 필요한 페이지는 `useAuth` 훅을 사용하여 접근 권한을 확인하고, 필요시 로그인 페이지로 리디렉션합니다.
+5. **권한 관리**: 인증이 필요한 페이지는 `useAuthWithRedirect` 훅을 사용하여 접근 권한을 확인하고, 필요시 로그인 페이지로 리디렉션합니다.
 
 ```jsx
 // 권한 관리 예시
 const ProtectedPage = () => {
-  const { isAuthenticated, loading } = useAuth();
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, loading, navigate]);
-  
-  if (loading) return <LoadingSpinner />;
-  if (!isAuthenticated) return null;
-  
-  return <div>접근이 허용된 페이지 내용</div>;
+    const {isAuthenticated, loading} = useAuthWithRedirect();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!loading && !isAuthenticated) {
+            navigate('/login', {replace: true});
+        }
+    }, [isAuthenticated, loading, navigate]);
+
+    if (loading) return <LoadingSpinner/>;
+    if (!isAuthenticated) return null;
+
+    return <div>접근이 허용된 페이지 내용</div>;
 };
 ```

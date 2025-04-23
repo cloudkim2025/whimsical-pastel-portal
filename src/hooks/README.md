@@ -5,7 +5,7 @@
 
 ## 주요 훅 설명
 
-### useAuth.ts
+### useAuthWithRedirect.ts
 
 **역할**: 사용자 인증 관련 기능을 제공하는 훅
 **사용하는 곳**: AuthContext와 함께 사용되어 로그인, 로그아웃, 인증 상태 확인 등을 처리
@@ -19,10 +19,10 @@
 
 **사용 예시**:
 ```typescript
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthWithRedirect } from '@/hooks/useAuthWithRedirect';
 
 const LoginComponent = () => {
-  const { login, isAuthenticated, user, error } = useAuth();
+  const { login, isAuthenticated, user, error } = useAuthWithRedirect();
   
   const handleSubmit = async (email: string, password: string) => {
     await login(email, password);

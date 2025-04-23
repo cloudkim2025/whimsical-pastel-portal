@@ -1,7 +1,7 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { authAPI } from '@/api/auth';
+import { EmailVerificationResponse } from '@/types/auth';
 
 interface UseEmailVerificationReturn {
   email: string;
@@ -34,24 +34,36 @@ export const useEmailVerification = (): UseEmailVerificationReturn => {
   };
 
   const handleSendVerificationCode = async (): Promise<void> => {
-    if (validateEmail()) {
-      try {
-        setIsSendingCode(true);
-        
-        // API 호출로 인증 코드 발송
-        const response = await authAPI.sendVerificationCode(email);
-        
-        toast.success(`${email}로 인증코드가 발송되었습니다.`);
+    if (!validateEmail()) return;
+
+    try {
+      setIsSendingCode(true);
+
+      const response = await authAPI.sendVerificationCode(email);
+      const data = response.data as EmailVerificationResponse;
+
+      toast.success(data.message);
+
+      if (data.message === '이미 인증된 이메일입니다.') {
+        setIsEmailVerified(true);
+        setIsVerificationModalOpen(false);
+      } else {
+        // 인증코드가 새로 발송된 경우
         setIsVerificationModalOpen(true);
-      } catch (error) {
-        console.error('Failed to send verification code:', error);
-        toast.error('인증 코드 발송에 실패했습니다.');
-      } finally {
-        setIsSendingCode(false);
       }
+
+    } catch (error: any) {
+      console.error('인증 코드 발송 실패:', error);
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('인증 코드 발송에 실패했습니다.');
+      }
+    } finally {
+      setIsSendingCode(false);
     }
   };
-  
+
   const handleVerificationResult = (success: boolean): void => {
     if (success) {
       setIsEmailVerified(true);
@@ -70,6 +82,6 @@ export const useEmailVerification = (): UseEmailVerificationReturn => {
     handleVerificationResult,
     validateEmail,
     emailError,
-    setEmailError
+    setEmailError,
   };
 };

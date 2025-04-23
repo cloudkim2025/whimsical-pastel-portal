@@ -28,10 +28,10 @@
 ### 사용 예시
 
 ```jsx
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthWithRedirect } from '@/contexts/AuthContext';
 
 const ProfileComponent = () => {
-  const { user, isAuthenticated, loading, updateProfile } = useAuth();
+  const { user, isAuthenticated, loading, updateProfile } = useAuthWithRedirect();
 
   if (loading) return <LoadingSpinner />;
   
@@ -158,11 +158,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
 3. **분리된 컨텍스트**: 관련 없는 상태를 하나의 컨텍스트에 합치지 말고, 관심사에 따라 컨텍스트를 분리하세요.
 
-4. **커스텀 훅 제공**: 각 컨텍스트에는 사용을 간편하게 하는 커스텀 훅을 함께 제공하세요 (예: `useAuth`, `useTheme`).
+4. **커스텀 훅 제공**: 각 컨텍스트에는 사용을 간편하게 하는 커스텀 훅을 함께 제공하세요 (예: `useAuthWithRedirect`, `useTheme`).
 
 ```jsx
 // 커스텀 훅 예시
-export const useAuth = () => {
+export const useAuthWithRedirect = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth는 AuthProvider 내부에서만 사용할 수 있습니다');

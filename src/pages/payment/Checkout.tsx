@@ -39,7 +39,7 @@ const Checkout: React.FC = () => {
   const [lecture, setLecture] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('kakao');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { isProcessing, setIsProcessing, processKakaoPayment, simulatePayment } = usePayment({
     lectureId: lectureId || ''
@@ -50,7 +50,7 @@ const Checkout: React.FC = () => {
     const cleanup = loadPortoneScript();
 
     // 인증 확인
-    if (!isAuthenticated) {
+    if (!user) {
       toast.error('결제를 진행하려면 로그인이 필요합니다.');
       navigate('/login');
       return;
@@ -62,7 +62,7 @@ const Checkout: React.FC = () => {
     }
 
     return cleanup;
-  }, [lectureId, isAuthenticated, navigate]);
+  }, [lectureId, user, navigate]);
   
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
