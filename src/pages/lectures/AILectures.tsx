@@ -194,7 +194,7 @@ const AILectures = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="pt-[72px] lg:pt-[92px] px-0"> {/* 헤더와 겹치지 않게 패딩 조정 */}
+      <div className="pt-[72px] lg:pt-[92px] px-0">
         <SidebarProvider defaultOpen={true}>
           <div className="flex min-h-[calc(100vh-5.5rem)] w-full">
             <LectureSidebar
@@ -207,16 +207,28 @@ const AILectures = () => {
             <SidebarInset>
               <div className="flex flex-col md:flex-row h-full">
                 {/* Code Editor Panel */}
-                <div className="w-full md:w-1/2 border-r border-border flex flex-col"
-                  style={{ maxHeight: "70vh", minHeight: "420px", height: "70vh" }}>
+                <div 
+                  className="w-full md:w-1/2 border-r border-border flex flex-col"
+                  style={{ 
+                    maxHeight: "70vh", 
+                    minHeight: "420px", 
+                    height: "70vh" 
+                  }}
+                >
                   <LectureCodePanel
                     title={activeSession.title}
                     code={activeSession.code}
                   />
                 </div>
                 {/* Chat Panel */}
-                <div className="w-full md:w-1/2 flex flex-col h-full"
-                  style={{ maxHeight: "70vh", minHeight: "420px", height: "70vh" }}>
+                <div 
+                  className="w-full md:w-1/2 flex flex-col h-full"
+                  style={{ 
+                    maxHeight: "70vh", 
+                    minHeight: "420px", 
+                    height: "70vh" 
+                  }}
+                >
                   <LectureChatPanel
                     messages={chatMessages}
                     userInput={userInput}

@@ -12,9 +12,6 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
   SidebarTrigger
 } from "@/components/ui/sidebar";
 import { Bot, Code, History, FileCode, ChevronRight } from "lucide-react";
@@ -51,7 +48,14 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
         </div>
         <SidebarTrigger />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent 
+        style={{ 
+          maxHeight: "70vh", 
+          minHeight: "420px", 
+          height: "70vh",
+          overflowY: "auto" 
+        }}
+      >
         <Tabs value={sidebarView} className="w-full" onValueChange={setSidebarView}>
           <div className="px-2">
             <TabsList className="w-full">
@@ -112,3 +116,4 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
 };
 
 export default LectureSidebar;
+
