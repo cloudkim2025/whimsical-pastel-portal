@@ -18,6 +18,9 @@ interface AuthContextType {
   logout: () => void;
   loginWithSocialMedia: (provider: 'google' | 'naver' | 'kakao') => void;
   updateUserFromToken: () => void;
+  isAuthenticated: () => boolean;
+  isAdmin: () => boolean;
+  isInstructor: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -159,6 +162,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = `/oauth2/authorization/${provider}`;
   };
 
+  const isAuthenticated = (): boolean => {
+    return user !== null;
+  };
+
+  const isAdmin = (): boolean => {
+    return user?.role === 'ADMIN';
+  };
+
+  const isInstructor = (): boolean => {
+    return user?.role === 'INSTRUCTOR' || user?.role === 'ADMIN';
+  };
+
   const value: AuthContextType = {
     user,
     login,
@@ -167,6 +182,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     logout,
     loginWithSocialMedia,
     updateUserFromToken,
+    isAuthenticated,
+    isAdmin,
+    isInstructor,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -7,6 +7,7 @@ export interface User {
   sub: string;
   nickname: string;
   profileImage?: string; // ✅ 대표 이미지 필드
+  role?: UserRole; // ✅ 사용자 역할 추가
 }
 
 // 로그인 요청 DTO
