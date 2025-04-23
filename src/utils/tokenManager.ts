@@ -28,25 +28,10 @@ export const tokenManager = {
   },
   
   /**
-   * 리프레시 토큰 저장
-   */
-  setRefreshToken(token: string): void {
-    localStorage.setItem(REFRESH_TOKEN_KEY, token);
-  },
-  
-  /**
-   * 리프레시 토큰 조회
-   */
-  getRefreshToken(): string | null {
-    return localStorage.getItem(REFRESH_TOKEN_KEY);
-  },
-  
-  /**
    * 모든 토큰 제거
    */
   clearTokens(): void {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
   },
   
   /**
@@ -64,7 +49,6 @@ export const tokenManager = {
       sub: payload.sub,
       nickname: payload.nickname,
       profileImage: payload.profileImage,
-      role: payload.role
     }
   }
 }
