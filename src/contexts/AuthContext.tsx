@@ -1,3 +1,4 @@
+
 // AuthContext.tsx
 
 import React, {createContext, type ReactNode, useContext, useEffect, useState,} from 'react';
@@ -7,30 +8,59 @@ import {authAPI} from '@/api/auth';
 import type {RegisterRequest, User} from '@/types/auth';
 import {FormErrors} from "@/components/forms/RegistrationForm.types";
 
-
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string, onSuccess?: () => void) => Promise<boolean>;
   forceLogin: (email: string, password: string, onSuccess?: () => void) => Promise<boolean>;
   register: (
       form: RegisterRequest,
-      onSuccess?: () => void,
+      onMessage?: (field: keyof FormErrors, message: string) => void,
       setErrors?: React.Dispatch<React.SetStateAction<FormErrors>>
   ) => Promise<boolean>;
   logout: () => void;
   loginWithSocialMedia: (provider: 'google' | 'naver' | 'kakao') => void;
   updateUserFromToken: () => void;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  isInstructor: boolean;
+  updateNickname: (nickname: string) => Promise<boolean>;
+  updateProfileImage: (image: File) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isInstructor, setIsInstructor] = useState<boolean>(false);
 
   const updateUserFromToken = () => {
     const userInfo = tokenManager.getUserInfo();
     setUser(userInfo || null);
   };
+
+  // Check user role on initial render
+  useEffect(() => {
+    const checkUserRole = async () => {
+      if (user) {
+        try {
+          const { data } = await authAPI.getUserRole();
+          const role = data.role;
+          setIsAdmin(role === 'ADMIN');
+          setIsInstructor(role === 'ADMIN' || role === 'INSTRUCTOR');
+        } catch (error) {
+          console.error('Failed to check user role:', error);
+          setIsAdmin(false);
+          setIsInstructor(false);
+        }
+      } else {
+        setIsAdmin(false);
+        setIsInstructor(false);
+      }
+    };
+
+    checkUserRole();
+  }, [user]);
 
   useEffect(() => {
     if (tokenManager.getToken()) {
@@ -153,6 +183,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateNickname = async (nickname: string): Promise<boolean> => {
+    try {
+      const response = await authAPI.updateNickname(nickname);
+      if (response.data?.success) {
+        // Get the new token from the response if it exists
+        if (response.data.accessToken) {
+          tokenManager.setToken(response.data.accessToken);
+          updateUserFromToken();
+        } else {
+          updateUserFromToken(); // In case token was refreshed server-side
+        }
+        toast.success('닉네임이 성공적으로 변경되었습니다.');
+        return true;
+      }
+      toast.error(response.data?.message || '닉네임 변경에 실패했습니다.');
+      return false;
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || '닉네임 변경 중 오류가 발생했습니다.');
+      return false;
+    }
+  };
+
+  const updateProfileImage = async (image: File): Promise<boolean> => {
+    try {
+      const formData = new FormData();
+      formData.append('profileImage', image);
+
+      const response = await authAPI.updateProfileImage(formData);
+      if (response.data?.success) {
+        // Get the new token from the response if it exists
+        if (response.data.accessToken) {
+          tokenManager.setToken(response.data.accessToken);
+          updateUserFromToken();
+        } else {
+          updateUserFromToken(); // In case token was refreshed server-side
+        }
+        toast.success('프로필 이미지가 성공적으로 변경되었습니다.');
+        return true;
+      }
+      toast.error(response.data?.message || '프로필 이미지 변경에 실패했습니다.');
+      return false;
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || '프로필 이미지 변경 중 오류가 발생했습니다.');
+      return false;
+    }
+  };
+
   const logout = async () => {
     try {
       await authAPI.logout();
@@ -161,12 +238,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       tokenManager.clearTokens();
       setUser(null);
+      setIsAdmin(false);
+      setIsInstructor(false);
       toast.info('로그아웃 되었습니다.');
     }
   };
 
   const loginWithSocialMedia = (provider: 'google' | 'naver' | 'kakao') => {
-    window.location.href = `/oauth2/authorization/${provider}`;
+    const state = Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('oauth_state', state);
+    window.location.href = `/oauth2/authorization/${provider}?state=${state}`;
   };
 
   const value: AuthContextType = {
@@ -177,6 +258,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     logout,
     loginWithSocialMedia,
     updateUserFromToken,
+    isAuthenticated: !!user,
+    isAdmin,
+    isInstructor,
+    updateNickname,
+    updateProfileImage,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

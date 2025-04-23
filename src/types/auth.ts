@@ -7,6 +7,7 @@ export interface User {
   sub: string;
   nickname: string;
   profileImage?: string; // ✅ 대표 이미지 필드
+  role?: UserRole; // Added role field for front-end use
 }
 
 // 로그인 요청 DTO
@@ -52,4 +53,24 @@ export interface CodeVerificationRequest {
 export interface EmailVerificationResponse {
   success: boolean;
   message: string;
+}
+
+// 프로필 업데이트 응답 DTO
+export interface ProfileUpdateResponse {
+  success: boolean;
+  accessToken?: string;
+  message: string;
+}
+
+// OAuth 코드 교환 요청 DTO
+export interface OAuthCodeExchangeRequest {
+  code: string;
+  state: string;
+}
+
+// OAuth 코드 교환 응답 DTO
+export interface OAuthCodeExchangeResponse {
+  accessToken: string;
+  needsLinking?: boolean;
+  message?: string;
 }

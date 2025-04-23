@@ -1,9 +1,18 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import ProfileEditForm from '@/components/profile/ProfileEditForm';
+import { useNavigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
 
   if (!user) {
     return (
@@ -14,20 +23,9 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center pt-14">
-      <Avatar className="h-24 w-24 border-2 border-ghibli-meadow">
-        {user.profileImage ? (
-          <AvatarImage src={user.profileImage} alt={user.nickname} />
-        ) : (
-          <AvatarFallback className="bg-ghibli-cloud text-ghibli-forest text-xl">
-            {user.nickname ? user.nickname.slice(0, 2).toUpperCase() : 'UP'}
-          </AvatarFallback>
-        )}
-      </Avatar>
-      <div className="mt-6">
-        <h2 className="text-2xl font-bold text-ghibli-forest">{user.nickname}</h2>
-      </div>
-      {/* 프로필 정보 등 추가 */}
+    <div className="container mx-auto pt-14 px-4">
+      <h1 className="text-3xl font-bold text-center text-ghibli-forest mb-8">내 프로필</h1>
+      <ProfileEditForm />
     </div>
   );
 };

@@ -6,11 +6,11 @@ export interface DecodedTokenPayload {
   sub: string;
   nickname: string;
   profileImage?: string;
+  role?: string;
   [key: string]: any;
 }
 
 const ACCESS_TOKEN_KEY = 'accessToken';
-const REFRESH_TOKEN_KEY = 'refreshToken';
 
 export const tokenManager = {
   /**
@@ -49,6 +49,7 @@ export const tokenManager = {
       sub: payload.sub,
       nickname: payload.nickname,
       profileImage: payload.profileImage,
+      role: payload.role,
     }
   }
 }

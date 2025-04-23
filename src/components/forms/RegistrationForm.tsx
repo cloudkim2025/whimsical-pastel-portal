@@ -1,3 +1,4 @@
+
 // forms/RegistrationForm
 import React, { useState, useRef } from 'react';
 import { Check, Upload } from 'lucide-react';
@@ -241,6 +242,7 @@ const RegistrationForm: React.FC = () => {
             onClose={() => setIsVerificationModalOpen(false)}
             onVerify={handleVerificationResult}
             email={email}
+            onResendCode={handleSendVerificationCode}
         />
       </>
   );

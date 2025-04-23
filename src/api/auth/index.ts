@@ -8,6 +8,7 @@
  * - 모든 http 예외는 try/catch로 응답 data, status 기준 분기 권장
  */
 import API from '@/utils/apiClient';
+import type { OAuthCodeExchangeRequest } from '@/types/auth';
 
 export const authAPI = {
   // 이메일 인증 코드 발송
@@ -38,6 +39,9 @@ export const authAPI = {
   // 내 정보 조회
   getUserInfo: () => API.get('/api/auths/info'),
 
+  // 사용자 역할 조회
+  getUserRole: () => API.get('/api/auths/role'),
+
   // 닉네임 변경
   updateNickname: (nickname: string) =>
     API.put('/api/auths/nickname', { nickname }),
@@ -54,6 +58,10 @@ export const authAPI = {
 
   // 회원 탈퇴
   deleteAccount: () => API.put('/api/auths/delete'),
+
+  // OAuth 코드 교환
+  postOAuthCode: (data: OAuthCodeExchangeRequest) =>
+    API.post('/oauth2/code', data),
 
   // 소셜 계정 연동
   linkSocialAccount: (accessToken: string, provider: string) =>
