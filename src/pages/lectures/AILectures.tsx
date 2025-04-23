@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -131,7 +132,7 @@ const AILectures = () => {
   const [activeSession, setActiveSession] = useState(mockSessions[0]);
   const [chatMessages, setChatMessages] = useState([
     {
-      role: "system",
+      role: "system" as const,
       content: "안녕하세요! AI 코드 분석 튜터입니다. 코드에 대해 어떤 질문이 있으신가요?",
     },
   ]);
@@ -144,7 +145,7 @@ const AILectures = () => {
   const handleSendMessage = async () => {
     if (!userInput.trim() || isProcessing) return;
 
-    const newMessage = { role: "user", content: userInput };
+    const newMessage = { role: "user" as const, content: userInput };
     setChatMessages((prev) => [...prev, newMessage]);
     setUserInput("");
     setIsProcessing(true);
@@ -152,7 +153,7 @@ const AILectures = () => {
     try {
       setTimeout(() => {
         const aiResponse = {
-          role: "assistant",
+          role: "assistant" as const,
           content: `이 코드는 ${activeSession.title}에 관한 패턴을 보여주고 있습니다. 주요 포인트는 다음과 같습니다:
 
 1. 효율적인 상태 관리를 위한 메모이제이션 기법을 사용했습니다.
@@ -169,7 +170,7 @@ const AILectures = () => {
       setChatMessages((prev) => [
         ...prev,
         {
-          role: "assistant",
+          role: "assistant" as const,
           content: "죄송합니다. 오류가 발생했습니다. 다시 시도해 주세요.",
         },
       ]);
@@ -181,7 +182,7 @@ const AILectures = () => {
     setActiveSession(session);
     setChatMessages([
       {
-        role: "system",
+        role: "system" as const,
         content: `${session.title}에 대한 분석을 시작합니다. 어떤 질문이 있으신가요?`,
       },
     ]);
@@ -193,9 +194,9 @@ const AILectures = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="pt-24 lg:pt-28">
+      <div className="pt-[72px] lg:pt-[92px] px-0"> {/* 헤더와 겹치지 않게 패딩 조정 */}
         <SidebarProvider defaultOpen={true}>
-          <div className="flex min-h-[calc(100vh-5rem)] w-full">
+          <div className="flex min-h-[calc(100vh-5.5rem)] w-full">
             <LectureSidebar
               sessions={mockSessions}
               activeSession={activeSession}
@@ -206,14 +207,16 @@ const AILectures = () => {
             <SidebarInset>
               <div className="flex flex-col md:flex-row h-full">
                 {/* Code Editor Panel */}
-                <div className="w-full md:w-1/2 border-r border-border">
+                <div className="w-full md:w-1/2 border-r border-border flex flex-col"
+                  style={{ maxHeight: "70vh", minHeight: "420px", height: "70vh" }}>
                   <LectureCodePanel
                     title={activeSession.title}
                     code={activeSession.code}
                   />
                 </div>
                 {/* Chat Panel */}
-                <div className="w-full md:w-1/2 flex flex-col h-full">
+                <div className="w-full md:w-1/2 flex flex-col h-full"
+                  style={{ maxHeight: "70vh", minHeight: "420px", height: "70vh" }}>
                   <LectureChatPanel
                     messages={chatMessages}
                     userInput={userInput}
@@ -242,3 +245,4 @@ const AILectures = () => {
 };
 
 export default AILectures;
+
