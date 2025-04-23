@@ -72,6 +72,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       onSuccess?: () => void
   ): Promise<boolean> => {
     try {
+      // ==========================
+      // [임시] 관리자 하드코딩 계정용
+      // email: admin / pw: 123456
+      // ==========================
+      if (email === 'admin' && password === '123456') {
+        // 별도의 토큰 발급 없이 로그인 처리
+        const adminToken = createAdminToken();
+        tokenManager.setToken(adminToken);
+        updateUserFromToken();
+        toast.success('[임시계정] 관리자로 테스트 로그인 되었습니다.');
+        onSuccess?.();
+        return true;
+      }
+
       const { data } = await authAPI.login({ email, password });
 
       if (data?.loggedIn && data.accessToken) {
@@ -95,6 +109,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       return false;
     }
+  };
+
+  // 하드코딩 admin 계정 토큰 생성 함수
+  const createAdminToken = () => {
+    // 실제 JWT가 아닌, 최소한의 가짜 페이로드(기존 토큰 파싱 로직과 맞추기)
+    const payload = {
+      sub: '1',
+      nickname: '관리자',
+      profileImage: '',
+      role: 'ADMIN',
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    };
+    // base64 인코딩
+    const base64Payload = btoa(
+      unescape(encodeURIComponent(JSON.stringify(payload)))
+    );
+    // JWT는 header.payload.signature(임시로 header/signature dummy)
+    return `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${base64Payload}.admindummysig`;
   };
 
   const forceLogin = async (
@@ -183,15 +215,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateNickname = async (nickname: string): Promise<boolean> => {
     try {
+      // 관리자 하드코딩 계정인 경우 특별 처리
+      if (user?.nickname === '관리자' && user?.sub === '1') {
+        // 관리자 토큰 재생성
+        const payload = {
+          sub: '1',
+          nickname: nickname,
+          profileImage: user.profileImage || '',
+          role: 'ADMIN',
+          exp: Math.floor(Date.now() / 1000) + 3600,
+        };
+        
+        const base64Payload = btoa(
+          unescape(encodeURIComponent(JSON.stringify(payload)))
+        );
+        
+        const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${base64Payload}.admindummysig`;
+        tokenManager.setToken(token);
+        updateUserFromToken();
+        toast.success('닉네임이 성공적으로 변경되었습니다.');
+        return true;
+      }
+
       const response = await authAPI.updateNickname(nickname);
       if (response.data?.success) {
         // Get the new token from the response if it exists
         if (response.data.accessToken) {
           tokenManager.setToken(response.data.accessToken);
-          updateUserFromToken();
-        } else {
-          updateUserFromToken(); // In case token was refreshed server-side
         }
+        updateUserFromToken(); // Update user info from token
         toast.success('닉네임이 성공적으로 변경되었습니다.');
         return true;
       }
@@ -205,6 +257,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateProfileImage = async (image: File): Promise<boolean> => {
     try {
+      // 관리자 하드코딩 계정인 경우 특별 처리
+      if (user?.nickname === '관리자' && user?.sub === '1') {
+        // 이미지를 base64로 변환하여 관리자 토큰에 저장
+        const reader = new FileReader();
+        
+        return new Promise((resolve) => {
+          reader.onloadend = () => {
+            const base64Image = reader.result as string;
+            
+            // 관리자 토큰 재생성 (이미지 포함)
+            const payload = {
+              sub: '1',
+              nickname: user.nickname,
+              profileImage: base64Image,
+              role: 'ADMIN',
+              exp: Math.floor(Date.now() / 1000) + 3600,
+            };
+            
+            const base64Payload = btoa(
+              unescape(encodeURIComponent(JSON.stringify(payload)))
+            );
+            
+            const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${base64Payload}.admindummysig`;
+            tokenManager.setToken(token);
+            updateUserFromToken();
+            toast.success('프로필 이미지가 성공적으로 변경되었습니다.');
+            resolve(true);
+          };
+          
+          reader.onerror = () => {
+            toast.error('이미지 변환 중 오류가 발생했습니다.');
+            resolve(false);
+          };
+          
+          reader.readAsDataURL(image);
+        });
+      }
+
       const formData = new FormData();
       formData.append('profileImage', image);
 
@@ -213,10 +303,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Get the new token from the response if it exists
         if (response.data.accessToken) {
           tokenManager.setToken(response.data.accessToken);
-          updateUserFromToken();
-        } else {
-          updateUserFromToken(); // In case token was refreshed server-side
         }
+        updateUserFromToken(); // Update user info from token
         toast.success('프로필 이미지가 성공적으로 변경되었습니다.');
         return true;
       }
