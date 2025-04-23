@@ -35,6 +35,8 @@ interface LectureSidebarProps {
   selectSession: (session: LectureSession) => void;
 }
 
+const SIDEBAR_HEIGHT = "70vh"; // 오른쪽 코드/챗 패널과 동일하게 맞춤
+
 const LectureSidebar: React.FC<LectureSidebarProps> = ({
   sessions,
   activeSession,
@@ -51,12 +53,12 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
         </div>
         <SidebarTrigger />
       </SidebarHeader>
-      <SidebarContent 
-        style={{ 
-          maxHeight: "70vh", 
-          minHeight: "420px", 
-          height: "70vh",
-          overflowY: "auto" 
+      <SidebarContent
+        style={{
+          maxHeight: SIDEBAR_HEIGHT,
+          minHeight: "420px",
+          height: SIDEBAR_HEIGHT,
+          overflowY: "auto",
         }}
       >
         <Tabs value={sidebarView} className="w-full" onValueChange={setSidebarView}>
