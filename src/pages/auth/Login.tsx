@@ -6,28 +6,47 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Home } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthWithRedirect } from '@/hooks/useAuthWithRedirect';
+import type { LoginRequest } from '@/types/auth';
 
+/**
+ * 로그인 페이지 
+ * - 이메일/비밀번호, 소셜 로그인, 에러 UI 모두 명세(OpenAPI) 기반 실제 API 연동
+ */
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState<LoginRequest>({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login } = useAuthWithRedirect();
+  const clientId = import.meta.env.VITE_NAVER_CLIENT_ID;
+  const redirectUri = encodeURIComponent(import.meta.env.VITE_NAVER_REDIRECT_URI);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
-      await login(email, password);
+      const success = await login(form.email, form.password);
+      if (!success) {
+        toast.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+      }
     } catch (error) {
       console.error('Login error:', error);
+      toast.error('로그인 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 소셜 로그인
   const handleSocialLogin = (provider: 'google' | 'naver' | 'kakao') => {
+    const state = crypto.randomUUID();
+    localStorage.setItem('oauth_state', state);
+
+    if (provider === 'naver') {
+      window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
+      return;
+    }
+    // 추후 구글, 카카오 etc 다른 OAuth도 별도 처리
     window.location.href = `/oauth2/authorization/${provider}`;
   };
 
@@ -46,7 +65,6 @@ const Login = () => {
               Aigongbu에 오신 것을 환영합니다
             </p>
           </div>
-
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-ghibli-midnight">
@@ -55,14 +73,13 @@ const Login = () => {
               <Input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="your@email.com"
                 required
                 className="w-full border-ghibli-meadow/50 focus:border-ghibli-forest focus:ring focus:ring-ghibli-meadow/30"
               />
             </div>
-
             <div className="space-y-2">
               <div className="flex justify-between">
                 <label htmlFor="password" className="block text-sm font-medium text-ghibli-midnight">
@@ -75,15 +92,14 @@ const Login = () => {
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder="••••••••"
                 required
                 className="w-full border-ghibli-meadow/50 focus:border-ghibli-forest focus:ring focus:ring-ghibli-meadow/30"
               />
             </div>
-
-            <Button 
+            <Button
               type="submit"
               disabled={isLoading}
               className="w-full bg-ghibli-meadow hover:bg-ghibli-forest text-white transition-all duration-300"
@@ -91,7 +107,6 @@ const Login = () => {
               {isLoading ? '로그인 중...' : '로그인'}
             </Button>
           </form>
-
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -101,7 +116,6 @@ const Login = () => {
                 <span className="px-2 bg-white text-ghibli-stone">또는</span>
               </div>
             </div>
-
             <div className="mt-6 grid grid-cols-3 gap-3">
               <button
                 type="button"
@@ -129,7 +143,6 @@ const Login = () => {
               </button>
             </div>
           </div>
-
           <div className="mt-8 text-center">
             <div className="flex flex-col space-y-3">
               <p className="text-sm text-ghibli-stone">
@@ -138,7 +151,6 @@ const Login = () => {
                   회원가입
                 </Link>
               </p>
-              
               <Link to="/" className="flex items-center justify-center space-x-2 py-2.5 px-5 border border-ghibli-meadow text-ghibli-forest rounded-full hover:bg-ghibli-cloud transition-all duration-300">
                 <Home size={18} />
                 <span>메인으로 돌아가기</span>

@@ -6,14 +6,17 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import SearchModal from '../SearchModal';
 
+/**
+ * 반응형 전체 메뉴. user 상태 기반 확장/로그아웃 반영.
+ */
 interface MobileMenuProps {
   isMenuOpen: boolean;
   onClose: () => void;
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({ isMenuOpen, onClose }) => {
-  const { isAuthenticated, user, logout } = useAuth();
-  
+  const { user, logout } = useAuth();
+
   return (
     <div className={cn(
       'md:hidden fixed inset-x-0 bg-white/95 backdrop-blur-lg transition-all duration-300 ease-in-out transform shadow-lg',
@@ -22,29 +25,26 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isMenuOpen, onClose }) => {
       <div className="px-6 py-4">
         <SearchModal onClose={onClose} />
       </div>
-      
       <nav className="container mx-auto px-6 py-6 flex flex-col space-y-4">
         <Link to="/" className="nav-link text-lg py-2">홈</Link>
         <Link to="/company-info" className="nav-link text-lg py-2">회사정보</Link>
         <Link to="/dev-lectures" className="nav-link text-lg py-2">개발강의</Link>
         <Link to="/ai-lectures" className="nav-link text-lg py-2">AI 강의</Link>
         <Link to="/top-lectures" className="nav-link text-lg py-2">인기강의</Link>
-        
-        {isAuthenticated ? (
+        {user ? (
           <div className="pt-2 border-t border-ghibli-earth/10">
             <div className="flex items-center space-x-3 p-2">
               <Avatar className="h-10 w-10 border-2 border-ghibli-meadow">
-                {user?.avatar ? (
-                  <AvatarImage src={user.avatar} alt={user.nickname} />
+                {user.profileImage ? (
+                  <AvatarImage src={user.profileImage} alt={user.nickname} />
                 ) : (
                   <AvatarFallback className="bg-ghibli-earth text-ghibli-forest">
-                    {user?.nickname?.slice(0, 2).toUpperCase() || 'U'}
+                    {user.nickname?.slice(0, 2).toUpperCase() || 'U'}
                   </AvatarFallback>
                 )}
               </Avatar>
               <div>
-                <p className="font-medium text-ghibli-forest">{user?.nickname}</p>
-                <p className="text-sm text-ghibli-stone truncate">{user?.email}</p>
+                <p className="font-medium text-ghibli-forest">{user.nickname}</p>
               </div>
             </div>
             <div className="mt-3 space-y-2">
@@ -54,7 +54,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isMenuOpen, onClose }) => {
               <Link to="/settings" className="block px-2 py-2 text-ghibli-forest hover:bg-ghibli-cloud rounded-md">
                 설정
               </Link>
-              <button 
+              <button
                 className="w-full text-left px-2 py-2 text-red-600 hover:bg-red-50 rounded-md"
                 onClick={logout}
               >
