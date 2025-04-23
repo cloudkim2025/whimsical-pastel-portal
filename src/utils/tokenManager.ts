@@ -6,7 +6,6 @@ export interface DecodedTokenPayload {
   sub: string;
   nickname: string;
   profileImage?: string;
-  role?: string;
   [key: string]: any;
 }
 
