@@ -127,7 +127,7 @@ export function useCounter() {
   }
 ];
 
-// Define a proper MessageType to include all possible roles
+// Define a proper MessageType interface that includes all possible roles
 interface MessageType {
   role: "system" | "user" | "assistant";
   content: string;
