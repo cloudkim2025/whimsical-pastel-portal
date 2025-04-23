@@ -32,7 +32,7 @@ export const useAuth = () => {
     setIsLoading(true);
 
     // admin 계정 하드코딩
-    if (email === 'admin' && password === '123456') {
+    if (email === 'admin@naver.com' && password === '123456') {
       const fakeToken = createAdminToken();
       tokenManager.setToken(fakeToken);
       toast.success('관리자 계정으로 로그인 되었습니다!');
