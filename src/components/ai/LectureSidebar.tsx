@@ -43,7 +43,11 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
   selectSession,
 }) => {
   return (
-    <Sidebar collapsible="icon" variant="sidebar" className="h-auto">
+    <Sidebar
+      collapsible="icon"
+      variant="sidebar"
+      className="h-fit max-h-[calc(100vh-160px)]"
+    >
       <SidebarHeader className="h-14 flex items-center justify-between px-4">
         <div className="flex items-center">
           <Bot className="h-5 w-5 text-ghibli-forest mr-2" />
@@ -54,8 +58,8 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
       <SidebarContent
         className="overflow-y-auto"
         style={{
-          maxHeight: "calc(100vh - 200px)", // Account for header/footer space
-          height: "fit-content"
+          height: "fit-content",
+          maxHeight: "calc(100vh - 160px)"
         }}
       >
         <Tabs value={sidebarView} className="w-full" onValueChange={setSidebarView}>
@@ -118,3 +122,4 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
 };
 
 export default LectureSidebar;
+
