@@ -20,10 +20,6 @@ export const useAuth = () => {
         // 토큰을 로컬 스토리지에 저장
         tokenManager.setToken(response.data.accessToken);
         
-        if (response.data.refreshToken) {
-          tokenManager.setRefreshToken(response.data.refreshToken);
-        }
-        
         toast.success(response.data.message || '로그인 성공!');
         
         // 역할에 따라 다른 페이지로 리디렉션
@@ -69,9 +65,6 @@ export const useAuth = () => {
       if (response.data.loggedIn && response.data.accessToken) {
         tokenManager.setToken(response.data.accessToken);
         
-        if (response.data.refreshToken) {
-          tokenManager.setRefreshToken(response.data.refreshToken);
-        }
         
         toast.success(response.data.message || '로그인 성공!');
         
