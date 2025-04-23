@@ -1,12 +1,12 @@
 
-import type { User } from '@/types/auth';
+import type { User, UserRole } from '@/types/auth';
 import { decodeTokenPayload } from '@/utils/decodeToken';
 
 export interface DecodedTokenPayload {
   sub: string;
   nickname: string;
   profileImage?: string;
-  role?: string;
+  role?: UserRole;
   [key: string]: any;
 }
 
@@ -49,7 +49,7 @@ export const tokenManager = {
       sub: payload.sub,
       nickname: payload.nickname,
       profileImage: payload.profileImage,
-      role: payload.role,
+      role: payload.role as UserRole,
     }
   }
 }

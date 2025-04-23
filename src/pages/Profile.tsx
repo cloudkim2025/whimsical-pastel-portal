@@ -23,7 +23,7 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto pt-14 px-4">
+    <div className="container mx-auto pt-24 px-4 min-h-screen">
       <h1 className="text-3xl font-bold text-center text-ghibli-forest mb-8">내 프로필</h1>
       <ProfileEditForm />
     </div>

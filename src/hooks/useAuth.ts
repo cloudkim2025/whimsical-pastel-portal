@@ -16,7 +16,7 @@ export const useAuth = () => {
       sub: '1',
       nickname: '관리자',
       profileImage: '',
-      role: 'ADMIN',
+      role: 'ADMIN' as UserRole,
       exp: Math.floor(Date.now() / 1000) + 3600,
     };
     // base64 인코딩
