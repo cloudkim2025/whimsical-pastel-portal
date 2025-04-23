@@ -1,14 +1,11 @@
 
-import React, {createContext, type ReactNode, useContext, useEffect, useState,} from 'react';
-import {toast} from 'sonner';
-import {tokenManager} from '@/utils/tokenManager';
-import {authAPI} from '@/api/auth';
-import type {RegisterRequest, User} from '@/types/auth';
+import React, { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { tokenManager } from '@/utils/tokenManager';
+import { authAPI } from '@/api/auth';
+import type { RegisterRequest, User } from '@/types/auth';
 import { FormErrors } from "@/components/forms/RegistrationForm.types";
 
-/**
- * AuthContext: 인증 상태 및 인증 관련 함수 전역 제공
- */
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string, onSuccess?: () => void) => Promise<boolean>;
@@ -28,20 +25,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  // 토큰에서 사용자 정보 재설정
   const updateUserFromToken = () => {
     const userInfo = tokenManager.getUserInfo();
     setUser(userInfo || null);
   };
 
-  // 앱 최초 마운트시 로그인 상태 확인
   useEffect(() => {
     if (tokenManager.getToken()) {
       updateUserFromToken();
     }
   }, []);
 
-  // 로그인 (명세 기반)
   const login = async (
     email: string,
     password: string,
@@ -62,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const status = error.response?.status;
       const msg = error.response?.data?.message;
       if (status === 409) {
-        toast.error('다른 기기에서 로그인 중입니다. 계속 진행 시 기존 세션은 만료됩니다.');
+        toast.error('해당 계정은 다른 브라우저나 기기에서 로그인된 상태입니다. 지금 로그인하면 기존 세션은 만료됩니다. 계속하시겠습니까?');
       } else {
         toast.error(msg || '로그인 중 오류가 발생했습니다.');
       }
@@ -70,7 +64,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // 강제 로그인 (명세 기반)
   const forceLogin = async (
     email: string,
     password: string,
@@ -93,7 +86,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // 회원가입 (명세 및 외부 onMsg/setErrors 커스텀 콜백 지원)
   const register = async (
     form: RegisterRequest,
     onMessage?: (field: keyof FormErrors, message: string) => void,
@@ -122,9 +114,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return true;
       }
 
-      // 유효성 서버 에러 응답 처리
       if (data.errors && setErrors) {
-        setErrors(prev => ({ ...prev, ...data.errors }));
+        setErrors((prev) => ({
+          ...prev,
+          ...data.errors,
+        }));
       }
 
       if (!data.errors && data.message && onMessage) {
@@ -149,7 +143,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // 로그아웃
   const logout = async () => {
     try {
       await authAPI.logout();
@@ -162,7 +155,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // 소셜 로그인
   const loginWithSocialMedia = (provider: 'google' | 'naver' | 'kakao') => {
     window.location.href = `/oauth2/authorization/${provider}`;
   };

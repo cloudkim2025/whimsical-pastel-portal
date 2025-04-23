@@ -6,9 +6,6 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import SearchModal from '../SearchModal';
 
-/**
- * 반응형 전체 메뉴. user 상태 기반 확장/로그아웃 반영.
- */
 interface MobileMenuProps {
   isMenuOpen: boolean;
   onClose: () => void;
@@ -39,7 +36,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isMenuOpen, onClose }) => {
                   <AvatarImage src={user.profileImage} alt={user.nickname} />
                 ) : (
                   <AvatarFallback className="bg-ghibli-earth text-ghibli-forest">
-                    {user.nickname?.slice(0, 2).toUpperCase() || 'U'}
+                    {user.nickname.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 )}
               </Avatar>
