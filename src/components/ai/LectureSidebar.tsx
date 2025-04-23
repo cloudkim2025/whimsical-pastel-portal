@@ -35,8 +35,8 @@ interface LectureSidebarProps {
   selectSession: (session: LectureSession) => void;
 }
 
-// Reduce the height to 60vh instead of 70vh
-const SIDEBAR_HEIGHT = "60vh"; 
+// Adjust sidebar height to be more compact
+const SIDEBAR_HEIGHT = "50vh"; 
 
 const LectureSidebar: React.FC<LectureSidebarProps> = ({
   sessions,
@@ -57,7 +57,7 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
       <SidebarContent
         style={{
           maxHeight: SIDEBAR_HEIGHT,
-          minHeight: "320px", // Reduced from 420px
+          minHeight: "250px", // Further reduced min-height
           height: SIDEBAR_HEIGHT,
           overflowY: "auto",
         }}
