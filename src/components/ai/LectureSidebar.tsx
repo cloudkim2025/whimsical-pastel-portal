@@ -35,9 +35,6 @@ interface LectureSidebarProps {
   selectSession: (session: LectureSession) => void;
 }
 
-// Adjust sidebar height to be more compact
-const SIDEBAR_HEIGHT = "50vh"; 
-
 const LectureSidebar: React.FC<LectureSidebarProps> = ({
   sessions,
   activeSession,
@@ -46,7 +43,7 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
   selectSession,
 }) => {
   return (
-    <Sidebar collapsible="icon" variant="sidebar">
+    <Sidebar collapsible="icon" variant="sidebar" className="h-auto">
       <SidebarHeader className="h-14 flex items-center justify-between px-4">
         <div className="flex items-center">
           <Bot className="h-5 w-5 text-ghibli-forest mr-2" />
@@ -55,11 +52,10 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
         <SidebarTrigger />
       </SidebarHeader>
       <SidebarContent
+        className="overflow-y-auto"
         style={{
-          maxHeight: SIDEBAR_HEIGHT,
-          minHeight: "250px", // Further reduced min-height
-          height: SIDEBAR_HEIGHT,
-          overflowY: "auto",
+          maxHeight: "calc(100vh - 200px)", // Account for header/footer space
+          height: "fit-content"
         }}
       >
         <Tabs value={sidebarView} className="w-full" onValueChange={setSidebarView}>
