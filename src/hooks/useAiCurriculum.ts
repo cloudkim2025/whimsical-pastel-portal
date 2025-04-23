@@ -1,9 +1,31 @@
 
 import { useState } from 'react';
 
+interface Curriculum {
+  id: string;
+  title: string;
+  content: string[];
+}
+
+export interface AnalysisSession {
+  id: string;
+  title: string;
+  summary: string;
+  timestamp: string;
+  code: string;
+  analyses: {
+    id: string;
+    question: string;
+    answer: string;
+    timestamp: string;
+  }[];
+}
+
 export const useAiCurriculum = () => {
   const [curriculum, setCurriculum] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [sessions, setSessions] = useState<AnalysisSession[]>([]);
+  const [currentSession, setCurrentSession] = useState<AnalysisSession | null>(null);
 
   // 비디오 파일을 분석하여 커리큘럼을 생성하는 함수
   const generateCurriculum = (videoFile: File | null) => {
@@ -34,9 +56,78 @@ export const useAiCurriculum = () => {
     }, 2000);
   };
 
+  // 코드를 분석하여 새 세션을 생성하는 함수
+  const analyzeCode = (code: string, title: string) => {
+    setIsAnalyzing(true);
+    
+    // 실제로는 AI 서비스에 코드를 전송하고 분석 결과를 받아와야 함
+    // 여기서는 시뮬레이션을 위한 더미 데이터를 생성
+    setTimeout(() => {
+      const newSession: AnalysisSession = {
+        id: `session-${Date.now()}`,
+        title,
+        summary: '코드 구조 및 패턴 분석',
+        timestamp: new Date().toISOString(),
+        code,
+        analyses: []
+      };
+      
+      setSessions(prev => [newSession, ...prev]);
+      setCurrentSession(newSession);
+      setIsAnalyzing(false);
+    }, 1500);
+  };
+
+  // 세션에 새 질문과 분석을 추가하는 함수
+  const addAnalysisToSession = (sessionId: string, question: string, answer: string) => {
+    setSessions(prev => {
+      return prev.map(session => {
+        if (session.id === sessionId) {
+          return {
+            ...session,
+            analyses: [
+              ...session.analyses,
+              {
+                id: `analysis-${Date.now()}`,
+                question,
+                answer,
+                timestamp: new Date().toISOString()
+              }
+            ]
+          };
+        }
+        return session;
+      });
+    });
+    
+    // 현재 세션 업데이트
+    if (currentSession?.id === sessionId) {
+      setCurrentSession(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          analyses: [
+            ...prev.analyses,
+            {
+              id: `analysis-${Date.now()}`,
+              question,
+              answer,
+              timestamp: new Date().toISOString()
+            }
+          ]
+        };
+      });
+    }
+  };
+
   return {
     curriculum,
     isAnalyzing,
-    generateCurriculum
+    generateCurriculum,
+    sessions,
+    currentSession,
+    analyzeCode,
+    addAnalysisToSession,
+    setCurrentSession
   };
 };
