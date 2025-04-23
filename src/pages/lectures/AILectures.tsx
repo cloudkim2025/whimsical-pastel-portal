@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
@@ -27,7 +26,6 @@ import AIHistorySidebar from '@/components/ai/AIHistorySidebar';
 import { useAiCurriculum } from '@/hooks/useAiCurriculum';
 import { aiAPI } from '@/api/ai';
 
-// Mock analysis sessions
 const mockSessions = [
   { 
     id: 'session1', 
@@ -205,7 +203,7 @@ const AILectures = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="pt-24 md:pt-20">  {/* Increased top padding to prevent header overlap */}
+      <div className="pt-24 lg:pt-20">  {/* Adjusted padding for better responsiveness */}
         <SidebarProvider defaultOpen={true}>
           <div className="flex min-h-[calc(100vh-5rem)] w-full">
             {/* History Sidebar */}
