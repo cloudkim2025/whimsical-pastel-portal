@@ -22,16 +22,7 @@ export const lectureAPI = {
     });
   },
 
-  // 강의 업로드 (새로 추가)
-  uploadLecture: (lectureFormData: FormData) => {
-    return API.post('/api/lectures/upload', lectureFormData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-  },
-
-  // 강의 섹션 업로드 (새로 추가)
+  // 섹션 업로드 (새로 추가)
   uploadSection: (sectionFormData: FormData) => {
     return API.post('/api/lectures/sections', sectionFormData, {
       headers: {

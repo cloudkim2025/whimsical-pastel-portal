@@ -22,7 +22,11 @@ export const useAuthWithRedirect = () => {
   const loginWithRedirect = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      return await login(email, password, () => navigate('/'));
+      const success = await login(email, password);
+      if (success) {
+        navigate('/');
+      }
+      return success;
     } finally {
       setIsLoading(false);
     }
@@ -31,7 +35,11 @@ export const useAuthWithRedirect = () => {
   const forceLoginWithRedirect = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      return await forceLogin(email, password, () => navigate('/'));
+      const success = await forceLogin(email, password);
+      if (success) {
+        navigate('/');
+      }
+      return success;
     } finally {
       setIsLoading(false);
     }

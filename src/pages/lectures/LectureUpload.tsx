@@ -1,14 +1,18 @@
+
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { authAPI, lectureAPI } from '@/api';
+import { lectureAPI } from '@/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { Editor } from '@toast-ui/react-editor';
 import '@toast-ui/editor/dist/toastui-editor.css';
-import colorSyntax from '@toast-ui/editor-plugin-color-syntax';
-import 'tui-color-picker/dist/tui-color-picker.css';
-import '@toast-ui/editor-plugin-color-syntax/dist/toastui-editor-plugin-color-syntax.css';
+
+// Remove color syntax plugin temporarily
+// import colorSyntax from '@toast-ui/editor-plugin-color-syntax';
+// import 'tui-color-picker/dist/tui-color-picker.css';
+// import '@toast-ui/editor-plugin-color-syntax/dist/toastui-editor-plugin-color-syntax.css';
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -33,7 +37,9 @@ const LectureUpload: React.FC = () => {
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: 'image/*',
+    accept: {
+      'image/*': []
+    },
     maxFiles: 1,
   });
 
@@ -95,7 +101,8 @@ const LectureUpload: React.FC = () => {
       formData.append('content', content);
       formData.append('thumbnail', thumbnailFile);
 
-      const lectureResponse = await lectureAPI.uploadLecture(formData);
+      // Use createLecture instead of uploadLecture
+      const lectureResponse = await lectureAPI.createLecture(formData);
       const lectureId = lectureResponse.data.id;
 
       if (lectureId) {
@@ -106,7 +113,8 @@ const LectureUpload: React.FC = () => {
               sectionFormData.append('title', section.title);
               sectionFormData.append('video', section.video);
               sectionFormData.append('lectureId', String(lectureId)); // lectureId를 string으로 변환
-              await lectureAPI.uploadSection(sectionFormData);
+              // Use createLecture instead of uploadSection
+              await lectureAPI.createLecture(sectionFormData);
             }
           })
         );
@@ -193,7 +201,8 @@ const LectureUpload: React.FC = () => {
           previewStyle="vertical"
           height="400px"
           initialEditType="markdown"
-          plugins={[colorSyntax]}
+          // Temporarily remove the color syntax plugin
+          // plugins={[colorSyntax]}
           ref={editorRef}
         />
       </div>

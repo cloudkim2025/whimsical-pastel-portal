@@ -14,7 +14,7 @@ export const useAuth = () => {
     setIsLoading(true);
     
     try {
-      const response = await authAPI.login(email, password);
+      const response = await authAPI.login({ email, password });
       
       if (response.data.loggedIn && response.data.accessToken) {
         // 토큰을 로컬 스토리지에 저장
@@ -64,7 +64,7 @@ export const useAuth = () => {
     setIsLoading(true);
     
     try {
-      const response = await authAPI.forceLogin(email, password);
+      const response = await authAPI.forceLogin({ email, password });
       
       if (response.data.loggedIn && response.data.accessToken) {
         tokenManager.setToken(response.data.accessToken);
