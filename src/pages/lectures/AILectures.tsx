@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -200,7 +201,7 @@ const AILectures = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="pt-[72px] lg:pt-[92px] px-0">
-        <SidebarProvider defaultOpen={true}>
+        <SidebarProvider defaultOpen={false}>
           <div className="flex min-h-[calc(100vh-5.5rem)] w-full">
             <LectureSidebar
               sessions={mockSessions}
@@ -210,14 +211,14 @@ const AILectures = () => {
               selectSession={selectSession}
             />
             <SidebarInset>
-              <div className="flex flex-col md:flex-row h-full">
+              <div className="flex flex-col md:flex-row h-full max-w-screen-xl mx-auto">
                 {/* Code Editor Panel */}
                 <div 
-                  className="w-full md:w-1/2 border-r border-border flex flex-col"
+                  className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
                   style={{ 
-                    maxHeight: "70vh", 
-                    minHeight: "420px", 
-                    height: "70vh" 
+                    height: "calc(100vh - 180px)", 
+                    minHeight: "420px",
+                    maxHeight: "calc(100vh - 180px)" 
                   }}
                 >
                   <LectureCodePanel
@@ -227,11 +228,11 @@ const AILectures = () => {
                 </div>
                 {/* Chat Panel */}
                 <div 
-                  className="w-full md:w-1/2 flex flex-col h-full"
+                  className="w-full md:w-1/2 flex flex-col"
                   style={{ 
-                    maxHeight: "70vh", 
-                    minHeight: "420px", 
-                    height: "70vh" 
+                    height: "calc(100vh - 180px)", 
+                    minHeight: "420px",
+                    maxHeight: "calc(100vh - 180px)" 
                   }}
                 >
                   <LectureChatPanel

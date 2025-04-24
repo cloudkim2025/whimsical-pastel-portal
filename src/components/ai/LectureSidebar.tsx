@@ -17,7 +17,8 @@ import {
   SidebarGroupLabel,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Bot, Code, History, FileCode, ChevronRight } from "lucide-react";
+import { Bot, Code, History, FileCode, ChevronRight, MenuIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface LectureSession {
   id: string;
@@ -42,6 +43,38 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
   setSidebarView,
   selectSession,
 }) => {
+  const [page, setPage] = React.useState(1);
+  const [hasMore, setHasMore] = React.useState(true);
+  const sidebarContentRef = React.useRef<HTMLDivElement>(null);
+
+  // Handle scroll for infinite loading
+  const handleScroll = () => {
+    if (!sidebarContentRef.current || !hasMore) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = sidebarContentRef.current;
+    
+    // If scrolled to bottom (with a small threshold)
+    if (scrollHeight - scrollTop - clientHeight < 20) {
+      // Load more sessions (simulating for now)
+      console.log("Loading more sessions...");
+      setPage(prev => prev + 1);
+      
+      // Here you would typically fetch more data
+      // For now, let's just simulate the end of data after a few pages
+      if (page >= 3) {
+        setHasMore(false);
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    const contentElement = sidebarContentRef.current;
+    if (contentElement) {
+      contentElement.addEventListener('scroll', handleScroll);
+      return () => contentElement.removeEventListener('scroll', handleScroll);
+    }
+  }, [hasMore, page]);
+
   return (
     <Sidebar
       collapsible="icon"
@@ -53,9 +86,15 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
           <Bot className="h-5 w-5 text-ghibli-forest mr-2" />
           <span className="font-medium text-ghibli-forest">AI 코드 분석</span>
         </div>
-        <SidebarTrigger />
+        <SidebarTrigger>
+          <MenuIcon className="h-4 w-4" />
+        </SidebarTrigger>
       </SidebarHeader>
-      <SidebarContent className="pt-2 px-2">
+      <SidebarContent 
+        ref={sidebarContentRef} 
+        className="pt-2 px-2 overflow-y-auto"
+        style={{ maxHeight: "calc(100vh - 300px)" }}
+      >
         <Tabs value={sidebarView} className="w-full" onValueChange={setSidebarView}>
           <TabsList className="w-full">
             <TabsTrigger value="history" className="flex-1">
@@ -84,6 +123,11 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
+                {hasMore && (
+                  <div className="py-2 text-center text-xs text-ghibli-stone animate-pulse">
+                    스크롤하여 더 보기...
+                  </div>
+                )}
               </SidebarMenu>
             </SidebarGroup>
           </TabsContent>

@@ -28,7 +28,7 @@ const LectureCodePanel: React.FC<LectureCodePanelProps> = ({
     </div>
     <div className="flex-1 overflow-auto bg-[#1E1E1E]">
       <pre className="p-4 text-[#D4D4D4] font-mono text-sm whitespace-pre overflow-x-auto">
-        <code>{code}</code>
+        <code>{code || "// 코드가 로드되지 않았습니다."}</code>
       </pre>
     </div>
   </div>
