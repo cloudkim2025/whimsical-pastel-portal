@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from "react";
 import {
     Tabs,
@@ -57,14 +58,13 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
     if (isCollapsed) {
         return (
             <div 
-                className="fixed top-[92px] left-0 z-[50] w-12 h-12 flex items-center justify-center bg-white border border-l-0 rounded-r shadow-md"
+                className="fixed top-24 left-0 z-[1000] bg-white rounded-r-lg shadow-lg border border-l-0 cursor-pointer"
+                onClick={() => setIsCollapsed(false)}
+                style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.1)" }}
             >
-                <button 
-                    onClick={() => setIsCollapsed(false)} 
-                    className="focus:outline-none"
-                >
+                <div className="p-3 flex items-center justify-center">
                     <Menu className="h-6 w-6 text-ghibli-forest" />
-                </button>
+                </div>
             </div>
         );
     }
@@ -76,8 +76,11 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
                     <Bot className="h-5 w-5 text-ghibli-forest mr-2" />
                     <span className="font-medium text-ghibli-forest">AI 코드 분석</span>
                 </div>
-                <button onClick={() => setIsCollapsed(true)}>
-                    <FileCode className="h-4 w-4" />
+                <button 
+                    onClick={() => setIsCollapsed(true)}
+                    className="hover:bg-gray-100 p-1.5 rounded-md transition-colors"
+                >
+                    <Menu className="h-5 w-5 text-ghibli-forest" />
                 </button>
             </SidebarHeader>
 

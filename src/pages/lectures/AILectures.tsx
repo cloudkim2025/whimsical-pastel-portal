@@ -28,7 +28,7 @@ const AILectures = () => {
     code: '// 코드를 입력하거나 분석할 세션을 선택해주세요.'
   });
   
-  // Define mock sessions for the AIHistorySidebar
+  // Define sessions for the AIHistorySidebar
   const mockSessions = [
     activeSession
   ];
@@ -112,22 +112,23 @@ const AILectures = () => {
                   className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
                   style={{ 
                     height: "calc(100vh - 130px)", 
-                    minHeight: "470px",
-                    maxHeight: "calc(100vh - 130px)",
-                    maxWidth: "820px" 
+                    minHeight: "520px",
+                    maxHeight: "calc(100vh - 80px)",
+                    maxWidth: "840px" 
                   }}
                 >
                   <LectureCodePanel
                     title={activeSession.title}
                     code={activeSession.code}
+                    onRefresh={() => console.log("Refreshing code view")}
                   />
                 </div>
                 <div 
                   className="w-full md:w-1/2 flex flex-col"
                   style={{ 
                     height: "calc(100vh - 130px)", 
-                    minHeight: "470px",
-                    maxHeight: "calc(100vh - 130px)" 
+                    minHeight: "520px",
+                    maxHeight: "calc(100vh - 80px)" 
                   }}
                 >
                   <LectureChatPanel
