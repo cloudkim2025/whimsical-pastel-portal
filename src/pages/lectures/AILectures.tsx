@@ -136,7 +136,7 @@ const AILectures = () => {
               variant="ghost"
               size="icon"
               className={`fixed top-[100px] transition-all duration-300 z-50 bg-white border border-border shadow-md rounded-r-lg h-10 w-10 
-                ${sidebarOpen ? 'left-[260px]' : 'left-2'}`}
+                ${sidebarOpen ? 'left-[210px]' : 'left-2'}`}
               onClick={toggleSidebar}
             >
               <Book className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 
