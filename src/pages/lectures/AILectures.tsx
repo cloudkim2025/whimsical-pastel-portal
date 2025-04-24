@@ -12,6 +12,8 @@ import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
 import AIHistorySidebar from "@/components/ai/AIHistorySidebar";
 import { useAiCurriculum } from "@/hooks/useAiCurriculum";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Define Message type
 interface Message {
@@ -43,6 +45,7 @@ const AILectures = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [sidebarView, setSidebarView] = useState("history");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const { curriculum, isAnalyzing, generateCurriculum } = useAiCurriculum();
 
   const handleSendMessage = async () => {
@@ -94,55 +97,72 @@ const AILectures = () => {
     }
   };
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <div className="pt-[72px] lg:pt-[92px] px-0">
-        <SidebarProvider defaultOpen={false}>
-          <div className="flex min-h-[calc(100vh-5.5rem)] w-full">
-            <LectureSidebar
-              activeSession={activeSession}
-              sidebarView={sidebarView}
-              setSidebarView={setSidebarView}
-              selectSession={selectSession}
-            />
-            <SidebarInset>
-              <div className="flex flex-col md:flex-row h-full max-w-screen-xl mx-auto">
-                <div 
-                  className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
-                  style={{ 
-                    height: "calc(100vh - 130px)", 
-                    minHeight: "520px",
-                    maxHeight: "calc(100vh - 80px)",
-                    maxWidth: "840px" 
-                  }}
-                >
-                  <LectureCodePanel
-                    title={activeSession.title}
-                    code={activeSession.code}
-                    onRefresh={() => console.log("Refreshing code view")}
-                  />
-                </div>
-                <div 
-                  className="w-full md:w-1/2 flex flex-col"
-                  style={{ 
-                    height: "calc(100vh - 130px)", 
-                    minHeight: "520px",
-                    maxHeight: "calc(100vh - 80px)" 
-                  }}
-                >
-                  <LectureChatPanel
-                    messages={chatMessages}
-                    userInput={userInput}
-                    setUserInput={setUserInput}
-                    isProcessing={isProcessing}
-                    onSendMessage={handleSendMessage}
-                  />
-                </div>
-              </div>
-            </SidebarInset>
+        <div className="flex min-h-[calc(100vh-5.5rem)] w-full relative">
+          {/* Toggle Button - Always visible */}
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="fixed top-[100px] left-0 z-50 bg-white border border-border shadow-md rounded-r-lg h-12 w-8"
+            onClick={toggleSidebar}
+          >
+            <Menu className={`h-5 w-5 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`} />
+          </Button>
+
+          {/* Sidebar */}
+          {sidebarOpen && (
+            <div className="min-w-[260px] max-w-[260px]">
+              <LectureSidebar
+                activeSession={activeSession}
+                sidebarView={sidebarView}
+                setSidebarView={setSidebarView}
+                selectSession={selectSession}
+              />
+            </div>
+          )}
+
+          {/* Main Content */}
+          <div className={`flex-1 flex flex-col md:flex-row h-full max-w-screen-xl mx-auto ${sidebarOpen ? "pl-0" : "pl-0"}`}>
+            <div 
+              className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
+              style={{ 
+                height: "calc(100vh - 130px)", 
+                minHeight: "520px",
+                maxHeight: "calc(100vh - 80px)",
+                maxWidth: "840px" 
+              }}
+            >
+              <LectureCodePanel
+                title={activeSession.title}
+                code={activeSession.code}
+                onRefresh={() => console.log("Refreshing code view")}
+              />
+            </div>
+            <div 
+              className="w-full md:w-1/2 flex flex-col"
+              style={{ 
+                height: "calc(100vh - 130px)", 
+                minHeight: "520px",
+                maxHeight: "calc(100vh - 80px)" 
+              }}
+            >
+              <LectureChatPanel
+                messages={chatMessages}
+                userInput={userInput}
+                setUserInput={setUserInput}
+                isProcessing={isProcessing}
+                onSendMessage={handleSendMessage}
+              />
+            </div>
           </div>
-        </SidebarProvider>
+        </div>
       </div>
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-[300px] p-0">

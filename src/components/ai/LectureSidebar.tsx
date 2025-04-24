@@ -16,7 +16,7 @@ import {
     SidebarGroup,
     SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Bot, Code, History, FileCode, ChevronRight, Menu } from "lucide-react";
+import { Bot, Code, History, FileCode, ChevronRight } from "lucide-react";
 
 interface LectureSession {
     id: string;
@@ -40,7 +40,6 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
     selectSession,
 }) => {
     const [hasScrollableContent, setHasScrollableContent] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
     const sidebarContentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -55,39 +54,19 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
         return () => window.removeEventListener("resize", checkScrollable);
     }, []);
 
-    if (isCollapsed) {
-        return (
-            <div 
-                className="fixed top-24 left-0 z-[1000] bg-white rounded-r-lg shadow-lg border border-l-0 cursor-pointer"
-                onClick={() => setIsCollapsed(false)}
-                style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.1)" }}
-            >
-                <div className="p-3 flex items-center justify-center">
-                    <Menu className="h-6 w-6 text-ghibli-forest" />
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <Sidebar className="h-fit max-h-[calc(100vh-50px)] mt-[92px] w-64 border-r bg-white">
-            <SidebarHeader className="h-14 flex items-center justify-between px-4">
+        <Sidebar className="h-full bg-white border-r border-border">
+            <SidebarHeader className="h-14 flex items-center px-4">
                 <div className="flex items-center">
                     <Bot className="h-5 w-5 text-ghibli-forest mr-2" />
                     <span className="font-medium text-ghibli-forest">AI 코드 분석</span>
                 </div>
-                <button 
-                    onClick={() => setIsCollapsed(true)}
-                    className="hover:bg-gray-100 p-1.5 rounded-md transition-colors"
-                >
-                    <Menu className="h-5 w-5 text-ghibli-forest" />
-                </button>
             </SidebarHeader>
 
             <SidebarContent
                 ref={sidebarContentRef}
                 className="pt-2 px-2 overflow-y-auto"
-                style={{ maxHeight: "calc(100vh - 200px)" }}
+                style={{ height: "calc(100vh - 150px)" }}
             >
                 <Tabs value={sidebarView} className="w-full" onValueChange={setSidebarView}>
                     <TabsList className="w-full">
