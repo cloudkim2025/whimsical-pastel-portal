@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Bot, Code, History, FileCode, ChevronRight } from "lucide-react";
 
-export interface LectureSession {
+interface LectureSession {
   id: string;
   title: string;
   summary: string;
@@ -46,7 +46,7 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
     <Sidebar
       collapsible="icon"
       variant="sidebar"
-      className="h-fit max-h-[calc(100vh-200px)] mt-4"
+      className="h-fit max-h-[calc(100vh-200px)] mt-[92px]" // Added top margin to match header height
     >
       <SidebarHeader className="h-14 flex items-center justify-between px-4">
         <div className="flex items-center">
