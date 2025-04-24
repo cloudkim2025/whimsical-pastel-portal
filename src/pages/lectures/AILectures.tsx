@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -102,12 +103,12 @@ const AILectures = () => {
           <Button 
             variant="outline" 
             size="icon" 
-            className="fixed top-[50px] left-24 z-50 bg-white border border-border shadow-md rounded-r-lg h-12 w-12 hover:bg-purple-50 transition-colors"
+            className="fixed top-[50px] left-24 z-50 bg-white border border-border shadow-md rounded-r-lg h-12 w-12 hover:bg-purple-50 transition-colors flex items-center justify-end pr-1"
             onClick={toggleSidebar}
           >
             <Book 
-              className={`h-6 w-6 text-ghibli-forest transition-transform duration-200 ${sidebarOpen ? "rotate-45" : ""}`} 
-              strokeWidth={2.5}
+              className={`h-4 w-4 text-ghibli-forest transition-transform duration-200 ${sidebarOpen ? "rotate-45" : ""}`} 
+              strokeWidth={2}
             />
           </Button>
 
