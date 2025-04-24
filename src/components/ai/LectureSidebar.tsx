@@ -26,13 +26,13 @@ interface LectureSidebarProps {
 }
 
 const LectureSidebar: React.FC<LectureSidebarProps> = ({
-                                                           activeSession,
-                                                           sidebarView,
-                                                           setSidebarView,
-                                                           selectSession,
-                                                           isCollapsed,
-                                                           toggleSidebar,
-                                                       }) => {
+    activeSession,
+    sidebarView,
+    setSidebarView,
+    selectSession,
+    isCollapsed,
+    toggleSidebar,
+}) => {
     const [hasScrollableContent, setHasScrollableContent] = useState(false);
     const sidebarContentRef = useRef<HTMLDivElement>(null);
 
@@ -48,12 +48,9 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
         return () => window.removeEventListener("resize", checkScrollable);
     }, []);
 
-    if (isCollapsed) {
-        return null;
-    }
-
     return (
-        <div className="h-full bg-white border-r border-border">
+        <div className={`h-full bg-white border-r border-border transition-all duration-300 ease-in-out 
+            ${isCollapsed ? 'w-0 opacity-0 overflow-hidden' : 'w-[260px] opacity-100'}`}>
             <div className="h-14 flex items-center px-4 justify-between">
                 <div className="flex items-center gap-2">
                     <Bot className="h-5 w-5 text-ghibli-forest" />

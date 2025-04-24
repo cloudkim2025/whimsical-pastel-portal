@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,7 +7,7 @@ import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
 import AIHistorySidebar from "@/components/ai/AIHistorySidebar";
 import { useAiCurriculum } from "@/hooks/useAiCurriculum";
-import { Menu } from "lucide-react";
+import { Menu, Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Message {
@@ -72,77 +71,70 @@ const AILectures = () => {
     if (isMobileMenuOpen) setIsMobileMenuOpen(false);
   };
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
   return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="pt-[72px] lg:pt-[92px] px-0">
-          <div className="flex min-h-[calc(100vh-5.5rem)] w-full relative">
-            {/* Toggle Button - Only visible when sidebar is collapsed */}
-            {!sidebarOpen && (
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="fixed top-[100px] left-6 z-50 bg-white border border-border shadow-md rounded-r-lg h-8 w-8"
-                    onClick={toggleSidebar}
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-            )}
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="pt-[72px] lg:pt-[92px] px-0">
+        <div className="flex min-h-[calc(100vh-5.5rem)] w-full relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`fixed top-[92px] transition-all duration-300 z-50 bg-white border border-border shadow-md rounded-r-lg h-10 w-10 
+              ${sidebarOpen ? 'left-[260px]' : 'left-2'}`}
+            onClick={toggleSidebar}
+          >
+            <Book className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 
+              ${sidebarOpen ? 'rotate-0' : 'rotate-180'}`} />
+          </Button>
 
-            {sidebarOpen && (
-                <div className="min-w-[260px] max-w-[260px]">
-                  <LectureSidebar
-                      activeSession={activeSession}
-                      sidebarView={sidebarView}
-                      setSidebarView={setSidebarView}
-                      selectSession={selectSession}
-                      isCollapsed={!sidebarOpen}
-                      toggleSidebar={toggleSidebar}
-                  />
-                </div>
-            )}
+          <LectureSidebar
+            activeSession={activeSession}
+            sidebarView={sidebarView}
+            setSidebarView={setSidebarView}
+            selectSession={selectSession}
+            isCollapsed={!sidebarOpen}
+            toggleSidebar={toggleSidebar}
+          />
 
-            <div className={`flex-1 flex flex-col md:flex-row h-full max-w-screen-xl mx-auto`}>
-              <div
-                  className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
-                  style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)", maxWidth: "840px" }}
-              >
-                <LectureCodePanel
-                    title={activeSession.title}
-                    code={activeSession.code}
-                    onRefresh={() => console.log("Refreshing code view")}
-                />
-              </div>
-              <div
-                  className="w-full md:w-1/2 flex flex-col"
-                  style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)" }}
-              >
-                <LectureChatPanel
-                    messages={chatMessages}
-                    userInput={userInput}
-                    setUserInput={setUserInput}
-                    isProcessing={isProcessing}
-                    onSendMessage={handleSendMessage}
-                />
-              </div>
+          <div className={`flex-1 flex flex-col md:flex-row h-full max-w-screen-xl mx-auto`}>
+            <div
+              className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
+              style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)", maxWidth: "840px" }}
+            >
+              <LectureCodePanel
+                title={activeSession.title}
+                code={activeSession.code}
+                onRefresh={() => console.log("Refreshing code view")}
+              />
+            </div>
+            <div
+              className="w-full md:w-1/2 flex flex-col"
+              style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)" }}
+            >
+              <LectureChatPanel
+                messages={chatMessages}
+                userInput={userInput}
+                setUserInput={setUserInput}
+                isProcessing={isProcessing}
+                onSendMessage={handleSendMessage}
+              />
             </div>
           </div>
         </div>
-        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-          <SheetContent side="left" className="w-[300px] p-0">
-            <AIHistorySidebar
-                sessions={mockSessions}
-                activeSessionId={activeSession.id}
-                onSelectSession={selectSession}
-            />
-          </SheetContent>
-        </Sheet>
-        <Footer />
       </div>
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <SheetContent side="left" className="w-[300px] p-0">
+          <AIHistorySidebar
+            sessions={mockSessions}
+            activeSessionId={activeSession.id}
+            onSelectSession={selectSession}
+          />
+        </SheetContent>
+      </Sheet>
+      <Footer />
+    </div>
   );
 };
 
