@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from "react";
 import {
   Tabs,
@@ -17,7 +18,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Bot, Code, History, FileCode } from "lucide-react";
+import { Bot, Code, History, FileCode, ChevronRight } from "lucide-react";
 
 interface LectureSession {
   id: string;

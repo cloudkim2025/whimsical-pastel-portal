@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -26,6 +27,11 @@ const AILectures = () => {
     timestamp: new Date().toISOString(),
     code: '// 코드를 입력하거나 분석할 세션을 선택해주세요.'
   });
+  
+  // Define mock sessions for the AIHistorySidebar
+  const mockSessions = [
+    activeSession
+  ];
   
   const [chatMessages, setChatMessages] = useState<Message[]>([
     {
@@ -140,6 +146,7 @@ const AILectures = () => {
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-[300px] p-0">
           <AIHistorySidebar
+            sessions={mockSessions}
             activeSessionId={activeSession.id}
             onSelectSession={selectSession}
           />
