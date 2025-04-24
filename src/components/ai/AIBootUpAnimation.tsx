@@ -27,7 +27,10 @@ const AIBootUpAnimation: React.FC<AIBootUpAnimationProps> = ({ onComplete }) => 
             ease: "easeOut"
           }}
         >
-          <Star className="w-16 h-16 text-ghibli-forest animate-pulse" strokeWidth={1} />
+          <Link to="/" className="flex items-center space-x-2">
+                        <Cloud className="h-8 w-8 text-ghibli-meadow animate-float" />
+                        <h1 className="text-2xl font-handwritten font-bold text-ghibli-forest">Aigongbu</h1>
+                    </Link>
         </motion.div>
       </motion.div>
     </AnimatePresence>
