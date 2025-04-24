@@ -2,10 +2,6 @@
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import {
-  SidebarProvider,
-  SidebarInset,
-} from "@/components/ui/sidebar";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import LectureSidebar from "@/components/ai/LectureSidebar";
 import LectureCodePanel from "@/components/ai/LectureCodePanel";
@@ -124,6 +120,8 @@ const AILectures = () => {
                 sidebarView={sidebarView}
                 setSidebarView={setSidebarView}
                 selectSession={selectSession}
+                isCollapsed={!sidebarOpen}
+                toggleSidebar={toggleSidebar}
               />
             </div>
           )}

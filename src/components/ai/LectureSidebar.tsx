@@ -6,16 +6,6 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs";
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuItem,
-    SidebarMenuButton,
-    SidebarGroup,
-    SidebarGroupLabel,
-} from "@/components/ui/sidebar";
 import { Bot, Code, History, FileCode, ChevronRight } from "lucide-react";
 
 interface LectureSession {
@@ -31,6 +21,8 @@ interface LectureSidebarProps {
     sidebarView: string;
     setSidebarView: (v: string) => void;
     selectSession: (session: LectureSession) => void;
+    isCollapsed: boolean;
+    toggleSidebar: () => void;
 }
 
 const LectureSidebar: React.FC<LectureSidebarProps> = ({
@@ -38,6 +30,8 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
     sidebarView,
     setSidebarView,
     selectSession,
+    isCollapsed,
+    toggleSidebar,
 }) => {
     const [hasScrollableContent, setHasScrollableContent] = useState(false);
     const sidebarContentRef = useRef<HTMLDivElement>(null);
@@ -54,16 +48,20 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
         return () => window.removeEventListener("resize", checkScrollable);
     }, []);
 
+    if (isCollapsed) {
+        return null; // When collapsed, don't render the sidebar content
+    }
+
     return (
-        <Sidebar className="h-full bg-white border-r border-border">
-            <SidebarHeader className="h-14 flex items-center px-4">
+        <div className="h-full bg-white border-r border-border">
+            <div className="h-14 flex items-center px-4">
                 <div className="flex items-center">
                     <Bot className="h-5 w-5 text-ghibli-forest mr-2" />
                     <span className="font-medium text-ghibli-forest">AI 코드 분석</span>
                 </div>
-            </SidebarHeader>
+            </div>
 
-            <SidebarContent
+            <div
                 ref={sidebarContentRef}
                 className="pt-2 px-2 overflow-y-auto"
                 style={{ height: "calc(100vh - 150px)" }}
@@ -79,31 +77,29 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
                     </TabsList>
 
                     <TabsContent value="history" className="mt-0">
-                        <SidebarGroup>
-                            <SidebarGroupLabel>최근 분석</SidebarGroupLabel>
-                            <SidebarMenu>
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton
-                                        onClick={() => selectSession(activeSession)}
-                                        isActive={true}
-                                        tooltip={activeSession.summary}
-                                    >
-                                        <Code className="h-4 w-4" />
-                                        <span>{activeSession.title}</span>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            </SidebarMenu>
+                        <div className="mt-2">
+                            <div className="text-xs font-medium text-ghibli-stone mb-2">최근 분석</div>
+                            <div>
+                                <button
+                                    onClick={() => selectSession(activeSession)}
+                                    className="w-full text-left flex items-center gap-2 overflow-hidden rounded-md p-2 text-sm hover:bg-sidebar-accent bg-sidebar-accent font-medium"
+                                    title={activeSession.summary}
+                                >
+                                    <Code className="h-4 w-4" />
+                                    <span className="truncate">{activeSession.title}</span>
+                                </button>
+                            </div>
                             {hasScrollableContent && (
                                 <div className="py-2 text-center text-xs text-ghibli-stone animate-pulse">
                                     스크롤하여 더 보기...
                                 </div>
                             )}
-                        </SidebarGroup>
+                        </div>
                     </TabsContent>
 
                     <TabsContent value="outline" className="mt-0">
-                        <SidebarGroup>
-                            <SidebarGroupLabel>코드 구조</SidebarGroupLabel>
+                        <div className="mt-2">
+                            <div className="text-xs font-medium text-ghibli-stone mb-2">코드 구조</div>
                             <div className="px-2 py-1 text-sm text-ghibli-stone">
                                 <div className="flex items-center pl-2 py-1">
                                     <ChevronRight className="h-3 w-3 mr-1" />
@@ -113,11 +109,11 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
                                     <span>ExpensiveComponent()</span>
                                 </div>
                             </div>
-                        </SidebarGroup>
+                        </div>
                     </TabsContent>
                 </Tabs>
-            </SidebarContent>
-        </Sidebar>
+            </div>
+        </div>
     );
 };
 
