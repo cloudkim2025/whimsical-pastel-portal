@@ -26,13 +26,13 @@ interface LectureSidebarProps {
 }
 
 const LectureSidebar: React.FC<LectureSidebarProps> = ({
-    activeSession,
-    sidebarView,
-    setSidebarView,
-    selectSession,
-    isCollapsed,
-    toggleSidebar,
-}) => {
+                                                           activeSession,
+                                                           sidebarView,
+                                                           setSidebarView,
+                                                           selectSession,
+                                                           isCollapsed,
+                                                           toggleSidebar,
+                                                       }) => {
     const [hasScrollableContent, setHasScrollableContent] = useState(false);
     const sidebarContentRef = useRef<HTMLDivElement>(null);
 
@@ -55,17 +55,6 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
                 <div className="flex items-center gap-2">
                     <Bot className="h-5 w-5 text-ghibli-forest" />
                     <span className="font-medium text-ghibli-forest">AI 코드 분석</span>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="p-1 h-8 w-8 hover:bg-purple-50 transition-colors"
-                        onClick={toggleSidebar}
-                    >
-                        <Book
-                            className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 ${!isCollapsed ? "rotate-45" : ""}`}
-                            strokeWidth={2.5}
-                        />
-                    </Button>
                 </div>
             </div>
 
