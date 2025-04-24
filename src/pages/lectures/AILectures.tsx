@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,10 +7,9 @@ import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
 import AIHistorySidebar from "@/components/ai/AIHistorySidebar";
 import { useAiCurriculum } from "@/hooks/useAiCurriculum";
-import { Menu } from "lucide-react";
+import { Menu, Token } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Define Message type
 interface Message {
   role: "system" | "user" | "assistant";
   content: string;
@@ -26,7 +24,6 @@ const AILectures = () => {
     code: '// 코드를 입력하거나 분석할 세션을 선택해주세요.'
   });
   
-  // Define sessions for the AIHistorySidebar
   const mockSessions = [
     activeSession
   ];
@@ -102,17 +99,18 @@ const AILectures = () => {
       <Header />
       <div className="pt-[72px] lg:pt-[92px] px-0">
         <div className="flex min-h-[calc(100vh-5.5rem)] w-full relative">
-          {/* Toggle Button - Always visible */}
           <Button 
             variant="outline" 
             size="icon" 
-            className="fixed top-[100px] left-0 z-50 bg-white border border-border shadow-md rounded-r-lg h-12 w-8"
+            className="fixed top-[50px] left-24 z-50 bg-white border border-border shadow-md rounded-r-lg h-12 w-12 hover:bg-purple-50 transition-colors"
             onClick={toggleSidebar}
           >
-            <Menu className={`h-5 w-5 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`} />
+            <Token 
+              className={`h-6 w-6 text-ghibli-forest transition-transform duration-200 ${sidebarOpen ? "rotate-45" : ""}`} 
+              strokeWidth={2.5}
+            />
           </Button>
 
-          {/* Sidebar */}
           {sidebarOpen && (
             <div className="min-w-[260px] max-w-[260px]">
               <LectureSidebar
@@ -126,7 +124,6 @@ const AILectures = () => {
             </div>
           )}
 
-          {/* Main Content */}
           <div className={`flex-1 flex flex-col md:flex-row h-full max-w-screen-xl mx-auto ${sidebarOpen ? "pl-0" : "pl-0"}`}>
             <div 
               className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
