@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import {
     Tabs,
@@ -6,7 +5,8 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs";
-import { Bot, Code, History, FileCode, ChevronRight } from "lucide-react";
+import { Bot, Code, History, FileCode, Book, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface LectureSession {
     id: string;
@@ -26,13 +26,13 @@ interface LectureSidebarProps {
 }
 
 const LectureSidebar: React.FC<LectureSidebarProps> = ({
-    activeSession,
-    sidebarView,
-    setSidebarView,
-    selectSession,
-    isCollapsed,
-    toggleSidebar,
-}) => {
+                                                           activeSession,
+                                                           sidebarView,
+                                                           setSidebarView,
+                                                           selectSession,
+                                                           isCollapsed,
+                                                           toggleSidebar,
+                                                       }) => {
     const [hasScrollableContent, setHasScrollableContent] = useState(false);
     const sidebarContentRef = useRef<HTMLDivElement>(null);
 
@@ -49,15 +49,26 @@ const LectureSidebar: React.FC<LectureSidebarProps> = ({
     }, []);
 
     if (isCollapsed) {
-        return null; // When collapsed, don't render the sidebar content
+        return null;
     }
 
     return (
         <div className="h-full bg-white border-r border-border">
-            <div className="h-14 flex items-center px-4">
-                <div className="flex items-center">
-                    <Bot className="h-5 w-5 text-ghibli-forest mr-2" />
+            <div className="h-14 flex items-center px-4 justify-between">
+                <div className="flex items-center gap-2">
+                    <Bot className="h-5 w-5 text-ghibli-forest" />
                     <span className="font-medium text-ghibli-forest">AI 코드 분석</span>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="p-1 h-8 w-8 hover:bg-purple-50 transition-colors"
+                        onClick={toggleSidebar}
+                    >
+                        <Book
+                            className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 ${!isCollapsed ? "rotate-45" : ""}`}
+                            strokeWidth={2.5}
+                        />
+                    </Button>
                 </div>
             </div>
 
