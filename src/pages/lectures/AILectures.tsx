@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import LectureSidebar from "@/components/ai/LectureSidebar";
 import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
@@ -150,13 +151,15 @@ const AILectures = () => {
             />
 
             <div className="flex-1 flex flex-col md:flex-row h-full max-w-screen-xl mx-auto">
-              <div className="w-full md:w-1/2 border-r border-border flex flex-col bg-black">
+              <div className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
+                   style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)", maxWidth: "840px" }}>
                 <LectureCodePanel
                   title={activeSession.title}
                   code={activeSession.code}
                 />
               </div>
-              <div className="w-full md:w-1/2 flex flex-col">
+              <div className="w-full md:w-1/2 flex flex-col"
+                   style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)" }}>
                 <LectureChatPanel
                   messages={chatMessages}
                   isProcessing={isProcessing}
