@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -10,21 +10,24 @@ interface Message {
 
 interface LectureChatPanelProps {
   messages: Message[];
+  userInput: string;
+  setUserInput: (input: string) => void;
   isProcessing: boolean;
-  onSendMessage: (message: string) => void;
+  onSendMessage: () => void;
 }
 
 const LectureChatPanel: React.FC<LectureChatPanelProps> = ({
   messages,
+  userInput,
+  setUserInput,
   isProcessing,
   onSendMessage,
 }) => {
-  const [userInput, setUserInput] = useState("");
-
-  const handleSubmit = () => {
-    if (!userInput.trim() || isProcessing) return;
-    onSendMessage(userInput);
-    setUserInput("");
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSendMessage();
+    }
   };
 
   return (
@@ -78,13 +81,13 @@ const LectureChatPanel: React.FC<LectureChatPanelProps> = ({
             type="text"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            onKeyDown={handleKeyPress}
             placeholder="질문을 입력하세요..."
             className="flex-1 px-3 py-2 rounded-l-md border border-border focus:outline-none focus:border-ghibli-forest"
             disabled={isProcessing}
           />
           <Button
-            onClick={handleSubmit}
+            onClick={onSendMessage}
             disabled={!userInput.trim() || isProcessing}
             className="rounded-l-none rounded-r-md bg-ghibli-forest hover:bg-ghibli-forest/90"
           >

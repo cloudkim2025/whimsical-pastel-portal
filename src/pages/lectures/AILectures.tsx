@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
 import LectureSidebar from "@/components/ai/LectureSidebar";
 import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
@@ -40,6 +39,7 @@ const AILectures = () => {
     role: "system",
     content: "안녕하세요! AI 코드 분석 튜터입니다. 코드에 대해 어떤 질문이 있으신가요?",
   }]);
+  const [userInput, setUserInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
@@ -57,17 +57,18 @@ const AILectures = () => {
     }
   };
 
-  const handleSendMessage = async (message: string) => {
-    if (isProcessing) return;
+  const handleSendMessage = async () => {
+    if (!userInput.trim() || isProcessing) return;
 
     setIsProcessing(true);
-    const newMessage: Message = { role: "user", content: message };
+    const newMessage: Message = { role: "user", content: userInput };
     setChatMessages(prev => [...prev, newMessage]);
+    setUserInput("");
 
     try {
       const response = await API.post('/aichat', {
         sessionId: activeSession.id,
-        message,
+        message: userInput,
         code: activeSession.code
       });
 
@@ -133,15 +134,15 @@ const AILectures = () => {
         <div className="pt-[72px] lg:pt-[92px] px-0 flex-1 overflow-hidden">
           <div className="flex h-full w-full relative">
             <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`fixed top-[100px] transition-all duration-300 z-50 bg-white border border-border shadow-md rounded-r-lg h-10 w-10 
-              ${sidebarOpen ? 'left-[210px]' : 'left-2'}`}
-                  onClick={toggleSidebar}
-              >
-                <Book className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 
-              ${sidebarOpen ? 'rotate-0' : 'rotate-180'}`} />
-              </Button>
+              variant="ghost"
+              size="icon"
+              className={`fixed top-[100px] transition-all duration-300 z-50 bg-white border border-border shadow-md rounded-r-lg h-10 w-10 
+                ${sidebarOpen ? 'left-[210px]' : 'left-2'}`}
+              onClick={toggleSidebar}
+            >
+              <Book className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 
+                ${sidebarOpen ? 'rotate-0' : 'rotate-180'}`} />
+            </Button>
 
             <LectureSidebar
               sessions={sessions}
@@ -151,17 +152,23 @@ const AILectures = () => {
             />
 
             <div className="flex-1 flex flex-col md:flex-row h-full max-w-screen-xl mx-auto">
-              <div className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
-                   style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)", maxWidth: "840px" }}>
+              <div 
+                className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
+                style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)", maxWidth: "840px" }}
+              >
                 <LectureCodePanel
                   title={activeSession.title}
                   code={activeSession.code}
                 />
               </div>
-              <div className="w-full md:w-1/2 flex flex-col"
-                   style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)" }}>
+              <div 
+                className="w-full md:w-1/2 flex flex-col"
+                style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)" }}
+              >
                 <LectureChatPanel
                   messages={chatMessages}
+                  userInput={userInput}
+                  setUserInput={setUserInput}
                   isProcessing={isProcessing}
                   onSendMessage={handleSendMessage}
                 />
