@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
-// import Footer from "@/components/Footer"; // 푸터 제거
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import LectureSidebar from "@/components/ai/LectureSidebar";
 import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
 import AIHistorySidebar from "@/components/ai/AIHistorySidebar";
-import { useAiCurriculum } from "@/hooks/useAiCurriculum";
+import AIBootUpAnimation from "@/components/ai/AIBootUpAnimation";
 import { Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 interface Message {
   role: "system" | "user" | "assistant";
@@ -16,6 +16,9 @@ interface Message {
 }
 
 const AILectures = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
+
   const [activeSession, setActiveSession] = useState({
     id: 'initial',
     title: '새로운 AI 코드 분석',
@@ -73,8 +76,31 @@ const AILectures = () => {
 
   const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowContent(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleBootUpComplete = () => {
+    setIsLoading(false);
+  };
+
   return (
-      <div className="h-screen overflow-hidden flex flex-col bg-background">
+    <>
+      {isLoading && <AIBootUpAnimation onComplete={handleBootUpComplete} />}
+      
+      <motion.div 
+        className="h-screen overflow-hidden flex flex-col bg-background"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ 
+          opacity: showContent ? 1 : 0, 
+          y: showContent ? 0 : 20 
+        }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
         <Header />
         <div className="pt-[72px] lg:pt-[92px] px-0 flex-1 overflow-hidden">
           <div className="flex h-full w-full relative">
@@ -134,7 +160,8 @@ const AILectures = () => {
             />
           </SheetContent>
         </Sheet>
-      </div>
+      </motion.div>
+    </>
   );
 };
 
