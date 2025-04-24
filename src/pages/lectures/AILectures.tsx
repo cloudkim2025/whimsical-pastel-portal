@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,7 +7,7 @@ import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
 import AIHistorySidebar from "@/components/ai/AIHistorySidebar";
 import { useAiCurriculum } from "@/hooks/useAiCurriculum";
-import { ChevronLeft, Code } from "lucide-react";
+import { Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Message {
@@ -106,7 +105,7 @@ const AILectures = () => {
             className="fixed top-[50px] left-24 z-50 bg-white border border-border shadow-md rounded-r-lg h-12 w-12 hover:bg-purple-50 transition-colors"
             onClick={toggleSidebar}
           >
-            <Code 
+            <Book 
               className={`h-6 w-6 text-ghibli-forest transition-transform duration-200 ${sidebarOpen ? "rotate-45" : ""}`} 
               strokeWidth={2.5}
             />
