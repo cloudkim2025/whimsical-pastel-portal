@@ -133,15 +133,15 @@ const AILectures = () => {
         <div className="pt-[72px] lg:pt-[92px] px-0 flex-1 overflow-hidden">
           <div className="flex h-full w-full relative">
             <Button
-              variant="ghost"
-              size="icon"
-              className={`fixed top-[100px] transition-all duration-300 z-50 bg-white border border-border shadow-md rounded-r-lg h-10 w-10 
-                ${sidebarOpen ? 'left-[210px]' : 'left-2'}`}
-              onClick={toggleSidebar}
-            >
-              <Book className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 
-                ${sidebarOpen ? 'rotate-0' : 'rotate-180'}`} />
-            </Button>
+                  variant="ghost"
+                  size="icon"
+                  className={`fixed top-[100px] transition-all duration-300 z-50 bg-white border border-border shadow-md rounded-r-lg h-10 w-10 
+              ${sidebarOpen ? 'left-[210px]' : 'left-2'}`}
+                  onClick={toggleSidebar}
+              >
+                <Book className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 
+              ${sidebarOpen ? 'rotate-0' : 'rotate-180'}`} />
+              </Button>
 
             <LectureSidebar
               sessions={sessions}
