@@ -6,7 +6,7 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs";
-import { Bot, Code, History, FileCode, Book } from "lucide-react";
+import { Bot, Code, History, FileCode, Book, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LectureSession {
