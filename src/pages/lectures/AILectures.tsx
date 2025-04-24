@@ -37,7 +37,6 @@ const AILectures = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [sidebarView, setSidebarView] = useState("history");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { curriculum, isAnalyzing, generateCurriculum } = useAiCurriculum();
 
   const handleSendMessage = async () => {
     if (!userInput.trim() || isProcessing) return;
