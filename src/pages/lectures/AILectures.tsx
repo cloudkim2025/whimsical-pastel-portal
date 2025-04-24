@@ -99,17 +99,20 @@ const AILectures = () => {
       <Header />
       <div className="pt-[72px] lg:pt-[92px] px-0">
         <div className="flex min-h-[calc(100vh-5.5rem)] w-full relative">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="fixed top-[50px] left-24 z-50 bg-white border border-border shadow-md rounded-r-lg h-12 w-12 hover:bg-purple-50 transition-colors"
-            onClick={toggleSidebar}
-          >
-            <Book 
-              className={`h-6 w-6 text-ghibli-forest transition-transform duration-200 ${sidebarOpen ? "rotate-45" : ""}`} 
-              strokeWidth={2.5}
-            />
-          </Button>
+          <div className="flex items-center gap-2 fixed top-[50px] left-4 z-50">
+            <span className="text-lg font-semibold">AI 코드 분석</span>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="p-1 h-8 w-8 hover:bg-purple-50 transition-colors"
+              onClick={toggleSidebar}
+            >
+              <Book 
+                className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 ${sidebarOpen ? "rotate-45" : ""}`} 
+                strokeWidth={2.5}
+              />
+            </Button>
+          </div>
 
           {sidebarOpen && (
             <div className="min-w-[260px] max-w-[260px]">
