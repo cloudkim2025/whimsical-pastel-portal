@@ -1,7 +1,7 @@
 
 // Type definitions for admin components
 export type CourseStatus = 'pending' | 'published';
-export type InstructorStatus = 'pending' | 'approved' | 'rejected';
+export type InstructorStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface CourseType {
   id: number;
@@ -16,12 +16,34 @@ export interface CourseType {
 
 export interface InstructorType {
   id: number;
+  userId: number;
   name: string;
-  email: string;
+  bio: string;
   category: string;
-  introduction: string;
-  profileImageUrl: string;
-  resumeUrl: string;
-  appliedAt: string;
+  profileImage: string;
+  createdAt?: string;
+  status: InstructorStatus;
+}
+
+export interface InstructorListResponse {
+  success: boolean;
+  message: string;
+  teachers: InstructorType[];
+  totalPages: number;
+  currentPage: number;
+}
+
+/**
+ * 강사 상세 조회 응답 타입
+ */
+export interface InstructorDetailResponse {
+  success: boolean;
+  message: string;
+  userId: number;
+  name: string;
+  bio: string;
+  category: string;
+  profileImage: string;
+  resumeFile: string;
   status: InstructorStatus;
 }

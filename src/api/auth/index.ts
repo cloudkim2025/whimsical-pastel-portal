@@ -60,5 +60,5 @@ export const authAPI = {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
-        }),
+        })
 };

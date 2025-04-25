@@ -2,22 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InstructorManagement from '@/components/admin/InstructorManagement';
 import LectureManagement from '@/components/admin/LectureManagement';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
 import { authAPI } from '@/api/auth';
 
 const Admin: React.FC = () => {
-  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('instructors');
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isCheckingRole, setIsCheckingRole] = useState(true);
 
   useEffect(() => {
     const path = location.pathname.split('/').pop();
@@ -29,53 +24,29 @@ const Admin: React.FC = () => {
       } else {
         setActiveTab('instructors');
       }
-      // 2. 관리자 여부 확인
+
+      // 2. API로 관리자 여부 확인
       try {
         const response = await authAPI.getUserRole();
         const role = response.data?.role;
-        if (role === 'ADMIN') {
-          setIsAdmin(true);
-        } else {
-          toast.error("관리자 권한이 필요합니다.");
-          setIsAdmin(false);
+
+        if (role !== 'ADMIN') {
+          toast.error('관리자 권한이 필요합니다.');
+          navigate('/', { replace: true }); // 홈으로 리다이렉트
         }
       } catch (error) {
-        console.error("관리자 권한 확인 실패", error);
-        toast.error("관리자 권한 확인 중 오류가 발생했습니다.");
-        setIsAdmin(false);
+        console.error('관리자 권한 확인 실패:', error);
+        toast.error('관리자 권한 확인 중 오류가 발생했습니다.');
+        navigate('/', { replace: true });
+      } finally {
+        setIsCheckingRole(false); // 검증 완료
       }
     };
 
     initialize();
-  }, [location]);
+  }, [location, navigate]);
 
-  if (!isAdmin) {
-    return (
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-1 flex items-center justify-center">
-            <div className="max-w-md w-full p-6">
-              <Alert variant="destructive" className="mb-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>접근 권한 없음</AlertTitle>
-                <AlertDescription>
-                  관리자 계정으로 로그인해야 이 페이지에 접근할 수 있습니다.
-                  <div className="mt-4 space-y-2">
-                    <Button onClick={() => navigate('/')} variant="outline" className="w-full">
-                      홈으로 돌아가기
-                    </Button>
-                    <Button onClick={() => navigate('/login')} className="w-full">
-                      관리자 로그인하기
-                    </Button>
-                  </div>
-                </AlertDescription>
-              </Alert>
-            </div>
-          </main>
-          <Footer />
-        </div>
-    );
-  }
+  if (isCheckingRole) return null; // 권한 확인 중에는 화면 표시 안 함
 
   return (
       <div className="min-h-screen flex flex-col">
@@ -83,7 +54,7 @@ const Admin: React.FC = () => {
         <main className="flex-1 py-16">
           <div className="container px-4 md:px-6">
             <h1 className="text-3xl md:text-4xl font-bold text-ghibli-midnight mb-8" lang="ko">
-              관리자 페이지 <span className="text-lg font-normal text-ghibli-stone">({user?.nickname})</span>
+              관리자 페이지
             </h1>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

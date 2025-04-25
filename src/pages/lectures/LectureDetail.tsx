@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { toast } from 'sonner';
-import { useAuthWithRedirect } from '@/hooks/useAuthWithRedirect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import VideoLectureModal from '@/components/VideoLectureModal';

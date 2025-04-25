@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { verificationAPI } from '@/api/verification';
-import { InstructorApplication } from '@/types/instructor';
+import { useNavigate } from 'react-router-dom';
 
 const categories = [
   { id: 'frontend', name: '프론트엔드' },
@@ -33,6 +33,7 @@ const InstructorApply: React.FC = () => {
   const [resume, setResume] = useState<File | null>(null);
   const [resumeName, setResumeName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -60,7 +61,7 @@ const InstructorApply: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // 유효성 검사
     if (!name || !introduction || !category || !profileImage || !resume) {
       toast({
@@ -70,43 +71,56 @@ const InstructorApply: React.FC = () => {
       });
       return;
     }
-    
-    setIsSubmitting(true);
-    
+
+    setIsSubmitting(true); // 제출 시작 표시
+
     try {
       const formData = new FormData();
       formData.append('name', name);
-      formData.append('introduction', introduction);
+      formData.append('bio', introduction);
       formData.append('category', category);
       formData.append('profileImage', profileImage);
       formData.append('resume', resume);
 
-      // API 호출
-      await verificationAPI.submitInstructorApplication(formData);
+      const response = await verificationAPI.applyForTeacher(formData);
 
-      toast({
-        title: "지원서 제출 완료",
-        description: "강사 지원서가 성공적으로 제출되었습니다. 심사 후 결과를 알려드리겠습니다."
-      });
-        
-      // 폼 초기화
-      setName('');
-      setIntroduction('');
-      setProfileImage(null);
-      setProfilePreview(null);
-      setCategory('');
-      setResume(null);
-      setResumeName('');
-      setIsSubmitting(false);
-    } catch (error) {
+      const {success, message} = response.data;
+
+      if (success) {
+        toast({
+          title: "지원서 제출 완료",
+          description: "강사 지원서가 성공적으로 제출되었습니다. 심사 후 결과를 알려드리겠습니다."
+        });
+
+        // 폼 초기화
+        setName('');
+        setIntroduction('');
+        setProfileImage(null);
+        setProfilePreview(null);
+        setCategory('');
+        setResume(null);
+        setResumeName('');
+
+        navigate('/');
+      } else {
+        toast({
+          title: "지원서 제출 실패",
+          description: message || "서버에서 실패 응답을 받았습니다."
+        });
+      }
+
+    } catch (error: any) {
+      console.error("지원서 제출 중 오류:", error);
       toast({
         variant: "destructive",
         title: "제출 실패",
-        description: "오류가 발생했습니다. 다시 시도해주세요."
+        description: error.response?.data?.message || "오류가 발생했습니다. 다시 시도해주세요."
       });
+    } finally {
       setIsSubmitting(false);
     }
-  };
+  }
+
 
   return (
     <div className="min-h-screen flex flex-col">

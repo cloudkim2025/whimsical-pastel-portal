@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, Heart, BookmarkPlus, PlusCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { authAPI } from '@/api/auth';
+import { useAuth } from '@/contexts/AuthContext';
 import Footer from '@/components/Footer';
+import axios from 'axios';
 
 const categories = [
   { id: 'frontend', name: '프론트엔드' },
@@ -15,34 +16,46 @@ const categories = [
   { id: 'data', name: '데이터 사이언스' },
   { id: 'ai', name: '인공지능' },
   { id: 'devops', name: 'DevOps' },
+  { id: 'database', name: '데이터베이스' },
 ];
 
-const lecturesData = Array(12).fill(null).map((_, idx) => ({
-  id: `lecture-${idx}`,
-  title: `웹 개발의 모든 것 ${idx + 1}`,
-  instructor: `김강사 ${idx + 1}`,
-  image: `https://api.dicebear.com/7.x/shapes/svg?seed=${idx}`,
-  category: categories[idx % categories.length].id,
-  rating: (4 + Math.random()).toFixed(1),
-  price: (15000 + idx * 1000).toLocaleString(),
-  bookmarks: Math.floor(Math.random() * 100),
-}));
+interface Lecture {
+  id: string;
+  title: string;
+  instructor: string;
+  imageUrl: string;
+  category: string;
+  rating: number;
+  price: number;
+  bookmarks: number;
+}
 
 const DevLectures: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
   const [bookmarkedLectures, setBookmarkedLectures] = useState<string[]>([]);
-  const [isInstructor, setIsInstructor] = useState<boolean>(false);
+  const [lectures, setLectures] = useState<Lecture[]>([]);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const fetchRole = async () => {
+    const fetchLectures = async () => {
       try {
-        const res = await authAPI.getUserRole();
-        setIsInstructor(res.data?.role === 'INSTRUCTOR' || res.data?.role === 'ADMIN');
-      } catch (e) {
-        console.error('역할 확인 실패', e);
+        const res = await axios.get('http://localhost:9004/api/lectures');
+        const mapped = res.data.map((lecture: any) => ({
+          id: String(lecture.lectureId),
+          title: lecture.title,
+          instructor: lecture.instructorName,
+          imageUrl: lecture.thumbnailUrl,
+          category: lecture.category,
+          rating: lecture.rating ?? 4.0,
+          price: lecture.price,
+          bookmarks: lecture.bookmarkCount ?? 0
+        }));
+        setLectures(mapped);
+      } catch (err) {
+        console.error('강의 데이터를 불러오지 못했습니다:', err);
       }
     };
-    fetchRole();
+    fetchLectures();
   }, []);
 
   const toggleBookmark = (lectureId: string) => {
@@ -53,25 +66,22 @@ const DevLectures: React.FC = () => {
     );
   };
 
-  const filteredLectures = lecturesData.filter(
-      (lecture) => lecture.category === selectedCategory
-  );
+  const filteredLectures = selectedCategory
+      ? lectures.filter((lecture) => lecture.category === selectedCategory)
+      : lectures;
+
 
   return (
       <div className="min-h-screen bg-background">
         <Header />
-
         <main className="container mx-auto pt-32 px-4 pb-16">
           <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               className="flex justify-between items-center mb-8"
           >
-            <h1 className="text-4xl font-handwritten text-ghibli-forest">
-              개발강의
-            </h1>
-
-            {isInstructor && (
+            <h1 className="text-4xl font-handwritten text-ghibli-forest">개발강의</h1>
+            {user && (
                 <Link to="/lecture-upload">
                   <Button className="btn-secondary flex items-center gap-2 font-korean">
                     <PlusCircle size={16} />
@@ -81,13 +91,13 @@ const DevLectures: React.FC = () => {
             )}
           </motion.div>
 
+          {/* 카테고리 선택 */}
           <div className="flex flex-wrap justify-center gap-2 mb-10">
             {categories.map((category) => (
                 <Button
                     key={category.id}
                     variant={selectedCategory === category.id ? 'default' : 'outline'}
-                    className={`
-                rounded-full px-5 py-2 font-medium transition-all font-korean
+                    className={`rounded-full px-5 py-2 font-medium transition-all font-korean
                 ${selectedCategory === category.id
                         ? 'bg-ghibli-meadow hover:bg-ghibli-forest text-white'
                         : 'border-ghibli-meadow/50 text-ghibli-forest hover:border-ghibli-forest hover:bg-ghibli-cloud'}
@@ -99,6 +109,7 @@ const DevLectures: React.FC = () => {
             ))}
           </div>
 
+          {/* 강의 카드 */}
           <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
               initial={{ opacity: 0 }}
@@ -116,7 +127,7 @@ const DevLectures: React.FC = () => {
                   <Card className="overflow-hidden h-full border border-ghibli-meadow/20 hover:shadow-lg transition-shadow duration-300">
                     <div className="relative">
                       <img
-                          src={lecture.image}
+                          src={lecture.imageUrl}
                           alt={lecture.title}
                           className="w-full h-48 object-cover"
                       />
@@ -142,14 +153,14 @@ const DevLectures: React.FC = () => {
                           {lecture.title}
                         </h3>
                         <p className="text-sm text-ghibli-stone mb-3 font-korean">
-                          {lecture.instructor}
+                          {lecture.instructor || '이름 없음'}
                         </p>
                         <div className="flex items-center space-x-1 mb-4">
                           <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                           <span className="text-sm font-medium">{lecture.rating}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="font-bold text-ghibli-midnight font-korean">₩{lecture.price}</span>
+                          <span className="font-bold text-ghibli-midnight font-korean">₩{lecture.price.toLocaleString()}</span>
                           <div className="flex items-center text-xs text-ghibli-stone">
                             <BookmarkPlus className="h-3 w-3 mr-1" /> {lecture.bookmarks}
                           </div>
@@ -167,7 +178,6 @@ const DevLectures: React.FC = () => {
             </Link>
           </div>
         </main>
-
         <Footer />
       </div>
   );

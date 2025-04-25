@@ -18,7 +18,7 @@ const Hero: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto mt-8">
           <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-ghibli-midnight leading-tight mb-8 animate-fade-in korean-text">
-            AI와 함께 더 빠르게 성장하는 당신의 개발 여정
+            AI와 함께 더 빠르게 성장하는<br />당신의 개발 여정
           </h1>
           <div className="bg-white/70 backdrop-blur-sm p-4 rounded-lg mb-12">
             <p className="text-lg md:text-xl text-ghibli-stone max-w-2xl mx-auto animate-slide-up opacity-0 korean-text" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
