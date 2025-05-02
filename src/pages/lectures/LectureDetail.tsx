@@ -1,10 +1,6 @@
-// ✅ 주요 리팩토링 포인트:
-// - useAuth 제거 → 대신 서버에서 role + status 체크
-// - 강의 구매 여부 API로 체크할 수 있도록 mock 제거 예정
-// - isApprovedInstructor 여부로 시청 가능 여부 제어
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -12,46 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Star, Heart, Share2, Clock, Users, Award, Bot, Play, MessageSquare } from 'lucide-react';
-import { toast } from 'sonner';
-import VideoLectureModal from '@/components/VideoLectureModal';
 import { Textarea } from '@/components/ui/textarea';
 import CurriculumPreview from '@/components/lectures/CurriculumPreview';
-import { authAPI } from '@/api/auth';
-import { tokenManager } from '@/utils/tokenManager';
-
-const getLectureData = (id: string) => ({
-  id,
-  title: `웹 개발의 모든 것 ${id.includes('ai') ? '- AI 강의' : ''}`,
-  instructor: id.includes('ai') ? `AI 튜터 ${id.slice(-1)}` : `김강사 ${id.slice(-1)}`,
-  image: `https://api.dicebear.com/7.x/shapes/svg?seed=${id}`,
-  instructorImage: `https://api.dicebear.com/7.x/avatars/svg?seed=${id}`,
-  category: id.includes('ai') ? 'AI 기초' : '프론트엔드',
-  rating: (4 + Math.random()).toFixed(1),
-  reviewCount: Math.floor(Math.random() * 500) + 50,
-  studentCount: Math.floor(Math.random() * 5000) + 500,
-  price: (id.includes('ai') ? 22000 : 15000).toLocaleString(),
-  bookmarks: Math.floor(Math.random() * 100),
-  duration: `${Math.floor(Math.random() * 20) + 10}시간`,
-  level: ['입문', '초급', '중급', '고급'][Math.floor(Math.random() * 4)],
-  isAI: id.includes('ai'),
-  isPurchased: Math.random() > 0.5,
-  views: Math.floor(Math.random() * 10000) + 1000,
-  description: `이 강의는 ${id.includes('ai') ? 'AI 기술' : '웹 개발'}의 기초부터 고급 기술까지 모든 것을 다루는 종합적인 과정입니다.`,
-  curriculum: [
-    '강의 소개 및 개발 환경 설정',
-    '웹 개발의 기본 원리와 HTML/CSS 기초',
-    'JavaScript 기초 문법과 DOM 조작',
-    'React의 개념과 컴포넌트 기반 아키텍처'
-  ],
-  lectureContent: [
-    { title: '섹션 1: 기초 개념', lectures: ['1. 소개', '2. 환경설정'] },
-    { title: '섹션 2: 응용 기술', lectures: ['3. 실습', '4. 프로젝트'] }
-  ],
-  reviews: [
-    { name: '김학생', rating: 5, comment: '좋은 강의!' },
-    { name: '홍길동', rating: 4, comment: '많이 배웠어요.' }
-  ]
-});
+import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { lectureAPI } from '@/api/lecture';
+import VideoLectureModal from '@/components/VideoLectureModal';
 
 const LectureDetail: React.FC = () => {
   const { lectureId } = useParams<{ lectureId: string }>();
@@ -59,93 +21,432 @@ const LectureDetail: React.FC = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [activeTab, setActiveTab] = useState('intro');
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
-  const [nickname, setNickname] = useState('');
-  const [reviewRating, setReviewRating] = useState<number>(5);
-  const [reviewComment, setReviewComment] = useState('');
 
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (lectureId) {
-      setLecture(getLectureData(lectureId));
-    }
-  }, [lectureId]);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   useEffect(() => {
-    const checkRole = async () => {
+    const fetchLecture = async () => {
+      if (!lectureId) return;
+
       try {
-        const res = await authAPI.getInstructorRole();
-        setIsApproved(res.data.success);
-
-        const userInfo = tokenManager.getUserInfo();
-        if (userInfo?.nickname) setNickname(userInfo.nickname);
+        const res = await lectureAPI.getLectureDetail(lectureId);
+        setLecture(res.data);
       } catch (err) {
-        setIsApproved(false);
+        toast.error('강의 정보를 불러오지 못했습니다.');
       }
     };
-    checkRole();
-  }, []);
 
-  const handleWatchLecture = () => {
-    if (!isApproved) {
-      toast.error('강의 시청은 승인된 강사만 가능합니다.');
+    fetchLecture();
+  }, [lectureId]);
+
+  const toggleBookmark = () => {
+    setIsBookmarked((prev) => !prev);
+    toast.success(isBookmarked ? '북마크가 해제되었습니다.' : '북마크에 추가되었습니다.');
+  };
+
+  const handleShare = () => {
+    toast.success('링크가 클립보드에 복사되었습니다.');
+  };
+
+  const handleCheckout = () => {
+    if (!user) {
+      toast.error('결제를 진행하려면 로그인이 필요합니다.');
+      navigate('/login');
       return;
     }
+    navigate(`/checkout/${lectureId}`);
+  };
+
+  const handleWatchLecture = () => {
     setShowVideoModal(true);
   };
 
   const handleSubmitReview = () => {
-    if (!isApproved) {
-      toast.error('수강평 작성은 승인된 강사만 가능합니다.');
+    if (!user) {
+      toast.error('수강평을 작성하려면 로그인이 필요합니다.');
       return;
     }
+
     if (!lecture?.isPurchased) {
-      toast.error('강의를 구매해야 수강평을 작성할 수 있습니다.');
+      toast.error('강의를 구매한 후에 수강평을 작성할 수 있습니다.');
       return;
     }
+
     if (!reviewComment.trim()) {
-      toast.error('내용을 입력해주세요.');
+      toast.error('수강평 내용을 입력해주세요.');
       return;
     }
-    const newReview = { name: nickname || '익명', rating: reviewRating, comment: reviewComment };
-    setLecture((prev: any) => ({ ...prev, reviews: [newReview, ...prev.reviews] }));
-    setReviewComment('');
-    toast.success('수강평 등록 완료');
+
+    setIsSubmittingReview(true);
+
+    // 💡 API 호출로 대체 가능
+    setTimeout(() => {
+      const newReview = {
+        name: user.nickname || '익명',
+        rating: reviewRating,
+        comment: reviewComment,
+      };
+
+      setLecture((prev: any) => ({
+        ...prev,
+        reviews: [newReview, ...prev.reviews],
+        reviewCount: prev.reviewCount + 1,
+      }));
+
+      setReviewComment('');
+      setReviewRating(5);
+      setIsSubmittingReview(false);
+
+      toast.success('수강평이 등록되었습니다.');
+    }, 1000);
   };
 
-  if (!lecture) return <div>강의 정보를 불러오는 중...</div>;
+  if (!lecture) {
+    return (
+        <div className="min-h-screen">
+          <Header />
+          <main className="container mx-auto pt-32 px-4 pb-16 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ghibli-forest mx-auto"></div>
+            <p className="mt-4 text-ghibli-forest">강의 정보를 불러오는 중...</p>
+          </main>
+          <Footer />
+        </div>
+    );
+  }
 
   return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-background">
         <Header />
-        <main className="pt-24 container mx-auto">
-          <h1 className="text-3xl font-bold mb-4">{lecture.title}</h1>
-          <div className="mb-6">{lecture.description}</div>
 
-          <Button onClick={handleWatchLecture} disabled={!isApproved}>강의 보기</Button>
-
-          {isApproved && lecture.isPurchased && (
-              <div className="mt-6">
-                <h2 className="text-xl font-bold mb-2">수강평 작성</h2>
-                <Textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} placeholder="내용 입력" />
-                <Button onClick={handleSubmitReview} className="mt-2">제출</Button>
-              </div>
-          )}
-
-          <div className="mt-10">
-            <h2 className="text-xl font-bold mb-2">수강평</h2>
-            {lecture.reviews.map((review: any, idx: number) => (
-                <div key={idx} className="border p-2 mb-2">
-                  <div className="font-bold">{review.name}</div>
-                  <div>{review.comment}</div>
+        <main className="container mx-auto pt-24 px-4 pb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left: Lecture Info */}
+            <div className="lg:col-span-2">
+              <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+              >
+                {/* Instructor info */}
+                <div className="flex items-center mb-6">
+                  <img
+                      src={lecture.instructorImage}
+                      alt={lecture.instructor}
+                      className="h-16 w-16 rounded-full border-2 border-ghibli-meadow mr-4"
+                  />
+                  <div>
+                    <h2 className="text-xl font-medium text-ghibli-midnight">{lecture.instructor}</h2>
+                    <p className="text-ghibli-stone">{lecture.isAI ? 'AI 튜터' : '전문 강사'}</p>
+                  </div>
                 </div>
-            ))}
+
+                {/* Lecture thumbnail */}
+                <div className="mb-8 relative rounded-xl overflow-hidden">
+                  <img
+                      src={lecture.image}
+                      alt={lecture.title}
+                      className="w-full h-80 object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                    <div className="inline-block px-3 py-1 bg-ghibli-meadow text-white rounded-full text-sm font-medium mb-2">
+                      {lecture.category}
+                    </div>
+                    <h1 className="text-3xl font-bold text-white mb-1">{lecture.title}</h1>
+                    <div className="flex items-center text-white">
+                      <Star className="h-4 w-4 text-yellow-400 fill-yellow-400 mr-1" />
+                      <span className="font-medium mr-2">{lecture.rating}</span>
+                      <span className="text-sm text-white/80">({lecture.reviewCount} 리뷰)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tabs */}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+                  <TabsList className="w-full border-b border-ghibli-meadow/20 bg-transparent">
+                    <TabsTrigger
+                        value="intro"
+                        className={`text-base pb-2 ${activeTab === 'intro' ? 'border-b-2 border-ghibli-forest text-ghibli-forest' : 'text-ghibli-stone'}`}
+                    >
+                      클래스 소개
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="curriculum"
+                        className={`text-base pb-2 ${activeTab === 'curriculum' ? 'border-b-2 border-ghibli-forest text-ghibli-forest' : 'text-ghibli-stone'}`}
+                    >
+                      커리큘럼
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="reviews"
+                        className={`text-base pb-2 ${activeTab === 'reviews' ? 'border-b-2 border-ghibli-forest text-ghibli-forest' : 'text-ghibli-stone'}`}
+                    >
+                      수강평
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="intro" className="pt-6">
+                    <Card className="border border-ghibli-meadow/20">
+                      <CardContent className="p-6">
+                        <h3 className="text-xl font-semibold text-ghibli-forest mb-4">강의 소개</h3>
+                        <p className="text-ghibli-midnight mb-6">{lecture.description}</p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                          <div className="flex items-center space-x-3">
+                            <Users className="h-5 w-5 text-ghibli-forest" />
+                            <div>
+                              <p className="text-sm text-ghibli-stone">수강생</p>
+                              <p className="font-medium text-ghibli-midnight">{lecture.studentCount.toLocaleString()}명</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <Clock className="h-5 w-5 text-ghibli-forest" />
+                            <div>
+                              <p className="text-sm text-ghibli-stone">총 강의 시간</p>
+                              <p className="font-medium text-ghibli-midnight">{lecture.duration}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <Award className="h-5 w-5 text-ghibli-forest" />
+                            <div>
+                              <p className="text-sm text-ghibli-stone">난이도</p>
+                              <p className="font-medium text-ghibli-midnight">{lecture.level}</p>
+                            </div>
+                          </div>
+                          {lecture.isAI && (
+                              <div className="flex items-center space-x-3">
+                                <Bot className="h-5 w-5 text-ghibli-forest" />
+                                <div>
+                                  <p className="font-medium text-ghibli-midnight">AI 도움받기 가능</p>
+                                </div>
+                              </div>
+                          )}
+                        </div>
+
+                        <h3 className="text-xl font-semibold text-ghibli-forest mb-4">이런 분들께 추천해요</h3>
+                        <ul className="list-disc list-inside text-ghibli-midnight space-y-2 mb-6">
+                          <li>{lecture.isAI ? 'AI 기술' : '웹 개발'}에 관심이 있는 초보자</li>
+                          <li>실무에 적용할 수 있는 실전 기술을 배우고 싶은 분</li>
+                          <li>체계적인 커리큘럼을 통해 학습하고 싶은 분</li>
+                          <li>프로젝트 경험을 쌓고 싶은 분</li>
+                        </ul>
+
+                        {/* AI 자동 생성 커리큘럼 */}
+                        {lecture.curriculum && lecture.curriculum.length > 0 && (
+                            <CurriculumPreview curriculum={lecture.curriculum} />
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="curriculum" className="pt-6">
+                    <Card className="border border-ghibli-meadow/20">
+                      <CardContent className="p-6">
+                        <h3 className="text-xl font-semibold text-ghibli-forest mb-4">커리큘럼</h3>
+                        <p className="text-ghibli-midnight mb-6">
+                          총 {lecture.lectureContent.reduce((acc: number, section: any) => acc + section.lectures.length, 0)}개의 강의로 구성되어 있습니다.
+                        </p>
+
+                        <div className="space-y-6">
+                          {lecture.lectureContent.map((section: any, index: number) => (
+                              <div key={index}>
+                                <h4 className="text-lg font-medium text-ghibli-forest mb-3">{section.title}</h4>
+                                <ul className="space-y-3">
+                                  {section.lectures.map((lec: string, lectureIndex: number) => (
+                                      <li key={lectureIndex} className="p-3 bg-ghibli-cloud/50 rounded-lg flex justify-between items-center">
+                                        <span>{lec}</span>
+                                        {!user && <span className="text-xs text-ghibli-stone">미리보기 불가</span>}
+                                      </li>
+                                  ))}
+                                </ul>
+                              </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="reviews" className="pt-6">
+                    <Card className="border border-ghibli-meadow/20">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-xl font-semibold text-ghibli-forest">수강평</h3>
+                          <div className="flex items-center">
+                            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500 mr-1" />
+                            <span className="font-bold text-lg">{lecture.rating}</span>
+                            <span className="text-ghibli-stone ml-2">({lecture.reviewCount} 리뷰)</span>
+                          </div>
+                        </div>
+
+                        {/* 수강평 작성 영역 */}
+                        {user && lecture.isPurchased && (
+                            <div className="mb-8 bg-ghibli-cloud/30 p-4 rounded-lg">
+                              <div className="flex items-center gap-2 mb-3">
+                                <MessageSquare className="h-5 w-5 text-ghibli-forest" />
+                                <h4 className="font-medium">수강평 작성</h4>
+                              </div>
+
+                              <div className="mb-3">
+                                <p className="text-sm text-ghibli-stone mb-2">별점</p>
+                                <div className="flex">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                      <button
+                                          key={star}
+                                          type="button"
+                                          onClick={() => setReviewRating(star)}
+                                          className="p-1"
+                                      >
+                                        <Star
+                                            className={`h-6 w-6 ${star <= reviewRating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                        />
+                                      </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="mb-3">
+                                <p className="text-sm text-ghibli-stone mb-2">내용</p>
+                                <Textarea
+                                    placeholder="수강평을 작성해주세요..."
+                                    className="resize-none"
+                                    value={reviewComment}
+                                    onChange={(e) => setReviewComment(e.target.value)}
+                                />
+                              </div>
+
+                              <div className="flex justify-end">
+                                <Button
+                                    onClick={handleSubmitReview}
+                                    disabled={isSubmittingReview || reviewComment.trim() === ''}
+                                    className="bg-ghibli-meadow hover:bg-ghibli-forest"
+                                >
+                                  {isSubmittingReview ? '제출 중...' : '수강평 등록'}
+                                </Button>
+                              </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-6">
+                          {lecture.reviews.map((review: any, index: number) => (
+                              <div key={index} className="border-b border-ghibli-meadow/10 pb-6 last:border-0">
+                                <div className="flex justify-between items-center mb-2">
+                                  <div className="font-medium">{review.name}</div>
+                                  <div className="flex">
+                                    {[...Array(5)].map((_, starIndex) => (
+                                        <Star
+                                            key={starIndex}
+                                            className={`h-4 w-4 ${starIndex < review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                        />
+                                    ))}
+                                  </div>
+                                </div>
+                                <p className="text-ghibli-midnight">{review.comment}</p>
+                              </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              </motion.div>
+            </div>
+
+            {/* Right: Checkout panel */}
+            <div className="lg:col-span-1">
+              <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="sticky top-28"
+              >
+                <Card className="border border-ghibli-meadow/20 overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="p-6">
+                      <h2 className="text-2xl font-semibold text-ghibli-forest mb-4">{lecture.title}</h2>
+
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex space-x-3">
+                          <button onClick={handleShare} className="p-2 rounded-full border border-ghibli-earth/30 hover:bg-ghibli-cloud transition-colors">
+                            <Share2 className="h-4 w-4" />
+                          </button>
+                          <button
+                              onClick={toggleBookmark}
+                              className="p-2 rounded-full border border-ghibli-earth/30 hover:bg-ghibli-cloud transition-colors"
+                          >
+                            <Heart className={`h-4 w-4 ${isBookmarked ? 'text-red-500 fill-red-500' : ''}`} />
+                          </button>
+                        </div>
+                        <div className="text-sm text-ghibli-stone">
+                          {lecture.bookmarks} 북마크
+                        </div>
+                      </div>
+
+                      <div className="mb-4">
+                        <div className="flex items-center mb-2">
+                          <Star className="h-5 w-5 text-yellow-500 fill-yellow-500 mr-1" />
+                          <span className="font-semibold mr-2">{lecture.rating}</span>
+                          <span className="text-sm text-ghibli-stone">({lecture.reviewCount} 리뷰)</span>
+                        </div>
+                        <div className="text-3xl font-bold text-ghibli-midnight mb-2">
+                          {lecture.isPurchased ? (
+                              <span className="text-green-600">구매 완료</span>
+                          ) : (
+                              <>₩{lecture.price}</>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 mb-6">
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 text-ghibli-forest mr-2" />
+                          <span className="text-sm">총 강의 시간: {lecture.duration}</span>
+                        </div>
+                        {lecture.isAI && (
+                            <div className="flex items-center">
+                              <Bot className="h-4 w-4 text-ghibli-forest mr-2" />
+                              <span className="text-sm">AI 도움받기 가능</span>
+                            </div>
+                        )}
+                      </div>
+
+                      {lecture.isPurchased ? (
+                          <Button
+                              onClick={handleWatchLecture}
+                              className="w-full bg-green-600 hover:bg-green-700 text-white transition-all duration-300 flex items-center justify-center gap-2"
+                          >
+                            <Play className="h-4 w-4" /> 강의 듣기
+                          </Button>
+                      ) : (
+                          <Button
+                              onClick={handleCheckout}
+                              className="w-full bg-ghibli-meadow hover:bg-ghibli-forest text-white transition-all duration-300"
+                          >
+                            결제하기
+                          </Button>
+                      )}
+                    </div>
+
+                    <div className="bg-ghibli-cloud/50 p-4 text-center">
+                      <p className="text-sm text-ghibli-stone">
+                        조회수: {lecture.views.toLocaleString()}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
           </div>
         </main>
-        <Footer />
 
-        <VideoLectureModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} course={lecture} />
+        {/* Video Lecture Modal */}
+        <VideoLectureModal
+            isOpen={showVideoModal}
+            onClose={() => setShowVideoModal(false)}
+            course={lecture}
+        />
       </div>
   );
 };

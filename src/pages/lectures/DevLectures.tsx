@@ -17,7 +17,7 @@ const categories = [
   { id: 'data', name: '데이터 사이언스' },
   { id: 'ai', name: '인공지능' },
   { id: 'devops', name: 'DevOps' },
-  { id: 'database', name: '데이터베이스' },
+  { id: 'database', name: '데이터베이스' }
 ];
 
 interface Lecture {

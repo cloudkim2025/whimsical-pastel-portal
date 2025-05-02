@@ -8,7 +8,7 @@ export const lectureAPI = {
 
   // 강의 상세 조회
   getLectureDetail: (lectureId: string) => {
-    return API.get(`/lectures/${lectureId}`);
+    return API.get(`/lectures/detail/${lectureId}`);
   },
 
   // 강의 등록 (강사용)
