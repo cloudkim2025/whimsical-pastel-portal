@@ -1,6 +1,4 @@
-
 import API from '@/utils/apiClient';
-import { CourseType } from '@/types/lecture';
 
 export const lectureAPI = {
   // 강의 목록 조회
@@ -12,10 +10,10 @@ export const lectureAPI = {
   getLectureDetail: (lectureId: string) => {
     return API.get(`/lectures/${lectureId}`);
   },
-  
+
   // 강의 등록 (강사용)
   createLecture: (lectureFormData: FormData) => {
-    return API.post('/api/lectures', lectureFormData, {
+    return API.post('/lectures', lectureFormData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

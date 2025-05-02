@@ -10,5 +10,9 @@ export const aiAPI = {
   // AI 추천 강의
   getAIRecommendations: (userId?: string) => {
     return API.get('/ai/recommendations', { params: { userId } });
+  },
+
+  tryGenerateCurriculum: (curriculumFormData: FormData) => {
+    return API.post('/ai/api/generate-curriculum', curriculumFormData)
   }
 };

@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Star, Heart, BookmarkPlus, PlusCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { lectureAPI } from '@/api/lecture';
 import Footer from '@/components/Footer';
 import axios from 'axios';
 
@@ -39,7 +40,7 @@ const DevLectures: React.FC = () => {
   useEffect(() => {
     const fetchLectures = async () => {
       try {
-        const res = await axios.get('http://localhost:9004/api/lectures');
+        const res = await lectureAPI.getLectures(); // ✅ apiClient 경유로 게이트웨이 접근
         const mapped = res.data.map((lecture: any) => ({
           id: String(lecture.lectureId),
           title: lecture.title,

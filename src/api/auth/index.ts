@@ -15,7 +15,6 @@ export const authAPI = {
         API.post('/auths/join', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         }),
-
     // 로그인
     login: (payload: { email: string; password: string }) =>
         API.post('/auths/login', payload),
@@ -32,6 +31,8 @@ export const authAPI = {
 
     // 역할 조회 (권한 확인용)
     getUserRole: () => API.get('/auths/api/info-role'),
+
+    getInstructorRole: () => API.get('/auths/teacher/role'),
 
     // 소셜 로그인 code/state 전달
     postOAuthCode: (payload: { code: string; state: string }) =>

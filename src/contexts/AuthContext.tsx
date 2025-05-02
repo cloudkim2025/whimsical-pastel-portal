@@ -14,7 +14,7 @@ interface AuthContextType {
   forceLogin: (email: string, password: string, onSuccess?: () => void) => Promise<boolean>;
   register: (
       form: RegisterRequest,
-      onSuccess?: () => void,
+      onSuccess?: (field: keyof FormErrors, message: string) => void,
       setErrors?: React.Dispatch<React.SetStateAction<FormErrors>>
   ) => Promise<boolean>;
   logout: () => void;

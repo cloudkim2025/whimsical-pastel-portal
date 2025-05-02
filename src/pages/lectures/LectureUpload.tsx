@@ -11,24 +11,29 @@ import AccessDenied from '@/components/lectures/AccessDenied';
 const LectureUpload: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isInstructor, setIsInstructor] = useState(false);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null); // null = 로딩 중
   const [nickname, setNickname] = useState('');
   const userInfo = tokenManager.getUserInfo();
 
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
-        const res = await authAPI.getUserRole();
-        const role = res.data?.role;
-        setIsInstructor(role === 'INSTRUCTOR' || role === 'ADMIN');
-        if (userInfo?.nickname) setNickname(userInfo.nickname);
+        const res = await authAPI.getInstructorRole();
+        const isApproved = res.data?.success;
 
-        if (role !== 'INSTRUCTOR' && role !== 'ADMIN') {
+        if (userInfo?.nickname) {
+          setNickname(userInfo.nickname);
+        }
+
+        if (isApproved) {
+          setHasAccess(true);
+        } else {
           toast({
             variant: 'destructive',
-            title: '접근 권한 없음',
-            description: '강사 계정만 강의를 등록할 수 있습니다.',
+            title: res.data?.message,
+            description: '강사 승인 후 강의를 등록할 수 있습니다.',
           });
+          setHasAccess(false);
           navigate('/');
         }
       } catch (error) {
@@ -38,6 +43,7 @@ const LectureUpload: React.FC = () => {
           title: '에러 발생',
           description: '권한 확인 중 오류가 발생했습니다.',
         });
+        setHasAccess(false);
         navigate('/');
       }
     };
@@ -54,17 +60,12 @@ const LectureUpload: React.FC = () => {
               <h1 className="text-3xl md:text-4xl font-bold text-ghibli-midnight mb-6" lang="ko">강의 등록</h1>
               {nickname && (
                   <p className="text-ghibli-stone mb-8 korean-text">
-                    {nickname} 강사님, 새로운 강의를 등록해주세요.
-                    강의를 업로드하면 AI가 자동으로 영상을 분석하여 커리큘럼을 생성합니다.
-                    업로드된 강의는 검토 후 승인되면 플랫폼에 공개됩니다.
+                    {nickname} 강사님, 새로운 강의를 등록해주세요.<br />
+                    업로드된 강의는 AI 분석을 거쳐 커리큘럼이 생성되며, 검토 후 플랫폼에 게시됩니다.
                   </p>
               )}
 
-              {isInstructor ? (
-                  <LectureForm userId={userInfo?.sub} />
-              ) : (
-                  <AccessDenied />
-              )}
+              {hasAccess ? <LectureForm /> : <AccessDenied />}
             </div>
           </div>
         </main>

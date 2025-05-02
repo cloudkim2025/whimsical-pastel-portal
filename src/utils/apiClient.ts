@@ -8,7 +8,7 @@ const API = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 10000,
+    timeout: 180000,
     withCredentials: true, // ✅ 쿠키 기반 리프레시 토큰 처리 지원
 });
 
