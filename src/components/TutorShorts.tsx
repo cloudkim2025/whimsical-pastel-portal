@@ -10,7 +10,7 @@ const tutors = [
     name: '김인공',
     title: 'AI 전문가',
     thumbnailUrl: 'public/lovable-uploads/54a601ec-8297-4281-9f86-96314a37d694.png',
-    videoUrl: 'https://static.videezy.com/system/resources/previews/000/042/818/original/business-meeting-02.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     topic: 'AI로 보는 세상'
   },
   {
@@ -18,7 +18,7 @@ const tutors = [
     name: '박웹개발',
     title: '웹 개발 전문가',
     thumbnailUrl: 'public/lovable-uploads/872cdf2e-5e57-4437-9d56-e3d9de32f64e.png',
-    videoUrl: 'https://static.videezy.com/system/resources/previews/000/037/344/original/SA_9.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     topic: 'OAuth2 로그인 시스템 구현'
   },
   {
@@ -26,7 +26,7 @@ const tutors = [
     name: '이클라우드',
     title: '클라우드 아키텍트',
     thumbnailUrl: 'public/lovable-uploads/f3deb0c3-69a6-4303-938a-b75ec8a7156a.png',
-    videoUrl: 'https://static.videezy.com/system/resources/previews/000/051/520/original/Typing_27.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     topic: 'AWS로 시작하는 클라우드 인프라'
   },
   {
@@ -34,7 +34,7 @@ const tutors = [
     name: '최모바일',
     title: 'iOS 앱 개발자',
     thumbnailUrl: 'public/lovable-uploads/5058af0f-6ce4-43e0-999f-79c23b02bfe6.png',
-    videoUrl: 'https://static.videezy.com/system/resources/previews/000/038/886/original/22.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     topic: 'iOS 앱 개발 입문'
   },
   {
@@ -42,7 +42,7 @@ const tutors = [
     name: '정백엔드',
     title: '백엔드 개발자',
     thumbnailUrl: 'public/lovable-uploads/377ae563-df7f-443f-94fd-8ff42f1b5220.png',
-    videoUrl: 'https://static.videezy.com/system/resources/previews/000/043/261/original/young_woman_selfie_04.mp4',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     topic: 'REST API 설계와 보안'
   },
 ];
