@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { lectureAPI } from '@/api/lecture';
 import Footer from '@/components/Footer';
 import axios from 'axios';
+import {authAPI} from "@/api";
 
 const categories = [
   { id: 'frontend', name: '프론트엔드' },
@@ -32,15 +33,15 @@ interface Lecture {
 }
 
 const DevLectures: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
-  const [bookmarkedLectures, setBookmarkedLectures] = useState<string[]>([]);
-  const [lectures, setLectures] = useState<Lecture[]>([]);
-  const { user } = useAuth();
+    const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
+    const [bookmarkedLectures, setBookmarkedLectures] = useState<string[]>([]);
+    const [lectures, setLectures] = useState<Lecture[]>([]);
+    const [isInstructor, setIsInstructor] = useState(false); // ✅ 강사 여부 상태 추가
 
   useEffect(() => {
     const fetchLectures = async () => {
       try {
-        const res = await lectureAPI.getLectures(); // ✅ apiClient 경유로 게이트웨이 접근
+        const res = await lectureAPI.getLectures();
         const mapped = res.data.map((lecture: any) => ({
           id: String(lecture.lectureId),
           title: lecture.title,
@@ -56,7 +57,20 @@ const DevLectures: React.FC = () => {
         console.error('강의 데이터를 불러오지 못했습니다:', err);
       }
     };
+
+    const checkInstructorRole = async () => {
+      try {
+        const res = await authAPI.getInstructorRole();
+        if (res.data.success === true) {
+          setIsInstructor(true); // ✅ 강사일 경우에만 true 설정
+        }
+      } catch (err) {
+        console.warn('강사 권한 확인 실패:', err);
+      }
+    };
+
     fetchLectures();
+    checkInstructorRole(); // ✅ 강사 체크 실행
   }, []);
 
   const toggleBookmark = (lectureId: string) => {
@@ -82,7 +96,7 @@ const DevLectures: React.FC = () => {
               className="flex justify-between items-center mb-8"
           >
             <h1 className="text-4xl font-handwritten text-ghibli-forest">개발강의</h1>
-            {user && (
+            {isInstructor && (
                 <Link to="/lecture-upload">
                   <Button className="btn-secondary flex items-center gap-2 font-korean">
                     <PlusCircle size={16} />

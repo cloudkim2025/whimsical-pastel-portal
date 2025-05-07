@@ -68,9 +68,9 @@ const InstructorManagement: React.FC = () => {
   }, [filter, isCheckingRole]);
 
   // 상태 변경
-  const handleStatusChange = async (userId: number, approve: boolean) => {
+  const handleStatusChange = async (id: number, approve: boolean) => {
     try {
-      const res = await verificationAPI.updateTeacherStatus(userId, approve);
+      const res = await verificationAPI.updateTeacherStatus(id, approve);
       if (res.data.success) {
         toast.success(res.data.message);
         fetchInstructors();
@@ -83,9 +83,9 @@ const InstructorManagement: React.FC = () => {
   };
 
   // 상세 조회
-  const handleViewDetail = async (userId: number) => {
+  const handleViewDetail = async (id: number) => {
     try {
-      const res = await verificationAPI.getAdminTeacherDetail(userId);
+      const res = await verificationAPI.getAdminTeacherDetail(id);
       const data = res.data as InstructorDetailResponse;
       if (data.success) {
         setSelectedInstructor(data);
@@ -148,7 +148,7 @@ const InstructorManagement: React.FC = () => {
                     i.name.toLowerCase().includes(searchTerm.toLowerCase())
                 )
                 .map((instructor) => (
-                    <Card key={instructor.userId}>
+                    <Card key={instructor.id}>
                       <CardContent className="p-4">
                         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
                           <Avatar className="w-16 h-16">
@@ -188,7 +188,7 @@ const InstructorManagement: React.FC = () => {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handleViewDetail(instructor.userId)}
+                                    onClick={() => handleViewDetail(instructor.id)}
                                 >
                                   <Eye className="h-3.5 w-3.5" />
                                   <span className="text-xs korean-text">상세보기</span>
@@ -198,7 +198,7 @@ const InstructorManagement: React.FC = () => {
                                       <Button
                                           size="sm"
                                           variant="outline"
-                                          onClick={() => handleStatusChange(instructor.userId, true)}
+                                          onClick={() => handleStatusChange(instructor.id, true)}
                                       >
                                         <Check className="h-3.5 w-3.5 text-green-500" />
                                         <span className="text-xs korean-text">승인</span>
@@ -206,7 +206,7 @@ const InstructorManagement: React.FC = () => {
                                       <Button
                                           size="sm"
                                           variant="outline"
-                                          onClick={() => handleStatusChange(instructor.userId, false)}
+                                          onClick={() => handleStatusChange(instructor.id, false)}
                                       >
                                         <X className="h-3.5 w-3.5 text-red-500" />
                                         <span className="text-xs korean-text">거절</span>
@@ -271,7 +271,7 @@ const InstructorManagement: React.FC = () => {
                           rel="noopener noreferrer"
                           className="text-sm text-blue-500 hover:underline korean-text"
                       >
-                        이력서 다운로드
+                        이력서 보기
                       </a>
                     </div>
                   </div>
@@ -282,7 +282,7 @@ const InstructorManagement: React.FC = () => {
                         <Button
                             variant="outline"
                             onClick={() => {
-                              handleStatusChange(selectedInstructor.userId, true);
+                              handleStatusChange(selectedInstructor.id, true);
                               setSelectedInstructor(null);
                             }}
                         >
@@ -291,7 +291,7 @@ const InstructorManagement: React.FC = () => {
                         <Button
                             variant="destructive"
                             onClick={() => {
-                              handleStatusChange(selectedInstructor.userId, false);
+                              handleStatusChange(selectedInstructor.id, false);
                               setSelectedInstructor(null);
                             }}
                         >

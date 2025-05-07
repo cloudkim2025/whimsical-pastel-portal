@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -59,7 +59,7 @@ const LectureDetail: React.FC = () => {
       navigate('/login');
       return;
     }
-    navigate(`/checkout/${lectureId}`);
+    navigate(`/checkout/${lectureId}`, { state: { lecture } });
   };
 
   const handleWatchLecture = () => {
@@ -159,7 +159,7 @@ const LectureDetail: React.FC = () => {
                     <h1 className="text-3xl font-bold text-white mb-1">{lecture.title}</h1>
                     <div className="flex items-center text-white">
                       <Star className="h-4 w-4 text-yellow-400 fill-yellow-400 mr-1" />
-                      <span className="font-medium mr-2">{lecture.rating}</span>
+                      <span className="font-medium mr-2">{Number(lecture.rating).toFixed(1)}</span>
                       <span className="text-sm text-white/80">({lecture.reviewCount} 리뷰)</span>
                     </div>
                   </div>
@@ -253,7 +253,15 @@ const LectureDetail: React.FC = () => {
                         <div className="space-y-6">
                           {lecture.lectureContent.map((section: any, index: number) => (
                               <div key={index}>
-                                <h4 className="text-lg font-medium text-ghibli-forest mb-3">{section.title}</h4>
+                                <h4 className="text-lg font-medium text-ghibli-forest mb-2">{section.title}</h4>
+
+                                {/* AI 분석 내용을 보여주는 부분 */}
+                                {section.content && (
+                                    <p className="text-sm text-ghibli-stone mb-3 whitespace-pre-line">
+                                      {section.content}
+                                    </p>
+                                )}
+
                                 <ul className="space-y-3">
                                   {section.lectures.map((lec: string, lectureIndex: number) => (
                                       <li key={lectureIndex} className="p-3 bg-ghibli-cloud/50 rounded-lg flex justify-between items-center">
@@ -276,7 +284,7 @@ const LectureDetail: React.FC = () => {
                           <h3 className="text-xl font-semibold text-ghibli-forest">수강평</h3>
                           <div className="flex items-center">
                             <Star className="h-5 w-5 text-yellow-500 fill-yellow-500 mr-1" />
-                            <span className="font-bold text-lg">{lecture.rating}</span>
+                            <span className="font-bold text-lg">{Number(lecture.rating).toFixed(1)}</span>
                             <span className="text-ghibli-stone ml-2">({lecture.reviewCount} 리뷰)</span>
                           </div>
                         </div>
@@ -387,7 +395,7 @@ const LectureDetail: React.FC = () => {
                       <div className="mb-4">
                         <div className="flex items-center mb-2">
                           <Star className="h-5 w-5 text-yellow-500 fill-yellow-500 mr-1" />
-                          <span className="font-semibold mr-2">{lecture.rating}</span>
+                          <span className="font-semibold mr-2">{Number(lecture.rating).toFixed(1)}</span>
                           <span className="text-sm text-ghibli-stone">({lecture.reviewCount} 리뷰)</span>
                         </div>
                         <div className="text-3xl font-bold text-ghibli-midnight mb-2">

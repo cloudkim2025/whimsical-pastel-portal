@@ -16,7 +16,6 @@ export interface CourseType {
 
 export interface InstructorType {
   id: number;
-  userId: number;
   name: string;
   bio: string;
   category: string;
@@ -39,7 +38,7 @@ export interface InstructorListResponse {
 export interface InstructorDetailResponse {
   success: boolean;
   message: string;
-  userId: number;
+  id: number;
   name: string;
   bio: string;
   category: string;
