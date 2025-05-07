@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Clock, Star, Heart, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
