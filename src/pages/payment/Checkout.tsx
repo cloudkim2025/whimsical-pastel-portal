@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 import Header from '@/components/Header';
-import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
+import {toast} from 'sonner';
+import {useAuth} from '@/contexts/AuthContext';
 import OrderSummary from './components/OrderSummary';
 import CheckoutSummary from './components/CheckoutSummary';
-import { usePayment } from './hooks/usePayment';
+import {usePayment} from './hooks/usePayment';
 
 // Portone SDK를 위한 스크립트 로딩 함수
+const Checkout = () => {
 const loadPortoneScript = () => {
   const script = document.createElement('script');
   script.src = 'https://cdn.iamport.kr/v1/iamport.js';
@@ -128,6 +130,5 @@ const getLectureData = (id: string) => ({
       </main>
     </div>
   );
-};
-
+}
 export default Checkout;

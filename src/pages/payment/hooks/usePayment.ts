@@ -37,7 +37,7 @@ export const usePayment = ({ lectureId }: UsePaymentProps) => {
               productPrice: parseInt(lecture.price.replace(/,/g, '')),
               paidAmount: rsp.paid_amount,
               paymentMethod: 'KG_inicis_'+ rsp.pay_method,
-            }, user?.id);
+            });
 
             toast.success('결제가 완료되었습니다!');
           } catch (err) {
@@ -57,5 +57,6 @@ export const usePayment = ({ lectureId }: UsePaymentProps) => {
   return {
     isProcessing,
     setIsProcessing,
+    processInicisPayment
   };
 };
