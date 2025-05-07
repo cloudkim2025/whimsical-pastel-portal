@@ -3,47 +3,47 @@ import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 
-// Improved tutor data with better video URLs and realistic descriptions
+// Improved tutor data with the provided images and videos
 const tutors = [
   {
     id: 'tutor-1',
-    name: '김웹개발',
-    title: '프론트엔드 전문가',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80',
+    name: '김인공',
+    title: 'AI 전문가',
+    thumbnailUrl: 'public/lovable-uploads/54a601ec-8297-4281-9f86-96314a37d694.png',
     videoUrl: 'https://static.videezy.com/system/resources/previews/000/042/818/original/business-meeting-02.mp4',
-    topic: 'React 최적화 테크닉'
+    topic: 'AI로 보는 세상'
   },
   {
     id: 'tutor-2',
-    name: '박백엔드',
-    title: '서버 개발 전문가',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1560523159-4a9692d222f9?auto=format&fit=crop&w=600&q=80',
+    name: '박웹개발',
+    title: '웹 개발 전문가',
+    thumbnailUrl: 'public/lovable-uploads/872cdf2e-5e57-4437-9d56-e3d9de32f64e.png',
     videoUrl: 'https://static.videezy.com/system/resources/previews/000/037/344/original/SA_9.mp4',
-    topic: 'Node.js 마이크로서비스'
+    topic: 'OAuth2 로그인 시스템 구현'
   },
   {
     id: 'tutor-3',
-    name: '이데이터',
-    title: '데이터 사이언티스트',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=600&q=80',
+    name: '이클라우드',
+    title: '클라우드 아키텍트',
+    thumbnailUrl: 'public/lovable-uploads/f3deb0c3-69a6-4303-938a-b75ec8a7156a.png',
     videoUrl: 'https://static.videezy.com/system/resources/previews/000/051/520/original/Typing_27.mp4',
-    topic: '데이터 시각화 기법'
+    topic: 'AWS로 시작하는 클라우드 인프라'
   },
   {
     id: 'tutor-4',
-    name: '최AI',
-    title: 'AI 튜터',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?auto=format&fit=crop&w=600&q=80',
+    name: '최모바일',
+    title: 'iOS 앱 개발자',
+    thumbnailUrl: 'public/lovable-uploads/5058af0f-6ce4-43e0-999f-79c23b02bfe6.png',
     videoUrl: 'https://static.videezy.com/system/resources/previews/000/038/886/original/22.mp4',
-    topic: '딥러닝 기초'
+    topic: 'iOS 앱 개발 입문'
   },
   {
     id: 'tutor-5',
-    name: '정모바일',
-    title: '앱 개발자',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1551818255-e6e10975bc17?auto=format&fit=crop&w=600&q=80',
+    name: '정백엔드',
+    title: '백엔드 개발자',
+    thumbnailUrl: 'public/lovable-uploads/377ae563-df7f-443f-94fd-8ff42f1b5220.png',
     videoUrl: 'https://static.videezy.com/system/resources/previews/000/043/261/original/young_woman_selfie_04.mp4',
-    topic: '모바일 UI/UX'
+    topic: 'REST API 설계와 보안'
   },
 ];
 

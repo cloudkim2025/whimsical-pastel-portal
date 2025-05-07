@@ -6,64 +6,45 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Mock lectures data with realistic images
+// Mock lectures data with the provided instructor images
 const createMockLectures = (prefix: string) => Array(6).fill(null).map((_, idx) => {
-  // Select appropriate image based on prefix and index
-  const imageBase = 'https://images.unsplash.com/';
-  
-  // Use different image sets for different categories
-  const updatedImages = [
-    'photo-1546410531-bb4caa6b424d', 
-    'photo-1524178232363-1fb2b075b655', 
-    'photo-1544531586-fde5298cdd40', 
-    'photo-1551818255-e6e10975bc17', 
-    'photo-1588196749597-9ff075ee6b5b', 
-    'photo-1531482615713-2afd69097998',
-  ];
-  
-  const popularImages = [
-    'photo-1560523159-4a9692d222f9', 
-    'photo-1523240795612-9a054b0db644', 
-    'photo-1517048676732-d65bc937f952', 
-    'photo-1507537297725-24a1c029d3ca',
-    'photo-1599658880436-c61792e70672',
-    'photo-1536148935331-408321065b18',
-  ];
-  
-  const deadlineImages = [
-    'photo-1522071820081-009f0129c71c', 
-    'photo-1573496357865-f988a0cb05b9',
-    'photo-1626785774573-4b799315345d',
-    'photo-1530099486328-e021101a494a',
-    'photo-1543269865-cbf427effbad',
-    'photo-1543269664-56d93c1b41a6',
+  // Use the uploaded images
+  const uploadedImages = [
+    'public/lovable-uploads/54a601ec-8297-4281-9f86-96314a37d694.png', // AI로 보는 세상
+    'public/lovable-uploads/872cdf2e-5e57-4437-9d56-e3d9de32f64e.png', // OAuth2 로그인
+    'public/lovable-uploads/f3deb0c3-69a6-4303-938a-b75ec8a7156a.png', // AWS 클라우드
+    'public/lovable-uploads/5058af0f-6ce4-43e0-999f-79c23b02bfe6.png', // iOS 앱 개발
+    'public/lovable-uploads/377ae563-df7f-443f-94fd-8ff42f1b5220.png', // REST API
+    'public/lovable-uploads/dbeefc26-dadd-4789-9a11-87c800bc1f06.png', // REST API
+    'public/lovable-uploads/9b530af4-f3e8-4917-a3ea-b2572b23abfd.png', // Vue 3
+    'public/lovable-uploads/0091da42-215f-49f1-aec1-327c8338951c.png'  // 스프링 부트
   ];
   
   // Titles based on category
   const titles = {
     updated: [
-      '최신 React 18 훅 마스터하기',
-      'NextJS 13 서버 컴포넌트의 이해',
-      'TypeScript 5.0 신규 기능 총정리',
-      'Tailwind CSS 3.0 고급 기법',
-      'GraphQL API 설계 패턴',
-      'Redux Toolkit과 RTK Query 실전'
+      'AI로 보는 세상: 딥러닝 기초부터 실전까지',
+      'OAuth2 로그인 시스템 구현',
+      'AWS로 시작하는 클라우드 인프라',
+      'iOS 앱 개발 입문',
+      'REST API 설계와 보안',
+      'Vue 3 완전 입문'
     ],
     popular: [
-      '한 번에 끝내는 자바스크립트 기초',
-      'AI 기반 웹 애플리케이션 개발',
-      '데이터 시각화 마스터 클래스',
-      '백엔드 개발자를 위한 SQL 최적화',
-      'AWS 클라우드 아키텍처 설계',
-      'DevOps와 CI/CD 파이프라인 구축'
+      'REST API 설계와 보안',
+      'OAuth2 로그인 시스템 구현',
+      'AI로 보는 세상: 딥러닝과 머신러닝',
+      '스프링 부트로 시작하는 백엔드 개발',
+      'Vue 3 완전 입문',
+      'iOS 앱 개발 입문'
     ],
     deadline: [
-      '6월 개강반: 풀스택 부트캠프',
-      '이번 주 마감: 프론트엔드 실무 과정',
-      '모집 임박: React Native 앱 개발',
-      '마지막 기회: 데이터 사이언스 특강',
-      '금주 마감: 클라우드 엔지니어링',
-      '단 3일 남음: Python 웹 스크래핑'
+      '마감 임박: AI로 보는 세상',
+      '마감 임박: OAuth2 로그인 구현',
+      '마감 임박: AWS 클라우드 인프라',
+      '마감 임박: iOS 앱 개발 특강',
+      '마감 임박: REST API 설계',
+      '마감 임박: Vue 3 입문'
     ]
   };
 
@@ -72,16 +53,6 @@ const createMockLectures = (prefix: string) => Array(6).fill(null).map((_, idx) 
     popular: ['김인기 강사', '이데이터 박사', '박AI 연구원', '최프론트 개발자', '정백엔드 전문가', '윤클라우드 아키텍트'],
     deadline: ['부트캠프 코치팀', '실무 프로젝트 팀', '모바일 개발팀', '데이터 랩 교수진', '클라우드 엔지니어팀', '파이썬 전문 강사']
   };
-  
-  // Select appropriate images
-  let imageIds;
-  if (prefix === 'updated') {
-    imageIds = updatedImages;
-  } else if (prefix === 'popular') {
-    imageIds = popularImages;
-  } else {
-    imageIds = deadlineImages;
-  }
   
   // Add videos for popular content
   const videos = [
@@ -93,18 +64,21 @@ const createMockLectures = (prefix: string) => Array(6).fill(null).map((_, idx) 
     'https://static.videezy.com/system/resources/previews/000/038/667/original/VQQP5E.mp4'
   ];
   
+  // Get image index - ensure we don't go beyond available images
+  const imageIndex = idx % uploadedImages.length;
+  
   return {
     id: `${prefix}-${idx + 1}`,
     title: titles[prefix as keyof typeof titles][idx],
     instructor: instructors[prefix as keyof typeof instructors][idx],
-    image: `${imageBase}${imageIds[idx]}?auto=format&fit=crop&w=600&q=80`,
+    image: uploadedImages[imageIndex],
     rating: (4 + Math.random()).toFixed(1),
     price: (49000 + idx * 5000).toLocaleString(),
     bookmarks: Math.floor(Math.random() * 100),
     deadline: prefix === 'deadline' ? `${Math.floor(Math.random() * 7) + 1}일 남음` : undefined,
     updateDate: prefix === 'updated' ? `${Math.floor(Math.random() * 7) + 1}일 전` : undefined,
     viewCount: prefix === 'popular' ? `${Math.floor(Math.random() * 1000) + 100}회` : undefined,
-    videoUrl: prefix === 'popular' ? videos[idx] : undefined,
+    videoUrl: videos[idx % videos.length], // Add videos to all categories for better demonstration
   };
 });
 

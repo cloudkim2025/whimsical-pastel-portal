@@ -5,52 +5,52 @@ import { Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-// Updated featured lectures data with realistic images and text overlays
+// Updated featured lectures data with the provided images
 const featuredLectures = [
   {
     id: 'featured-1',
     title: 'AI로 보는 세상: 딥러닝 기초부터 실전까지',
     instructor: '김인공 교수',
-    image: 'https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?auto=format&fit=crop&w=1200&q=80',
+    image: 'public/lovable-uploads/54a601ec-8297-4281-9f86-96314a37d694.png',
     rating: 4.9,
     price: '129,000',
-    description: '최신 AI 기술과 머신러닝의 핵심을 이해하고 실무에 적용하는 방법을 배우세요',
+    description: '딥러닝, 자연어처리, 생성형 AI까지 인공지능의 핵심을 한 번에',
   },
   {
     id: 'featured-2',
-    title: '프론트엔드 개발자를 위한 React 완벽 가이드',
+    title: 'OAuth2 로그인 시스템 구현',
     instructor: '박웹개발 강사',
-    image: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=1200&q=80',
+    image: 'public/lovable-uploads/872cdf2e-5e57-4437-9d56-e3d9de32f64e.png',
     rating: 4.8,
     price: '149,000',
-    description: 'React 18의 새로운 기능부터 실전 프로젝트까지 현직 개발자의 노하우를 배워보세요',
+    description: '구글, 네이버, 카카오로 로그인부터 토큰 발급까지 직접 구현해보세요',
   },
   {
     id: 'featured-3',
-    title: '데이터 사이언티스트 완성 과정',
-    instructor: '정데이터 박사',
-    image: 'https://images.unsplash.com/photo-1551818255-e6e10975bc17?auto=format&fit=crop&w=1200&q=80',
+    title: 'AWS로 시작하는 클라우드 인프라',
+    instructor: '이클라우드 아키텍트',
+    image: 'public/lovable-uploads/f3deb0c3-69a6-4303-938a-b75ec8a7156a.png',
     rating: 4.7,
     price: '159,000',
-    description: '데이터 분석, 시각화부터 머신러닝 알고리즘 구현까지 실무 중심의 강의',
+    description: 'EC2, S3, RDS, IAM까지 서비스 배포에 꼭 필요한 구성요소를 배워요',
   },
   {
     id: 'featured-4',
-    title: '클라우드 서비스 완전 정복',
-    instructor: '강클라우드 아키텍트',
-    image: 'https://images.unsplash.com/photo-1560523159-4a9692d222f9?auto=format&fit=crop&w=1200&q=80',
+    title: 'iOS 앱 개발 입문',
+    instructor: '최모바일 개발자',
+    image: 'public/lovable-uploads/5058af0f-6ce4-43e0-999f-79c23b02bfe6.png',
     rating: 4.9,
     price: '179,000',
-    description: 'AWS, Azure, GCP를 활용한 클라우드 인프라 설계와 운영의 모든 것',
+    description: 'Swift와 SwiftUI를 활용한 실습 중심의 모바일 앱 개발 입문',
   },
   {
     id: 'featured-5',
-    title: '풀스택 개발자 부트캠프',
-    instructor: '신풀스택 개발자',
-    image: 'public/lovable-uploads/d555527f-18a3-4f59-a2e3-6db9291a20da.png',
+    title: 'REST API 설계와 보안',
+    instructor: '정백엔드 개발자',
+    image: 'public/lovable-uploads/377ae563-df7f-443f-94fd-8ff42f1b5220.png',
     rating: 4.6,
     price: '239,000',
-    description: 'AI로 보는 세상: 딥러닝, 자연어처리, 생성형 AI까지 인공지능의 핵심을 한 번에',
+    description: '효율적인 API 설계, 인증과 인가, 실전 보안 전략까지 한 번에!',
   },
 ];
 
@@ -158,7 +158,7 @@ const FeaturedLecturesCarousel: React.FC = () => {
                   {/* Overlay text on the image */}
                   <div className="absolute bottom-8 right-8 max-w-xs bg-black/50 backdrop-blur-sm p-3 rounded-lg text-white">
                     <h3 className="text-lg font-bold mb-1">
-                      {index === 4 ? "AI로 보는 세상" : lecture.title.split(':')[0]}
+                      {lecture.title.split(':')[0]}
                     </h3>
                     <p className="text-sm">
                       {lecture.instructor} 강의
