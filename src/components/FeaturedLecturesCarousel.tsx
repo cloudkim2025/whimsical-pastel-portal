@@ -5,52 +5,52 @@ import { Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-// Mock featured lectures data with realistic images
+// Updated featured lectures data with realistic images and text overlays
 const featuredLectures = [
   {
     id: 'featured-1',
-    title: '현직자와 함께하는 웹 개발 완전 정복',
-    instructor: '김개발',
-    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+    title: 'AI로 보는 세상: 딥러닝 기초부터 실전까지',
+    instructor: '김인공 교수',
+    image: 'https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?auto=format&fit=crop&w=1200&q=80',
     rating: 4.9,
     price: '129,000',
-    description: '웹 개발의 기초부터 실전까지, 현직 개발자의 노하우를 배우세요',
+    description: '최신 AI 기술과 머신러닝의 핵심을 이해하고 실무에 적용하는 방법을 배우세요',
   },
   {
     id: 'featured-2',
-    title: 'AI와 함께하는 JavaScript 마스터 클래스',
-    instructor: '박인공지능',
-    image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80',
+    title: '프론트엔드 개발자를 위한 React 완벽 가이드',
+    instructor: '박웹개발 강사',
+    image: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=1200&q=80',
     rating: 4.8,
     price: '149,000',
-    description: 'JavaScript에 특화된 AI 튜터와 함께 프론트엔드 개발자로 성장하세요',
+    description: 'React 18의 새로운 기능부터 실전 프로젝트까지 현직 개발자의 노하우를 배워보세요',
   },
   {
     id: 'featured-3',
-    title: '데이터 사이언티스트를 위한 파이썬 완벽 가이드',
-    instructor: '최데이터',
-    image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=1200&q=80',
+    title: '데이터 사이언티스트 완성 과정',
+    instructor: '정데이터 박사',
+    image: 'https://images.unsplash.com/photo-1551818255-e6e10975bc17?auto=format&fit=crop&w=1200&q=80',
     rating: 4.7,
     price: '159,000',
-    description: '데이터 분석, 시각화부터 머신러닝까지 한 번에 배우세요',
+    description: '데이터 분석, 시각화부터 머신러닝 알고리즘 구현까지 실무 중심의 강의',
   },
   {
     id: 'featured-4',
-    title: 'DevOps 전문가 되기',
-    instructor: '이클라우드',
-    image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=1200&q=80',
+    title: '클라우드 서비스 완전 정복',
+    instructor: '강클라우드 아키텍트',
+    image: 'https://images.unsplash.com/photo-1560523159-4a9692d222f9?auto=format&fit=crop&w=1200&q=80',
     rating: 4.9,
     price: '179,000',
-    description: 'CI/CD, Docker, Kubernetes까지 DevOps의 모든 것',
+    description: 'AWS, Azure, GCP를 활용한 클라우드 인프라 설계와 운영의 모든 것',
   },
   {
     id: 'featured-5',
-    title: '모바일 앱 개발 마스터하기',
-    instructor: '정모바일',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80',
+    title: '풀스택 개발자 부트캠프',
+    instructor: '신풀스택 개발자',
+    image: 'public/lovable-uploads/d555527f-18a3-4f59-a2e3-6db9291a20da.png',
     rating: 4.6,
-    price: '139,000',
-    description: 'React Native로 iOS, Android 앱을 한 번에 개발하는 비법',
+    price: '239,000',
+    description: 'AI로 보는 세상: 딥러닝, 자연어처리, 생성형 AI까지 인공지능의 핵심을 한 번에',
   },
 ];
 
@@ -154,6 +154,16 @@ const FeaturedLecturesCarousel: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                  
+                  {/* Overlay text on the image */}
+                  <div className="absolute bottom-8 right-8 max-w-xs bg-black/50 backdrop-blur-sm p-3 rounded-lg text-white">
+                    <h3 className="text-lg font-bold mb-1">
+                      {index === 4 ? "AI로 보는 세상" : lecture.title.split(':')[0]}
+                    </h3>
+                    <p className="text-sm">
+                      {lecture.instructor} 강의
+                    </p>
+                  </div>
                 </div>
               </div>
             </motion.div>

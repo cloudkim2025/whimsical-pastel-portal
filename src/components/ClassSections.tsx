@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Clock, Star, Heart } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Star, Heart, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,28 +9,102 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // Mock lectures data with realistic images
 const createMockLectures = (prefix: string) => Array(6).fill(null).map((_, idx) => {
   // Select appropriate image based on prefix and index
-  const imageBase = 'https://images.unsplash.com/photo-';
-  const imageIds = [
-    '1498050108023-c5249f4df085',
-    '1461749280684-dccba630e2f6',
-    '1488590528505-98d2b5aba04b',
-    '1486312338219-ce68d2c6f44d',
-    '1487058792275-0ad4aaf24ca7',
-    '1605810230434-7631ac76ec81',
+  const imageBase = 'https://images.unsplash.com/';
+  
+  // Use different image sets for different categories
+  const updatedImages = [
+    'photo-1546410531-bb4caa6b424d', 
+    'photo-1524178232363-1fb2b075b655', 
+    'photo-1544531586-fde5298cdd40', 
+    'photo-1551818255-e6e10975bc17', 
+    'photo-1588196749597-9ff075ee6b5b', 
+    'photo-1531482615713-2afd69097998',
+  ];
+  
+  const popularImages = [
+    'photo-1560523159-4a9692d222f9', 
+    'photo-1523240795612-9a054b0db644', 
+    'photo-1517048676732-d65bc937f952', 
+    'photo-1507537297725-24a1c029d3ca',
+    'photo-1599658880436-c61792e70672',
+    'photo-1536148935331-408321065b18',
+  ];
+  
+  const deadlineImages = [
+    'photo-1522071820081-009f0129c71c', 
+    'photo-1573496357865-f988a0cb05b9',
+    'photo-1626785774573-4b799315345d',
+    'photo-1530099486328-e021101a494a',
+    'photo-1543269865-cbf427effbad',
+    'photo-1543269664-56d93c1b41a6',
+  ];
+  
+  // Titles based on category
+  const titles = {
+    updated: [
+      '최신 React 18 훅 마스터하기',
+      'NextJS 13 서버 컴포넌트의 이해',
+      'TypeScript 5.0 신규 기능 총정리',
+      'Tailwind CSS 3.0 고급 기법',
+      'GraphQL API 설계 패턴',
+      'Redux Toolkit과 RTK Query 실전'
+    ],
+    popular: [
+      '한 번에 끝내는 자바스크립트 기초',
+      'AI 기반 웹 애플리케이션 개발',
+      '데이터 시각화 마스터 클래스',
+      '백엔드 개발자를 위한 SQL 최적화',
+      'AWS 클라우드 아키텍처 설계',
+      'DevOps와 CI/CD 파이프라인 구축'
+    ],
+    deadline: [
+      '6월 개강반: 풀스택 부트캠프',
+      '이번 주 마감: 프론트엔드 실무 과정',
+      '모집 임박: React Native 앱 개발',
+      '마지막 기회: 데이터 사이언스 특강',
+      '금주 마감: 클라우드 엔지니어링',
+      '단 3일 남음: Python 웹 스크래핑'
+    ]
+  };
+
+  const instructors = {
+    updated: ['김최신 교수', '박업데이트 강사', '이신기술 개발자', '최프론트 선임', '정백엔드 아키텍트', '강풀스택 개발자'],
+    popular: ['김인기 강사', '이데이터 박사', '박AI 연구원', '최프론트 개발자', '정백엔드 전문가', '윤클라우드 아키텍트'],
+    deadline: ['부트캠프 코치팀', '실무 프로젝트 팀', '모바일 개발팀', '데이터 랩 교수진', '클라우드 엔지니어팀', '파이썬 전문 강사']
+  };
+  
+  // Select appropriate images
+  let imageIds;
+  if (prefix === 'updated') {
+    imageIds = updatedImages;
+  } else if (prefix === 'popular') {
+    imageIds = popularImages;
+  } else {
+    imageIds = deadlineImages;
+  }
+  
+  // Add videos for popular content
+  const videos = [
+    'https://static.videezy.com/system/resources/previews/000/042/818/original/business-meeting-02.mp4',
+    'https://static.videezy.com/system/resources/previews/000/037/344/original/SA_9.mp4',
+    'https://static.videezy.com/system/resources/previews/000/051/520/original/Typing_27.mp4',
+    'https://static.videezy.com/system/resources/previews/000/038/886/original/22.mp4',
+    'https://static.videezy.com/system/resources/previews/000/043/261/original/young_woman_selfie_04.mp4',
+    'https://static.videezy.com/system/resources/previews/000/038/667/original/VQQP5E.mp4'
   ];
   
   return {
     id: `${prefix}-${idx + 1}`,
-    title: `${prefix === 'updated' ? '최근 업데이트된' : prefix === 'popular' ? '가장 많이 본' : '마감 임박'} 강의 ${idx + 1}`,
-    instructor: `강사 ${idx + 1}`,
+    title: titles[prefix as keyof typeof titles][idx],
+    instructor: instructors[prefix as keyof typeof instructors][idx],
     image: `${imageBase}${imageIds[idx]}?auto=format&fit=crop&w=600&q=80`,
     rating: (4 + Math.random()).toFixed(1),
-    price: (15000 + idx * 5000).toLocaleString(),
+    price: (49000 + idx * 5000).toLocaleString(),
     bookmarks: Math.floor(Math.random() * 100),
     deadline: prefix === 'deadline' ? `${Math.floor(Math.random() * 7) + 1}일 남음` : undefined,
     updateDate: prefix === 'updated' ? `${Math.floor(Math.random() * 7) + 1}일 전` : undefined,
     viewCount: prefix === 'popular' ? `${Math.floor(Math.random() * 1000) + 100}회` : undefined,
-    videoUrl: prefix === 'popular' ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' : undefined,
+    videoUrl: prefix === 'popular' ? videos[idx] : undefined,
   };
 });
 
@@ -42,6 +116,8 @@ const ClassSections: React.FC = () => {
   const updatedCarouselRef = useRef<HTMLDivElement>(null);
   const popularCarouselRef = useRef<HTMLDivElement>(null);
   const deadlineCarouselRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
+  const [activeVideo, setActiveVideo] = useState<string | null>(null);
   
   const scroll = (ref: React.RefObject<HTMLDivElement>, direction: 'left' | 'right') => {
     if (ref.current) {
@@ -52,6 +128,24 @@ const ClassSections: React.FC = () => {
         left: scrollTo,
         behavior: 'smooth'
       });
+    }
+  };
+  
+  const handleMouseEnter = (lectureId: string) => {
+    setActiveVideo(lectureId);
+    const video = videoRefs.current[lectureId];
+    if (video) {
+      video.currentTime = 0;
+      video.muted = true;
+      video.play().catch(err => console.error("Video play failed:", err));
+    }
+  };
+  
+  const handleMouseLeave = (lectureId: string) => {
+    setActiveVideo(null);
+    const video = videoRefs.current[lectureId];
+    if (video) {
+      video.pause();
     }
   };
   
@@ -70,29 +164,52 @@ const ClassSections: React.FC = () => {
             transition={{ delay: idx * 0.1 }}
             viewport={{ once: true }}
             className="min-w-[280px] max-w-[280px] snap-start"
+            onMouseEnter={() => lecture.videoUrl && handleMouseEnter(lecture.id)}
+            onMouseLeave={() => lecture.videoUrl && handleMouseLeave(lecture.id)}
           >
             <div className="bg-white rounded-lg overflow-hidden border border-ghibli-meadow/20 shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col">
               <div className="relative">
                 <img 
                   src={lecture.image} 
                   alt={lecture.title} 
-                  className="w-full h-40 object-cover"
+                  className={`w-full h-40 object-cover ${activeVideo === lecture.id ? 'opacity-0' : 'opacity-100'}`}
                 />
-                <button className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors">
+                
+                {lecture.videoUrl && (
+                  <video
+                    ref={el => videoRefs.current[lecture.id] = el}
+                    src={lecture.videoUrl}
+                    className={`absolute inset-0 w-full h-40 object-cover ${activeVideo === lecture.id ? 'opacity-100' : 'opacity-0'}`}
+                    muted
+                    playsInline
+                    loop
+                  />
+                )}
+                
+                <button className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors z-10">
                   <Heart className="h-4 w-4 text-gray-500 hover:text-red-500" />
                 </button>
+                
+                {lecture.videoUrl && (
+                  <div className={`absolute inset-0 flex items-center justify-center ${activeVideo === lecture.id ? 'opacity-0' : 'opacity-100'}`}>
+                    <div className="bg-black/40 rounded-full p-2">
+                      <Play className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                )}
+                
                 {lecture.deadline && (
-                  <div className="absolute bottom-0 left-0 bg-red-500 text-white px-3 py-1 text-xs font-medium flex items-center">
+                  <div className="absolute bottom-0 left-0 bg-red-500 text-white px-3 py-1 text-xs font-medium flex items-center z-10">
                     <Clock className="h-3 w-3 mr-1" /> {lecture.deadline}
                   </div>
                 )}
                 {lecture.updateDate && (
-                  <div className="absolute bottom-0 left-0 bg-green-500 text-white px-3 py-1 text-xs font-medium">
+                  <div className="absolute bottom-0 left-0 bg-green-500 text-white px-3 py-1 text-xs font-medium z-10">
                     {lecture.updateDate} 업데이트
                   </div>
                 )}
                 {lecture.viewCount && (
-                  <div className="absolute bottom-0 left-0 bg-blue-500 text-white px-3 py-1 text-xs font-medium">
+                  <div className="absolute bottom-0 left-0 bg-blue-500 text-white px-3 py-1 text-xs font-medium z-10">
                     조회수 {lecture.viewCount}
                   </div>
                 )}
