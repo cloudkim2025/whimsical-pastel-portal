@@ -1,4 +1,3 @@
-
 import API from '@/utils/apiClient';
 import { PaymentRequest } from '@/types/payment';
 
@@ -7,9 +6,13 @@ export const paymentAPI = {
   savePayment: (paymentData: PaymentRequest) => {
     return API.post('/pay/save', paymentData);
   },
-  
-  // 결제 내역 조회
-  getPaymentHistory: () => {
-    return API.get('/pay');
+
+  // 결제 내역 조회 (본인 것만)
+  getMyPurchases: () => {
+    return API.get('/pay/my-purchases');
+  },
+
+  cancelPayment: (merchantUid: string) => {
+    return API.post('/pay/cancel', { merchantUid });
   }
 };

@@ -11,7 +11,10 @@ export interface PaymentItem {
 }
 
 export interface PaymentRequest {
-  lectureId: string;
-  amount: number;
+  productId: number;
+  merchantUid: string;
+  impUid: string;
+  productPrice: number;
+  paidAmount: number;
   paymentMethod: string;
 }

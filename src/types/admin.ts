@@ -1,4 +1,3 @@
-
 // Type definitions for admin components
 export type CourseStatus = 'pending' | 'published';
 export type InstructorStatus = 'PENDING' | 'APPROVED' | 'REJECTED';

@@ -5,3 +5,4 @@ export * from './lecture';
 export * from './verification';
 export * from './video';
 export * from './ai';
+export { paymentAPI } from './payment';

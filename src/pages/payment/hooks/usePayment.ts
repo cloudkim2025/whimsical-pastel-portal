@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { paymentAPI } from '@/api/payment';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UsePaymentProps {
   lectureId: string;
@@ -11,51 +12,50 @@ interface UsePaymentProps {
 export const usePayment = ({ lectureId }: UsePaymentProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const processKakaoPayment = async (lecture: any) => {
-    // (실제로는 여기서 포트원 SDK를 사용하여 결제 진행)
-    console.log('카카오페이 결제 시작:', { lecture });
-    
-    try {
-      // 결제 프로세스 시뮬레이션 (실제로는 포트원 SDK 사용)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // 결제 성공 시 백엔드로 결제 정보 저장
-      await paymentAPI.savePayment({
-        lectureId: lectureId,
-        paymentMethod: 'KAKAO_PAY',
+
+  const processInicisPayment = async (lecture: any) => {
+    const IMP = (window as any).IMP;
+    const merchantUid = crypto.randomUUID();
+
+    IMP.request_pay(
+      {
+        pg: 'html5_inicis',
+        pay_method: 'card',
+        merchant_uid: merchantUid,
+        name: lecture.title,
         amount: parseInt(lecture.price.replace(/,/g, '')),
-      });
-      
-      toast.success('결제가 완료되었습니다!');
-      navigate('/payment/success', { 
-        state: { lectureId, lectureName: lecture.title } 
-      });
-    } catch (error) {
-      console.error('결제 처리 중 오류 발생:', error);
-      toast.error('결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-  
-  const simulatePayment = async () => {
-    try {
-      // 테스트용 결제 프로세스 시뮬레이션
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      toast.success('결제가 완료되었습니다!');
-      navigate('/payment/history');
-    } catch (error) {
-      toast.error('결제 처리 중 오류가 발생했습니다.');
-    } finally {
-      setIsProcessing(false);
-    }
+      },
+      async function (rsp: any) {
+        if (rsp.success) {
+          try {
+            await paymentAPI.savePayment({
+              productId: Number(lectureId),
+              merchantUid: rsp.merchant_uid,
+              impUid: rsp.imp_uid,
+              productPrice: parseInt(lecture.price.replace(/,/g, '')),
+              paidAmount: rsp.paid_amount,
+              paymentMethod: 'KG_inicis_'+ rsp.pay_method,
+            }, user?.id);
+
+            toast.success('결제가 완료되었습니다!');
+          } catch (err) {
+            console.error('❌ 결제 저장 실패:', err);
+            toast.error('결제는 완료되었지만, 서버 저장 중 오류가 발생했습니다.');
+          } finally {
+            setIsProcessing(false);
+          }
+        } else {
+          toast.error(`결제 실패: ${rsp.error_msg}`);
+          setIsProcessing(false);
+        }
+      }
+    );
   };
   
   return {
     isProcessing,
     setIsProcessing,
-    processKakaoPayment,
-    simulatePayment
   };
 };
