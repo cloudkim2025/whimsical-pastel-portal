@@ -54,14 +54,14 @@ const createMockLectures = (prefix: string) => Array(6).fill(null).map((_, idx) 
     deadline: ['부트캠프 코치팀', '실무 프로젝트 팀', '모바일 개발팀', '데이터 랩 교수진', '클라우드 엔지니어팀', '파이썬 전문 강사']
   };
   
-  // Updated videos with working sources
+  // Add videos for popular content
   const videos = [
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'
+    'https://static.videezy.com/system/resources/previews/000/042/818/original/business-meeting-02.mp4',
+    'https://static.videezy.com/system/resources/previews/000/037/344/original/SA_9.mp4',
+    'https://static.videezy.com/system/resources/previews/000/051/520/original/Typing_27.mp4',
+    'https://static.videezy.com/system/resources/previews/000/038/886/original/22.mp4',
+    'https://static.videezy.com/system/resources/previews/000/043/261/original/young_woman_selfie_04.mp4',
+    'https://static.videezy.com/system/resources/previews/000/038/667/original/VQQP5E.mp4'
   ];
   
   // Get image index - ensure we don't go beyond available images
