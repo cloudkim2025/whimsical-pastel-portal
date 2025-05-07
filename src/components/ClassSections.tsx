@@ -6,19 +6,33 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Mock lectures data
-const createMockLectures = (prefix: string) => Array(6).fill(null).map((_, idx) => ({
-  id: `${prefix}-${idx + 1}`,
-  title: `${prefix === 'updated' ? '최근 업데이트된' : prefix === 'popular' ? '가장 많이 본' : '마감 임박'} 강의 ${idx + 1}`,
-  instructor: `강사 ${idx + 1}`,
-  image: `https://api.dicebear.com/7.x/shapes/svg?seed=${prefix}${idx + 1}`,
-  rating: (4 + Math.random()).toFixed(1),
-  price: (15000 + idx * 5000).toLocaleString(),
-  bookmarks: Math.floor(Math.random() * 100),
-  deadline: prefix === 'deadline' ? `${Math.floor(Math.random() * 7) + 1}일 남음` : undefined,
-  updateDate: prefix === 'updated' ? `${Math.floor(Math.random() * 7) + 1}일 전` : undefined,
-  viewCount: prefix === 'popular' ? `${Math.floor(Math.random() * 1000) + 100}회` : undefined,
-}));
+// Mock lectures data with realistic images
+const createMockLectures = (prefix: string) => Array(6).fill(null).map((_, idx) => {
+  // Select appropriate image based on prefix and index
+  const imageBase = 'https://images.unsplash.com/photo-';
+  const imageIds = [
+    '1498050108023-c5249f4df085',
+    '1461749280684-dccba630e2f6',
+    '1488590528505-98d2b5aba04b',
+    '1486312338219-ce68d2c6f44d',
+    '1487058792275-0ad4aaf24ca7',
+    '1605810230434-7631ac76ec81',
+  ];
+  
+  return {
+    id: `${prefix}-${idx + 1}`,
+    title: `${prefix === 'updated' ? '최근 업데이트된' : prefix === 'popular' ? '가장 많이 본' : '마감 임박'} 강의 ${idx + 1}`,
+    instructor: `강사 ${idx + 1}`,
+    image: `${imageBase}${imageIds[idx]}?auto=format&fit=crop&w=600&q=80`,
+    rating: (4 + Math.random()).toFixed(1),
+    price: (15000 + idx * 5000).toLocaleString(),
+    bookmarks: Math.floor(Math.random() * 100),
+    deadline: prefix === 'deadline' ? `${Math.floor(Math.random() * 7) + 1}일 남음` : undefined,
+    updateDate: prefix === 'updated' ? `${Math.floor(Math.random() * 7) + 1}일 전` : undefined,
+    viewCount: prefix === 'popular' ? `${Math.floor(Math.random() * 1000) + 100}회` : undefined,
+    videoUrl: prefix === 'popular' ? 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4' : undefined,
+  };
+});
 
 const updatedLectures = createMockLectures('updated');
 const popularLectures = createMockLectures('popular');

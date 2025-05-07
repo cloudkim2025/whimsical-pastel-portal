@@ -5,12 +5,21 @@ import { ChevronLeft, ChevronRight, Star, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-// Mock popular lectures
+// Mock popular lectures with realistic images
 const popularLectures = Array(8).fill(null).map((_, idx) => ({
   id: `popular-${idx + 1}`,
   title: `인기 강의 ${idx + 1}`,
   instructor: `김강사 ${idx + 1}`,
-  image: `https://api.dicebear.com/7.x/shapes/svg?seed=popular${idx + 1}`,
+  image: `https://images.unsplash.com/photo-${[
+    '1498050108023-c5249f4df085',
+    '1461749280684-dccba630e2f6',
+    '1488590528505-98d2b5aba04b',
+    '1486312338219-ce68d2c6f44d',
+    '1487058792275-0ad4aaf24ca7',
+    '1605810230434-7631ac76ec81',
+    '1519389950473-47ba0277781c',
+    '1581091226825-a6a2a5aee158'
+  ][idx]}?auto=format&fit=crop&w=600&q=80`,
   rating: (4 + Math.random()).toFixed(1),
   price: (15000 + idx * 5000).toLocaleString(),
   bookmarks: Math.floor(Math.random() * 100),
