@@ -1,5 +1,3 @@
-//hooks/useAuth.ts 파일을 -> hooks/useAuthWithRedirect
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';

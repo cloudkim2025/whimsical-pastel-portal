@@ -5,52 +5,57 @@ import { Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-// Mock featured lectures data
+// Updated featured lectures data with the provided images and working videos
 const featuredLectures = [
   {
     id: 'featured-1',
-    title: '현직자와 함께하는 웹 개발 완전 정복',
-    instructor: '김개발',
-    image: 'https://api.dicebear.com/7.x/shapes/svg?seed=featured1',
+    title: 'AI로 보는 세상: 딥러닝 기초부터 실전까지',
+    instructor: '김인공 교수',
+    image: 'public/lovable-uploads/54a601ec-8297-4281-9f86-96314a37d694.png',
+    video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     rating: 4.9,
     price: '129,000',
-    description: '웹 개발의 기초부터 실전까지, 현직 개발자의 노하우를 배우세요',
+    description: '딥러닝, 자연어처리, 생성형 AI까지 인공지능의 핵심을 한 번에',
   },
   {
     id: 'featured-2',
-    title: 'AI와 함께하는 JavaScript 마스터 클래스',
-    instructor: '박인공지능',
-    image: 'https://api.dicebear.com/7.x/shapes/svg?seed=featured2',
+    title: 'OAuth2 로그인 시스템 구현',
+    instructor: '박웹개발 강사',
+    image: 'public/lovable-uploads/872cdf2e-5e57-4437-9d56-e3d9de32f64e.png',
+    video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     rating: 4.8,
     price: '149,000',
-    description: 'JavaScript에 특화된 AI 튜터와 함께 프론트엔드 개발자로 성장하세요',
+    description: '구글, 네이버, 카카오로 로그인부터 토큰 발급까지 직접 구현해보세요',
   },
   {
     id: 'featured-3',
-    title: '데이터 사이언티스트를 위한 파이썬 완벽 가이드',
-    instructor: '최데이터',
-    image: 'https://api.dicebear.com/7.x/shapes/svg?seed=featured3',
+    title: 'AWS로 시작하는 클라우드 인프라',
+    instructor: '이클라우드 아키텍트',
+    image: 'public/lovable-uploads/f3deb0c3-69a6-4303-938a-b75ec8a7156a.png',
+    video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     rating: 4.7,
     price: '159,000',
-    description: '데이터 분석, 시각화부터 머신러닝까지 한 번에 배우세요',
+    description: 'EC2, S3, RDS, IAM까지 서비스 배포에 꼭 필요한 구성요소를 배워요',
   },
   {
     id: 'featured-4',
-    title: 'DevOps 전문가 되기',
-    instructor: '이클라우드',
-    image: 'https://api.dicebear.com/7.x/shapes/svg?seed=featured4',
+    title: 'iOS 앱 개발 입문',
+    instructor: '최모바일 개발자',
+    image: 'public/lovable-uploads/5058af0f-6ce4-43e0-999f-79c23b02bfe6.png',
+    video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     rating: 4.9,
     price: '179,000',
-    description: 'CI/CD, Docker, Kubernetes까지 DevOps의 모든 것',
+    description: 'Swift와 SwiftUI를 활용한 실습 중심의 모바일 앱 개발 입문',
   },
   {
     id: 'featured-5',
-    title: '모바일 앱 개발 마스터하기',
-    instructor: '정모바일',
-    image: 'https://api.dicebear.com/7.x/shapes/svg?seed=featured5',
+    title: 'REST API 설계와 보안',
+    instructor: '정백엔드 개발자',
+    image: 'public/lovable-uploads/377ae563-df7f-443f-94fd-8ff42f1b5220.png',
+    video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     rating: 4.6,
-    price: '139,000',
-    description: 'React Native로 iOS, Android 앱을 한 번에 개발하는 비법',
+    price: '239,000',
+    description: '효율적인 API 설계, 인증과 인가, 실전 보안 전략까지 한 번에!',
   },
 ];
 
@@ -154,6 +159,16 @@ const FeaturedLecturesCarousel: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                  
+                  {/* Overlay text on the image */}
+                  <div className="absolute bottom-8 right-8 max-w-xs bg-black/50 backdrop-blur-sm p-3 rounded-lg text-white">
+                    <h3 className="text-lg font-bold mb-1">
+                      {lecture.title.split(':')[0]}
+                    </h3>
+                    <p className="text-sm">
+                      {lecture.instructor} 강의
+                    </p>
+                  </div>
                 </div>
               </div>
             </motion.div>

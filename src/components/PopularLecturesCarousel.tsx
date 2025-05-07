@@ -4,21 +4,11 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Star, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-
-// Mock popular lectures
-const popularLectures = Array(8).fill(null).map((_, idx) => ({
-  id: `popular-${idx + 1}`,
-  title: `인기 강의 ${idx + 1}`,
-  instructor: `김강사 ${idx + 1}`,
-  image: `https://api.dicebear.com/7.x/shapes/svg?seed=popular${idx + 1}`,
-  rating: (4 + Math.random()).toFixed(1),
-  price: (15000 + idx * 5000).toLocaleString(),
-  bookmarks: Math.floor(Math.random() * 100),
-  category: ['프론트엔드', '백엔드', '데이터 사이언스', 'AI 강의'][idx % 4],
-}));
+import { generateTopLecturesData } from '@/data/mockTopLectures';
 
 const PopularLecturesCarousel: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
+  const popularLectures = generateTopLecturesData().slice(0, 8);
   
   const scroll = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
@@ -72,8 +62,10 @@ const PopularLecturesCarousel: React.FC = () => {
                   <button className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors">
                     <Heart className="h-4 w-4 text-gray-500 hover:text-red-500" />
                   </button>
-                  <div className="absolute bottom-0 left-0 bg-ghibli-meadow text-white px-3 py-1 text-xs font-medium">
-                    {lecture.category}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                    <span className="inline-block bg-ghibli-meadow text-white px-3 py-1 text-xs font-medium rounded-full mb-1">
+                      {lecture.category === 'frontend' ? '프론트엔드' : '백엔드'}
+                    </span>
                   </div>
                 </div>
                 <div className="p-4 flex-grow flex flex-col">
@@ -88,6 +80,7 @@ const PopularLecturesCarousel: React.FC = () => {
                   <div className="flex items-center space-x-1 mb-4">
                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                     <span className="text-sm font-medium">{lecture.rating}</span>
+                    <span className="text-xs text-ghibli-stone">(수강생 {Math.floor(Math.random() * 500) + 100}명)</span>
                   </div>
                   <div className="flex justify-between items-center mt-auto">
                     <span className="font-bold text-ghibli-midnight">₩{lecture.price}</span>

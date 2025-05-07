@@ -9,7 +9,7 @@ export const paymentAPI = {
 
   // 결제 내역 조회 (본인 것만)
   getMyPurchases: () => {
-    return API.get('/pay/my-purchases');
+    return API.get('/pay/read');
   },
 
   cancelPayment: (merchantUid: string) => {

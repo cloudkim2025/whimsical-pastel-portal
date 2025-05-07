@@ -18,5 +18,14 @@ export const lectureAPI = {
         'Content-Type': 'multipart/form-data',
       },
     });
+  },
+
+  // 섹션 업로드 (새로 추가)
+  uploadSection: (sectionFormData: FormData) => {
+    return API.post('/api/lectures/sections', sectionFormData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 };
