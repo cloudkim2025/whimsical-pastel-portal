@@ -11,9 +11,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@codemirror/lang-javascript": "^6.2.1",
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/lang-javascript": "^6.2.3",
     "@codemirror/language": "^6.11.0",
     "@codemirror/state": "^6.4.0",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",

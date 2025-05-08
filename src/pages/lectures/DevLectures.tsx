@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
@@ -8,6 +7,7 @@ import { Star, Heart, BookmarkPlus, PlusCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import Footer from '@/components/Footer';
+import PurchasedCoursesButton from '@/components/lectures/PurchasedCoursesButton';
 
 // Mock categories and lectures data
 const categories = [
@@ -161,6 +161,7 @@ const DevLectures: React.FC = () => {
         </div>
       </main>
       
+      <PurchasedCoursesButton />
       <Footer />
     </div>
   );

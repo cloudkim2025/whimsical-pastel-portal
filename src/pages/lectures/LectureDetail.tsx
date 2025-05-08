@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -13,6 +12,7 @@ import { toast } from 'sonner';
 import VideoLectureModal from '@/components/VideoLectureModal';
 import { Textarea } from '@/components/ui/textarea';
 import CurriculumPreview from '@/components/lectures/CurriculumPreview';
+import PurchasedCoursesButton from '@/components/lectures/PurchasedCoursesButton';
 
 // Mock lecture data
 const getLectureData = (id: string) => ({
@@ -478,6 +478,8 @@ const LectureDetail: React.FC = () => {
         </div>
       </main>
 
+      <PurchasedCoursesButton />
+      
       {/* Video Lecture Modal */}
       <VideoLectureModal 
         isOpen={showVideoModal} 

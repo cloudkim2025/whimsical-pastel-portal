@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
 import LectureSidebar from "@/components/ai/LectureSidebar";
@@ -5,10 +6,9 @@ import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
 import AIBootUpAnimation from "@/components/ai/AIBootUpAnimation";
 import SessionLoading from "@/components/ai/SessionLoading";
-import { Book, PanelLeft, Bot, Zap } from "lucide-react";
+import { Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 import API from "@/utils/AIapiClient";
 import { ChatSessionMeta } from "@/types/userChatSession";
 import { SessionMeta } from "@/types/session";
@@ -35,7 +35,6 @@ const AILectures: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [sidebarView, setSidebarView] = useState<"history" | "latest_docs">("history");
   const ws = useRef<WebSocket | null>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -54,24 +53,14 @@ const AILectures: React.FC = () => {
       try {
         await Promise.all([fetchChatSessions(), fetchLatestSessions()]);
         setShowContent(true);
-        toast({
-          title: "준비되었습니다",
-          description: "AI 코드 분석기가 로드되었습니다",
-          variant: "success"
-        });
       } catch (err) {
         console.error("초기 데이터 로딩 실패:", err);
-        toast({
-          title: "로드 실패",
-          description: "초기 데이터 로딩에 실패했습니다.",
-          variant: "destructive"
-        });
       } finally {
         setIsLoading(false);
       }
     };
     loadInitialData();
-  }, [isLoading, toast]);
+  }, [isLoading]);
 
   const fetchChatSessions = async () => {
     try {
@@ -130,21 +119,10 @@ const AILectures: React.FC = () => {
       connectWebSocket(newChatSession.chat_session_id);
       await fetchChatSessions();
       setSidebarView("history");
-      
-      toast({
-        title: "새 세션 생성됨",
-        description: `"${session.title}" 기반 세션이 생성되었습니다.`,
-        variant: "success"
-      });
     } catch (e) {
       console.error("최신문서 기반 chat session 생성 실패:", e);
       messagesRef.current = [{ role: "system", content: "최신문서 기반 세션 생성 실패" }];
       setChatMessages([...messagesRef.current]);
-      toast({
-        title: "세션 생성 실패",
-        description: "최신문서 기반 세션 생성에 실패했습니다.",
-        variant: "destructive"
-      });
     }
   };
 
@@ -227,124 +205,58 @@ const AILectures: React.FC = () => {
       connectWebSocket(res.data.chat_session_id);
       await fetchChatSessions();
       setSidebarView("history");
-      toast({
-        title: "새 세션 생성됨",
-        description: "새로운 대화가 시작되었습니다.",
-        variant: "success"
-      });
     } catch (e) {
       console.error("새 세션 생성 실패:", e);
-      toast({
-        title: "세션 생성 실패",
-        description: "새 세션 생성에 실패했습니다.",
-        variant: "destructive"
-      });
     }
   };
 
   return isBooting ? (
-    <AIBootUpAnimation onComplete={() => {}} />
+      <AIBootUpAnimation onComplete={() => {}} />
   ) : isLoading ? (
-    <SessionLoading />
+      <SessionLoading />
   ) : (
-    <motion.div
-      className="h-screen overflow-hidden flex flex-col bg-gradient-to-br from-indigo-50/50 to-slate-50/50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: showContent ? 1 : 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      <Header />
-      <div className="pt-[72px] lg:pt-[92px] flex-1 flex overflow-hidden">
-        <motion.button
-          whileHover={{ scale: 1.05, backgroundColor: "#e0e7ff" }}
-          whileTap={{ scale: 0.95 }}
-          className="fixed top-[100px] z-50 bg-white shadow-md rounded-full p-2 transition-all"
-          style={{ 
-            left: sidebarOpen ? "290px" : "20px",
-            transition: "left 0.3s ease-in-out"
-          }}
-          onClick={() => setSidebarOpen((v) => !v)}
-        >
-          {sidebarOpen ? (
-            <PanelLeft className="h-5 w-5 text-indigo-600" />
-          ) : (
-            <Book className="h-5 w-5 text-indigo-600" />
-          )}
-        </motion.button>
-
-        <LectureSidebar
-          sessions={chatSessions}
-          latestSessions={latestSessions}
-          activeSession={activeSession}
-          selectSession={sidebarView === "history" ? selectChatSession : selectLatestSession}
-          sidebarView={sidebarView}
-          setSidebarView={setSidebarView}
-          isCollapsed={!sidebarOpen}
-          toggleSidebar={() => setSidebarOpen((v) => !v)}
-        />
-
-        <AnimatePresence mode="wait">
-          {!activeSession ? (
-            <motion.div 
-              key="empty-state"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col items-center justify-center p-10 text-center"
-            >
-              <div className="bg-indigo-100 p-5 rounded-full mb-6">
-                <Bot className="h-12 w-12 text-indigo-600" />
-              </div>
-              <h1 className="text-3xl font-medium text-slate-800 mb-4">AI 코드 분석기</h1>
-              <p className="text-lg text-slate-600 max-w-md mb-8">
-                코드에 대한 질문이나 분석이 필요하신가요? AI가 도와드립니다.
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleNewChatSession}
-                className="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors"
-              >
-                <Zap className="h-5 w-5" />
-                <span>새 세션 시작하기</span>
-              </motion.button>
-            </motion.div>
-          ) : (
-            <motion.div 
-              key="content" 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col md:flex-row max-w-screen-2xl mx-auto gap-4 p-4"
-            >
-              <motion.div 
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="w-full md:w-[55%] rounded-xl overflow-hidden shadow-lg"
-              >
-                <LectureCodePanel session={activeSession} />
-              </motion.div>
-              <motion.div 
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="w-full md:w-[45%] flex flex-col rounded-xl overflow-hidden shadow-lg"
-              >
-                <LectureChatPanel
+      <motion.div
+          className="h-screen overflow-hidden flex flex-col bg-background"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: showContent ? 1 : 0 }}
+      >
+        <Header />
+        <div className="pt-[72px] lg:pt-[92px] flex-1 flex overflow-hidden">
+          <Button
+              variant="ghost"
+              size="icon"
+              className={`fixed top-[100px] z-50 transition-all ${sidebarOpen ? "left-[210px]" : "left-2"}`}
+              onClick={() => setSidebarOpen((v) => !v)}
+          >
+            <Book className="h-5 w-5 text-ghibli-forest" />
+          </Button>
+          <LectureSidebar
+              sessions={chatSessions}
+              latestSessions={latestSessions}
+              activeSession={activeSession}
+              selectSession={sidebarView === "history" ? selectChatSession : selectLatestSession}
+              sidebarView={sidebarView}
+              setSidebarView={setSidebarView}
+              isCollapsed={!sidebarOpen}
+              toggleSidebar={() => setSidebarOpen((v) => !v)}
+          />
+          <div className="flex-1 flex flex-col md:flex-row max-w-screen-2xl mx-auto">
+            <div className="w-full md:w-1/2 border-r bg-black mr-10">
+              <LectureCodePanel session={activeSession} />
+            </div>
+            <div className="w-full md:w-1/2 flex flex-col border border-gray-300 rounded">
+              <LectureChatPanel
                   messages={chatMessages}
                   userInput={userInput}
                   setUserInput={setUserInput}
                   isProcessing={isProcessing}
                   onSendMessage={handleSendMessage}
                   onNewChatSession={handleNewChatSession}
-                />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.div>
+              />
+            </div>
+          </div>
+        </div>
+      </motion.div>
   );
 };
 
