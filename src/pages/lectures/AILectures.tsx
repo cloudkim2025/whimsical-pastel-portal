@@ -1,183 +1,262 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
 import LectureSidebar from "@/components/ai/LectureSidebar";
 import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
 import AIBootUpAnimation from "@/components/ai/AIBootUpAnimation";
+import SessionLoading from "@/components/ai/SessionLoading";
 import { Book } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import API from "@/utils/apiClient";
+import API from "@/utils/AIapiClient";
+import { ChatSessionMeta } from "@/types/userChatSession";
+import { SessionMeta } from "@/types/session";
 
 interface Message {
   role: "system" | "user" | "assistant";
   content: string;
+  timestamp?: string;
 }
 
-interface Session {
-  id: string;
-  title: string;
-  summary: string;
-  timestamp: string;
-  code: string;
-}
-
-const AILectures = () => {
-  const [isLoading, setIsLoading] = useState(true);
+const AILectures: React.FC = () => {
+  const userId = "test_user";
+  const [isBooting, setIsBooting] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [activeSession, setActiveSession] = useState<Session>({
-    id: 'initial',
-    title: '새로운 AI 코드 분석',
-    summary: '코드를 입력하거나 분석할 내용을 선택해주세요.',
-    timestamp: new Date().toISOString(),
-    code: '// 코드를 입력하거나 분석할 세션을 선택해주세요.'
-  });
-  const [chatMessages, setChatMessages] = useState<Message[]>([{
-    role: "system",
-    content: "안녕하세요! AI 코드 분석 튜터입니다. 코드에 대해 어떤 질문이 있으신가요?",
-  }]);
+  const [chatSessions, setChatSessions] = useState<ChatSessionMeta[]>([]);
+  const [latestSessions, setLatestSessions] = useState<SessionMeta[]>([]);
+  const [activeSession, setActiveSession] = useState<ChatSessionMeta | SessionMeta | null>(null);
+  const [chatMessages, setChatMessages] = useState<Message[]>([]);
+  const messagesRef = useRef<Message[]>([]);
+  const [activeCode, setActiveCode] = useState<string>("// 아직 코드 분석 내용이 없습니다.");
   const [userInput, setUserInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [sidebarView, setSidebarView] = useState<"history" | "latest_docs">("history");
+  const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    fetchSessions();
-    const timer = setTimeout(() => setShowContent(true), 2000);
-    return () => clearTimeout(timer);
+    const timer = setTimeout(() => {
+      setIsBooting(false);
+      setIsLoading(true);
+    }, 2000);
+    return () => {
+      clearTimeout(timer);
+      ws.current?.close();
+    };
   }, []);
 
-  const fetchSessions = async () => {
+  useEffect(() => {
+    if (!isLoading) return;
+    const loadInitialData = async () => {
+      try {
+        await Promise.all([fetchChatSessions(), fetchLatestSessions()]);
+        setShowContent(true);
+      } catch (err) {
+        console.error("초기 데이터 로딩 실패:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadInitialData();
+  }, [isLoading]);
+
+  const fetchChatSessions = async () => {
     try {
-      const response = await API.get('/aichat/history');
-      setSessions([activeSession, ...response.data]);
-    } catch (error) {
-      console.error('Failed to fetch sessions:', error);
+      const res = await API.get<ChatSessionMeta[]>("/chat_sessions", { params: { user_id: userId } });
+      setChatSessions(res.data);
+    } catch (err) {
+      console.error("fetchChatSessions 오류:", err);
+      setChatSessions([]);
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!userInput.trim() || isProcessing) return;
-
-    setIsProcessing(true);
-    const newMessage: Message = { role: "user", content: userInput };
-    setChatMessages(prev => [...prev, newMessage]);
-    setUserInput("");
-
+  const fetchLatestSessions = async () => {
     try {
-      const response = await API.post('/aichat', {
-        sessionId: activeSession.id,
-        message: userInput,
-        code: activeSession.code
+      const res = await API.get<SessionMeta[]>("/sessions/latest", { params: { user_id: userId } });
+      setLatestSessions(res.data);
+    } catch (err) {
+      console.error("fetchLatestSessions 오류:", err);
+      setLatestSessions([]);
+    }
+  };
+
+  const selectChatSession = async (session: ChatSessionMeta) => {
+    setActiveSession(session);
+    messagesRef.current = [];
+    try {
+      const chatRes = await API.get<Message[]>(`/chat_sessions/${session.chat_session_id}/logs`);
+      messagesRef.current = [...chatRes.data];
+      setChatMessages([...messagesRef.current]);
+    } catch {
+      messagesRef.current = [{ role: "system", content: "대화 내역 로드 실패" }];
+      setChatMessages([...messagesRef.current]);
+    }
+    setActiveCode(`[요약]\n${session.summary || "(요약 없음)"}\n\n[코드]\n${session.code || "(코드 없음)"}`);
+    connectWebSocket(session.chat_session_id);
+  };
+
+  const selectLatestSession = async (session: SessionMeta) => {
+    try {
+      const createRes = await API.post<ChatSessionMeta>("/chat_sessions", {
+        user_id: userId,
+        initial_question: session.title,
+        summary: session.summary,
+        code: session.code,
       });
 
-      setChatMessages(prev => [...prev, {
-        role: "assistant",
-        content: response.data.message
-      }]);
+      const newChatSession = createRes.data;
+      setActiveSession(newChatSession);
 
-      if (response.data.code) {
-        setActiveSession(prev => ({
-          ...prev,
-          code: response.data.code
-        }));
+      setActiveCode(`[요약]\n${newChatSession.summary || "(요약 없음)"}\n\n[코드]\n${newChatSession.code || "(코드 없음)"}`);
+
+      messagesRef.current = [
+        { role: "system", content: `"${session.title}" 최신문서를 기반으로 새 대화가 생성되었습니다.` },
+      ];
+      setChatMessages([...messagesRef.current]);
+
+      connectWebSocket(newChatSession.chat_session_id);
+      await fetchChatSessions();
+      setSidebarView("history");
+    } catch (e) {
+      console.error("최신문서 기반 chat session 생성 실패:", e);
+      messagesRef.current = [{ role: "system", content: "최신문서 기반 세션 생성 실패" }];
+      setChatMessages([...messagesRef.current]);
+    }
+  };
+
+  const connectWebSocket = (sessionId?: string) => {
+    ws.current?.close();
+    const url = API.defaults.baseURL!.replace(/^http/, "ws") + "/aichat/websocket";
+    const socket = new WebSocket(url);
+    ws.current = socket;
+
+    socket.onopen = () => {
+      const payload = sessionId ? { user_id: userId, session_id: sessionId } : { user_id: userId };
+      socket.send(JSON.stringify(payload));
+    };
+
+    socket.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        const type = msg.type;
+
+        if (type === "chat") {
+          let content = typeof msg.summary === "string" ? msg.summary : String(msg.summary);
+          content = content.replace(/^요약[:：]?\s*/i, "").trim();
+          messagesRef.current.push({ role: "assistant", content });
+        } else if (type === "system") {
+          messagesRef.current.push({ role: "system", content: msg.message });
+        } else if (type === "error") {
+          console.error("[ERROR] WebSocket error message:", msg.message);
+          messagesRef.current.push({
+            role: "system",
+            content: "아이공 분석 실패: 잠시 후 다시 시도해주세요."
+          });
+        } else if (type === "session_update") {
+          setChatSessions((prev) =>
+              prev.map((sess) =>
+                  sess.chat_session_id === msg.chat_session_id ? { ...sess, title: msg.new_title } : sess
+              )
+          );
+        } else if (type === "code") {
+          setActiveCode(`${msg.code || "(코드 없음)"}`);
+        }
+      } catch (err) {
+        console.error("WebSocket JSON parse error:", err);
+        messagesRef.current.push({
+          role: "system",
+          content: "아이공 분석 처리 중 오류 발생: 잠시 후 다시 시도해주세요."
+        });
+      } finally {
+        setChatMessages([...messagesRef.current]);
+        setIsProcessing(false);
       }
-    } catch (error) {
-      console.error('Failed to send message:', error);
-      setChatMessages(prev => [...prev, {
-        role: "assistant",
-        content: "죄송합니다. 오류가 발생했습니다. 다시 시도해 주세요.",
-      }]);
-    } finally {
+    };
+
+    socket.onerror = (e) => {
+      console.error("WebSocket error:", e);
       setIsProcessing(false);
-    }
+    };
+
+    socket.onclose = () => {
+      console.warn("WebSocket closed");
+    };
   };
 
-  const selectSession = async (session: Session) => {
-    setActiveSession(session);
-    setChatMessages([{
-      role: "system",
-      content: `${session.title}에 대한 분석을 시작합니다. 어떤 질문이 있으신가요?`,
-    }]);
+  const handleSendMessage = () => {
+    if (!activeSession || !userInput.trim() || isProcessing || ws.current?.readyState !== WebSocket.OPEN) return;
+    setIsProcessing(true);
+    messagesRef.current = [...messagesRef.current, { role: "user", content: userInput }];
+    setChatMessages([...messagesRef.current]);
+    const payload = { question: userInput, language: "en", include_code: true, summary_only: false, documents: [] };
+    ws.current.send(JSON.stringify(payload));
+    setUserInput("");
+  };
 
+  const handleNewChatSession = async () => {
     try {
-      const response = await API.get(`/aichat/analyze/${session.id}`);
-      if (response.data.messages) {
-        setChatMessages(response.data.messages);
-      }
-    } catch (error) {
-      console.error('Failed to load session messages:', error);
+      const res = await API.post<ChatSessionMeta>("/chat_sessions", { user_id: userId, initial_question: "" });
+      setActiveSession(res.data);
+      messagesRef.current = [{ role: "system", content: "새로운 대화가 시작되었습니다." }];
+      setChatMessages([...messagesRef.current]);
+      setActiveCode(`[요약]\n${res.data.summary || "(요약 없음)"}\n\n[코드]\n${res.data.code || "(코드 없음)"}`);
+      connectWebSocket(res.data.chat_session_id);
+      await fetchChatSessions();
+      setSidebarView("history");
+    } catch (e) {
+      console.error("새 세션 생성 실패:", e);
     }
   };
 
-  const handleBootUpComplete = () => {
-    setIsLoading(false);
-  };
-
-  const toggleSidebar = () => setSidebarOpen(prev => !prev);
-
-  return (
-    <>
-      {isLoading && <AIBootUpAnimation onComplete={handleBootUpComplete} />}
-      
-      <motion.div 
-        className="h-screen overflow-hidden flex flex-col bg-background"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ 
-          opacity: showContent ? 1 : 0, 
-          y: showContent ? 0 : 20 
-        }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+  return isBooting ? (
+      <AIBootUpAnimation onComplete={() => {}} />
+  ) : isLoading ? (
+      <SessionLoading />
+  ) : (
+      <motion.div
+          className="h-screen overflow-hidden flex flex-col bg-background"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: showContent ? 1 : 0 }}
       >
         <Header />
-        <div className="pt-[72px] lg:pt-[92px] px-0 flex-1 overflow-hidden">
-          <div className="flex h-full w-full relative">
-            <Button
+        <div className="pt-[72px] lg:pt-[92px] flex-1 flex overflow-hidden">
+          <Button
               variant="ghost"
               size="icon"
-              className={`fixed top-[100px] transition-all duration-300 z-50 bg-white border border-border shadow-md rounded-r-lg h-10 w-10 
-                ${sidebarOpen ? 'left-[210px]' : 'left-2'}`}
-              onClick={toggleSidebar}
-            >
-              <Book className={`h-5 w-5 text-ghibli-forest transition-transform duration-200 
-                ${sidebarOpen ? 'rotate-0' : 'rotate-180'}`} />
-            </Button>
-
-            <LectureSidebar
-              sessions={sessions}
+              className={`fixed top-[100px] z-50 transition-all ${sidebarOpen ? "left-[210px]" : "left-2"}`}
+              onClick={() => setSidebarOpen((v) => !v)}
+          >
+            <Book className="h-5 w-5 text-ghibli-forest" />
+          </Button>
+          <LectureSidebar
+              sessions={chatSessions}
+              latestSessions={latestSessions}
               activeSession={activeSession}
-              selectSession={selectSession}
+              selectSession={sidebarView === "history" ? selectChatSession : selectLatestSession}
+              sidebarView={sidebarView}
+              setSidebarView={setSidebarView}
               isCollapsed={!sidebarOpen}
-            />
-
-            <div className="flex-1 flex flex-col md:flex-row h-full max-w-screen-xl mx-auto">
-              <div 
-                className="w-full md:w-1/2 border-r border-border flex flex-col bg-black"
-                style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)", maxWidth: "840px" }}
-              >
-                <LectureCodePanel
-                  title={activeSession.title}
-                  code={activeSession.code}
-                />
-              </div>
-              <div 
-                className="w-full md:w-1/2 flex flex-col"
-                style={{ height: "calc(100vh - 130px)", minHeight: "520px", maxHeight: "calc(100vh - 80px)" }}
-              >
-                <LectureChatPanel
+              toggleSidebar={() => setSidebarOpen((v) => !v)}
+          />
+          <div className="flex-1 flex flex-col md:flex-row max-w-screen-2xl mx-auto">
+            <div className="w-full md:w-1/2 border-r bg-black mr-10">
+              <LectureCodePanel session={activeSession} />
+            </div>
+            <div className="w-full md:w-1/2 flex flex-col border border-gray-300 rounded">
+              <LectureChatPanel
                   messages={chatMessages}
                   userInput={userInput}
                   setUserInput={setUserInput}
                   isProcessing={isProcessing}
                   onSendMessage={handleSendMessage}
-                />
-              </div>
+                  onNewChatSession={handleNewChatSession}
+              />
             </div>
           </div>
         </div>
       </motion.div>
-    </>
   );
 };
 
