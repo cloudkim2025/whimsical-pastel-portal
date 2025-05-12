@@ -28,7 +28,7 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
     
     // Create particles
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 2000;
+    const particlesCount = 2500; // Increased particle count for more density
     
     const posArray = new Float32Array(particlesCount * 3);
     const colorsArray = new Float32Array(particlesCount * 3);
@@ -36,24 +36,24 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
     
     for (let i = 0; i < particlesCount * 3; i++) {
       // Position (xyz)
-      posArray[i] = (Math.random() - 0.5) * 60;
+      posArray[i] = (Math.random() - 0.5) * 70; // Wider distribution
       
-      // Colors (rgb)
+      // Colors (rgb) - using ghibli theme colors
       if (i % 3 === 0) {
-        // R value - ghibli colors
-        colorsArray[i] = 0.5 + Math.random() * 0.5; // Brighter colors
+        // R value - ghibli forest
+        colorsArray[i] = 0.58 + Math.random() * 0.2;
       } else if (i % 3 === 1) {
-        // G value - ghibli colors
-        colorsArray[i] = 0.7 + Math.random() * 0.3; // Brighter colors
+        // G value - ghibli meadow
+        colorsArray[i] = 0.8 + Math.random() * 0.2;
       } else {
-        // B value - ghibli colors
-        colorsArray[i] = 0.6 + Math.random() * 0.4; // Brighter colors
+        // B value - ghibli sky-blue
+        colorsArray[i] = 0.65 + Math.random() * 0.3;
       }
     }
     
     // Varying sizes for particles
     for (let i = 0; i < particlesCount; i++) {
-      sizesArray[i] = Math.random() * 0.3 + 0.1; // Varying sizes
+      sizesArray[i] = Math.random() * 0.5 + 0.1; // More varying sizes
     }
     
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
@@ -64,6 +64,7 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
     const particlesMaterial = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
+        scrollY: { value: 0 }, // Add scrollY uniform
         pointTexture: { value: new THREE.TextureLoader().load('/placeholder.svg') }
       },
       vertexShader: `
@@ -71,14 +72,26 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
         attribute vec3 color;
         varying vec3 vColor;
         uniform float time;
+        uniform float scrollY;
         
         void main() {
           vColor = color;
           
-          // Animated position
+          // Animated position based on time and scroll
           vec3 pos = position;
-          pos.y += sin(time * 0.2 + position.x * 0.5) * 0.5;
-          pos.x += cos(time * 0.2 + position.y * 0.5) * 0.5;
+          
+          // Wave effect
+          pos.y += sin(time * 0.3 + position.x * 0.25 + scrollY * 0.01) * 0.8;
+          pos.x += cos(time * 0.3 + position.y * 0.25 + scrollY * 0.01) * 0.8;
+          
+          // Scroll-based z-position for parallax
+          pos.z += sin(scrollY * 0.001 + position.x * 0.01) * 5.0;
+          
+          // Add subtle rotation based on scroll
+          float angle = scrollY * 0.0005;
+          float c = cos(angle);
+          float s = sin(angle);
+          pos.xz = mat2(c, -s, s, c) * pos.xz;
           
           vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
           gl_PointSize = size * (300.0 / -mvPosition.z);
@@ -90,12 +103,13 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
         uniform sampler2D pointTexture;
         
         void main() {
-          // Circular point shape
-          if (length(gl_PointCoord - vec2(0.5)) > 0.5) discard;
+          // Circular point shape with soft edges
+          float distFromCenter = length(gl_PointCoord - vec2(0.5));
+          if (distFromCenter > 0.5) discard;
           
-          // Color with soft edges
-          float alpha = 1.0 - length(gl_PointCoord - vec2(0.5)) * 2.0;
-          gl_FragColor = vec4(vColor, alpha);
+          // Color with soft glow edges
+          float alpha = smoothstep(0.5, 0.0, distFromCenter);
+          gl_FragColor = vec4(vColor, alpha * 0.8);
         }
       `,
       transparent: true,
@@ -141,20 +155,21 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
       // Update shader time uniform
       if (particlesMaterial.uniforms) {
         particlesMaterial.uniforms.time.value = elapsedTime;
+        particlesMaterial.uniforms.scrollY.value = scrollY;
       }
       
       // Rotate based on mouse position with limited effect
-      particlesMesh.rotation.x = mousePosition.y * 0.3;
-      particlesMesh.rotation.y = mousePosition.x * 0.3;
-      
-      // Slow continuous rotation for ambient movement
-      particlesMesh.rotation.z = elapsedTime * 0.05;
+      particlesMesh.rotation.x = mousePosition.y * 0.2;
+      particlesMesh.rotation.y = mousePosition.x * 0.2;
       
       // Respond to scroll position - more dramatic effect
-      const scrollEffect = scrollY * 0.002;
-      particlesMesh.rotation.x += scrollEffect * 0.05;
-      particlesMesh.rotation.y += scrollEffect * 0.1;
-      particlesMesh.position.z = -scrollEffect * 3;
+      const scrollEffect = scrollY * 0.003;
+      camera.position.z = 15 + Math.sin(scrollEffect) * 3;
+      particlesMesh.rotation.z = scrollEffect * 0.1;
+      
+      // Subtle camera movement
+      camera.position.x = Math.sin(scrollEffect * 0.5) * 2;
+      camera.position.y = Math.cos(scrollEffect * 0.3) * 1;
       
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
@@ -171,12 +186,12 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
       particlesMaterial.dispose();
       renderer.dispose();
     };
-  }, [scrollY]);
+  }, [scrollY]); // React to scrollY changes
   
   return (
     <canvas 
       ref={canvasRef}
-      className="fixed inset-0 -z-10 bg-gradient-to-b from-ghibli-midnight/90 via-background/90 to-background"
+      className="fixed inset-0 -z-10 bg-gradient-to-b from-ghibli-midnight via-background/90 to-background"
     />
   );
 };

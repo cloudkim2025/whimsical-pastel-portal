@@ -1,10 +1,17 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Book, Code, Bot, Users } from 'lucide-react';
 import GlassmorphicCard from './GlassmorphicCard';
 
 const FeatureSection: React.FC = () => {
+  // Use scroll progress to create scroll-based animations
+  const { scrollYProgress } = useScroll();
+  
+  // Create different transform values for different scroll positions
+  const rotateX = useTransform(scrollYProgress, [0, 1], [0, 10]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
+  
   const features = [
     {
       icon: <Book className="h-8 w-8 text-white" />,
@@ -29,34 +36,79 @@ const FeatureSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <section className="py-10 relative perspective-1000">
+      {/* Decorative elements */}
+      <motion.div 
+        className="absolute top-20 right-10 w-40 h-40 bg-ghibli-meadow/20 rounded-full blur-3xl"
+        style={{
+          rotate: useTransform(scrollYProgress, [0, 1], [0, 360]),
+          scale: useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.5, 1]),
+        }}
+      />
+      
+      <motion.div 
+        className="absolute bottom-20 left-10 w-40 h-40 bg-ghibli-forest/20 rounded-full blur-3xl"
+        style={{
+          rotate: useTransform(scrollYProgress, [0, 1], [0, -360]),
+          scale: useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.5, 1]),
+        }}
+      />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 transform-gpu" style={{ transformStyle: 'preserve-3d' }}>
         {features.map((feature, index) => (
-          <GlassmorphicCard 
-            key={index} 
-            delay={0.1 * index}
-            direction={index % 2 === 0 ? 'left' : 'right'}
-            variant={index % 2 === 0 ? 'dark' : 'light'}
-            className="p-0"
+          <motion.div
+            key={index}
+            style={{
+              transformStyle: 'preserve-3d',
+              rotateX: index % 2 === 0 ? rotateX : useTransform(scrollYProgress, [0, 1], [0, -5]),
+              scale: index % 3 === 0 ? scale : 1,
+              z: useTransform(scrollYProgress, [0, 0.5, 1], [0, index * 10, 0]),
+            }}
           >
-            <div className="flex flex-col p-6">
-              <div className="flex items-center mb-3 bg-ghibli-forest/40 p-3 rounded-lg">
-                <div className="bg-ghibli-forest rounded-full p-3">
-                  {feature.icon}
+            <GlassmorphicCard 
+              key={index} 
+              delay={0.1 * index}
+              direction={index % 2 === 0 ? 'left' : 'right'}
+              variant={index % 2 === 0 ? 'dark' : 'light'}
+              className="p-0 h-full"
+              depth={20 + index * 5}
+            >
+              <div className="flex flex-col p-6 h-full">
+                <div className="flex items-center mb-3 bg-ghibli-forest/25 backdrop-blur-md p-3 rounded-lg border border-white/10">
+                  <div className="bg-gradient-to-br from-ghibli-forest to-ghibli-meadow rounded-full p-3 shadow-lg transform-gpu">
+                    <motion.div
+                      whileHover={{ rotateZ: 10 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      {feature.icon}
+                    </motion.div>
+                  </div>
+                  
+                  <h3 className="text-xl font-handwritten text-white ml-4 drop-shadow-md">
+                    {feature.title}
+                  </h3>
                 </div>
                 
-                <h3 className="text-xl font-handwritten text-white ml-4 drop-shadow-md">
-                  {feature.title}
-                </h3>
+                <div className="bg-black/20 backdrop-blur-xl p-4 rounded-lg border border-white/10 flex-grow">
+                  <p className="text-white font-medium">
+                    {feature.description}
+                  </p>
+                </div>
+                
+                {/* Interactive decorative element */}
+                <motion.div 
+                  className="absolute bottom-3 right-3 w-10 h-10 opacity-30"
+                  animate={{
+                    rotate: [0, 360],
+                    scale: [1, 1.1, 1],
+                  }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                >
+                  <div className="w-full h-full bg-white rounded-full blur-md" />
+                </motion.div>
               </div>
-              
-              <div className="bg-black/20 backdrop-blur-sm p-4 rounded-lg">
-                <p className="text-white font-medium">
-                  {feature.description}
-                </p>
-              </div>
-            </div>
-          </GlassmorphicCard>
+            </GlassmorphicCard>
+          </motion.div>
         ))}
       </div>
     </section>
