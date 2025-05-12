@@ -22,29 +22,15 @@ const CompanyInfo: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [scrollY, setScrollY] = useState(0);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   
   // Handle scroll events for parallax and 3D effects
   const handleScroll = () => {
     setScrollY(window.scrollY);
   };
   
-  // Handle mouse movement for interactive effects
-  const handleMouseMove = (e: MouseEvent) => {
-    setMousePos({
-      x: (e.clientX / window.innerWidth) * 2 - 1,
-      y: -(e.clientY / window.innerHeight) * 2 + 1
-    });
-  };
-  
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('mousemove', handleMouseMove);
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
   const handleStartFree = () => {
@@ -55,13 +41,8 @@ const CompanyInfo: React.FC = () => {
     }
   };
   
-  // Calculate transform style based on scroll and mouse position
-  const getParallaxStyle = (depth: number = 1) => ({
-    transform: `translateZ(${depth * -10}px) translateX(${mousePos.x * depth * 10}px) translateY(${mousePos.y * depth * 10}px)`
-  });
-  
   return (
-    <div className="min-h-screen relative overflow-x-hidden perspective-1000">
+    <div className="min-h-screen relative overflow-x-hidden bg-gradient-to-br from-ghibli-midnight/90 via-ghibli-forest/50 to-background/90">
       {/* Interactive 3D background */}
       <InteractiveBackground scrollY={scrollY} />
       
@@ -79,87 +60,38 @@ const CompanyInfo: React.FC = () => {
         <span className="text-white text-sm font-medium">스크롤하여 탐색하세요</span>
       </motion.div>
       
-      {/* 3D Container for all content */}
-      <div 
-        className="transform-gpu perspective-1000 w-full"
-        style={{ transformStyle: 'preserve-3d' }}
-      >
-        <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-          <div className="max-w-4xl mx-auto transform-gpu">
-            {/* Company Header Section */}
-            <motion.div 
-              style={{ ...getParallaxStyle(0.2) }}
-              className="mb-16"
-            >
-              <CompanyHeader />
-            </motion.div>
-            
-            {/* Vision Section */}
-            <motion.div 
-              style={{ ...getParallaxStyle(0.4) }}
-              className="my-24"
-            >
-              <VisionSection />
-            </motion.div>
-            
-            {/* Feature Section */}
-            <motion.div 
-              style={{ ...getParallaxStyle(0.6) }}
-              className="my-24"
-            >
-              <FeatureSection />
-            </motion.div>
-            
-            {/* Philosophy Section */}
-            <motion.div 
-              style={{ ...getParallaxStyle(0.5) }}
-              className="my-24"
-            >
-              <PhilosophySection />
-            </motion.div>
-            
-            {/* Testimonials Section */}
-            <motion.div 
-              style={{ ...getParallaxStyle(0.3) }}
-              className="my-24"
-            >
-              <TestimonialsSection />
-            </motion.div>
-            
-            {/* Call to Action Section */}
-            <motion.div 
-              style={{ ...getParallaxStyle(0.2) }}
-              className="my-24"
-            >
-              <CTASection onStartFree={handleStartFree} />
-            </motion.div>
-            
-            {/* Floating particles */}
-            <div className="h-24 relative">
-              {[...Array(5)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-4 h-4 bg-white/10 rounded-full backdrop-blur-sm"
-                  animate={{
-                    x: [0, Math.random() * 100 - 50, 0],
-                    y: [0, Math.random() * 100 - 50, 0],
-                    opacity: [0.3, 0.7, 0.3],
-                  }}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 5 + i,
-                    ease: "easeInOut"
-                  }}
-                  style={{
-                    left: `${20 + i * 15}%`,
-                    top: `${10 + i * 15}%`,
-                  }}
-                />
-              ))}
+      <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
+        <div className="max-w-4xl mx-auto">
+          {/* Company Header Section */}
+          <CompanyHeader />
+          
+          {/* Vision Section */}
+          <VisionSection />
+          
+          {/* Feature Section */}
+          <FeatureSection />
+          
+          {/* Philosophy Section */}
+          <PhilosophySection />
+          
+          {/* Testimonials Section */}
+          <TestimonialsSection />
+          
+          {/* Call to Action Section */}
+          <CTASection onStartFree={handleStartFree} />
+          
+          {/* Scroll indicator */}
+          <motion.div
+            className="flex justify-center my-12"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+          >
+            <div className="bg-white/20 backdrop-blur-md p-3 rounded-full">
+              <Cloud className="h-6 w-6 text-white" />
             </div>
-          </div>
-        </main>
-      </div>
+          </motion.div>
+        </div>
+      </main>
       
       <Footer />
     </div>

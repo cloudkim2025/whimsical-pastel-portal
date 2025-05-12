@@ -117,15 +117,6 @@ export default {
 				'slide-left': {
 					'0%': { transform: 'translateX(20px)', opacity: '0' },
 					'100%': { transform: 'translateX(0)', opacity: '1' }
-				},
-				'pulse-glow': {
-					'0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
-					'50%': { opacity: '1', transform: 'scale(1.05)' }
-				},
-				'rotate-3d': {
-					'0%': { transform: 'rotateX(0) rotateY(0)' },
-					'50%': { transform: 'rotateX(5deg) rotateY(5deg)' },
-					'100%': { transform: 'rotateX(0) rotateY(0)' }
 				}
 			},
 			animation: {
@@ -136,30 +127,7 @@ export default {
 				'fade-in': 'fade-in 1.5s ease-out',
 				'slide-up': 'slide-up 1s ease-out',
 				'slide-right': 'slide-right 1s ease-out',
-				'slide-left': 'slide-left 1s ease-out',
-				'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
-				'rotate-3d': 'rotate-3d 5s ease-in-out infinite'
-			},
-			// New utilities for 3D transforms
-			transformStyle: {
-				'3d': 'preserve-3d',
-				'flat': 'flat'
-			},
-			perspective: {
-				'none': 'none',
-				'500': '500px',
-				'1000': '1000px',
-				'2000': '2000px'
-			},
-			backdropFilter: {
-				'none': 'none',
-				'blur-sm': 'blur(4px)',
-				'blur': 'blur(8px)',
-				'blur-md': 'blur(12px)',
-				'blur-lg': 'blur(16px)',
-				'blur-xl': 'blur(24px)',
-				'blur-2xl': 'blur(40px)',
-				'blur-3xl': 'blur(64px)'
+				'slide-left': 'slide-left 1s ease-out'
 			}
 		}
 	},

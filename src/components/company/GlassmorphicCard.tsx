@@ -10,7 +10,6 @@ interface GlassmorphicCardProps {
   yOffset?: number;
   direction?: 'left' | 'right' | 'up' | 'down';
   variant?: 'default' | 'dark' | 'light';
-  depth?: number; // New prop for 3D depth
 }
 
 const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({ 
@@ -19,8 +18,7 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
   delay = 0,
   yOffset = 30,
   direction = 'up',
-  variant = 'default',
-  depth = 20
+  variant = 'default'
 }) => {
   // Calculate initial animation values based on direction
   const getDirectionValues = () => {
@@ -39,60 +37,39 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
 
   const { x, y } = getDirectionValues();
   
-  // Get background style based on variant - enhanced for better glassmorphism
+  // Get background style based on variant
   const getBackgroundStyle = () => {
     switch (variant) {
       case 'dark':
-        return "bg-black/30 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]";
+        return "bg-black/40 backdrop-blur-xl border border-white/20 shadow-lg";
       case 'light':
-        return "bg-white/20 backdrop-blur-xl border border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.25)]";
+        return "bg-white/30 backdrop-blur-xl border border-white/40 shadow-lg";
       default:
-        return "bg-white/15 backdrop-blur-xl border border-white/25 shadow-[0_8px_32px_0_rgba(31,38,135,0.20)]";
+        return "bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg";
     }
   };
   
   return (
     <motion.div
-      initial={{ opacity: 0, x, y, scale: 0.97 }}
-      whileInView={{ 
-        opacity: 1, 
-        x: 0, 
-        y: 0, 
-        scale: 1,
-        rotateX: 0,
-        rotateY: 0,
-        z: 0
-      }}
-      viewport={{ once: true, margin: "-100px" }}
+      initial={{ opacity: 0, x, y }}
+      whileInView={{ opacity: 1, x: 0, y: 0 }}
+      viewport={{ once: true }}
       transition={{ 
         duration: 0.8, 
         delay: delay,
         type: 'spring',
         stiffness: 50
       }}
-      whileHover={{
-        scale: 1.02,
-        rotateX: 2,
-        rotateY: 2,
-        z: depth,
-        transition: { duration: 0.4 }
-      }}
       className={cn(
-        "relative rounded-2xl overflow-hidden transform-gpu will-change-transform", 
+        "relative rounded-2xl overflow-hidden", 
         getBackgroundStyle(),
         className
       )}
-      style={{
-        transformStyle: "preserve-3d"
-      }}
     >
-      {/* Frosted glass inner border effect */}
-      <div className="absolute inset-0 opacity-40 bg-gradient-to-br from-white/40 via-transparent to-transparent pointer-events-none rounded-2xl" />
+      {/* Inner light effect */}
+      <div className="absolute inset-0 opacity-30 bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none" />
       
-      {/* Extra inner glow effect */}
-      <div className="absolute inset-0 opacity-30 bg-gradient-to-tr from-transparent via-white/10 to-white/30 pointer-events-none rounded-2xl" />
-      
-      {/* Content container with improved text readability */}
+      {/* Content container with semi-opaque background for better text readability */}
       <div className="relative z-10 p-6">
         {children}
       </div>
