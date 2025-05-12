@@ -3,7 +3,7 @@ import axios from 'axios';
 import { tokenManager } from './tokenManager';
 
 const API = axios.create({
-  baseURL: 'http://localhost:9000',  // Edge-service gateway 주소 (필요시 수정)
+  baseURL: 'http://localhost:9004',  // Edge-service gateway 주소 (필요시 수정)
   headers: {
     'Content-Type': 'application/json',
   },

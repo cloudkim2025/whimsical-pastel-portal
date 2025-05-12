@@ -15,7 +15,7 @@ export const lectureAPI = {
   
   // 강의 등록 (강사용)
   createLecture: (lectureFormData: FormData) => {
-    return API.post('/api/lectures', lectureFormData, {
+      return API.post('/api/lectures', lectureFormData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

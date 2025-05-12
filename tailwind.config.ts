@@ -72,7 +72,9 @@ export default {
 					'earth': '#D7C0AE',
 					'sunset': '#FFB4B4',
 					'stone': '#967E76',
-					'midnight': '#65647C'
+					'midnight': '#65647C',
+					'midnight-dark': '#4B4453',
+					'pastel-blue': '#6A9AC4'
 				}
 			},
 			borderRadius: {
