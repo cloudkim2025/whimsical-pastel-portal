@@ -28,43 +28,89 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
     
     // Create particles
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 1500;
+    const particlesCount = 2000;
     
     const posArray = new Float32Array(particlesCount * 3);
     const colorsArray = new Float32Array(particlesCount * 3);
+    const sizesArray = new Float32Array(particlesCount);
     
     for (let i = 0; i < particlesCount * 3; i++) {
       // Position (xyz)
-      posArray[i] = (Math.random() - 0.5) * 50;
+      posArray[i] = (Math.random() - 0.5) * 60;
       
       // Colors (rgb)
       if (i % 3 === 0) {
-        // R value - ghibli meadow/forest tones
-        colorsArray[i] = 0.4 + Math.random() * 0.2;
+        // R value - ghibli colors
+        colorsArray[i] = 0.5 + Math.random() * 0.5; // Brighter colors
       } else if (i % 3 === 1) {
-        // G value - ghibli meadow/forest tones
-        colorsArray[i] = 0.65 + Math.random() * 0.2;
+        // G value - ghibli colors
+        colorsArray[i] = 0.7 + Math.random() * 0.3; // Brighter colors
       } else {
-        // B value - ghibli meadow/forest tones
-        colorsArray[i] = 0.5 + Math.random() * 0.2;
+        // B value - ghibli colors
+        colorsArray[i] = 0.6 + Math.random() * 0.4; // Brighter colors
       }
+    }
+    
+    // Varying sizes for particles
+    for (let i = 0; i < particlesCount; i++) {
+      sizesArray[i] = Math.random() * 0.3 + 0.1; // Varying sizes
     }
     
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
     particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+    particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizesArray, 1));
     
-    // Material with custom vertex and fragment shaders for more interesting visuals
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.12,
-      sizeAttenuation: true,
-      vertexColors: true,
+    // Custom shader material for more interesting visuals
+    const particlesMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0 },
+        pointTexture: { value: new THREE.TextureLoader().load('/placeholder.svg') }
+      },
+      vertexShader: `
+        attribute float size;
+        attribute vec3 color;
+        varying vec3 vColor;
+        uniform float time;
+        
+        void main() {
+          vColor = color;
+          
+          // Animated position
+          vec3 pos = position;
+          pos.y += sin(time * 0.2 + position.x * 0.5) * 0.5;
+          pos.x += cos(time * 0.2 + position.y * 0.5) * 0.5;
+          
+          vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+          gl_PointSize = size * (300.0 / -mvPosition.z);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        uniform sampler2D pointTexture;
+        
+        void main() {
+          // Circular point shape
+          if (length(gl_PointCoord - vec2(0.5)) > 0.5) discard;
+          
+          // Color with soft edges
+          float alpha = 1.0 - length(gl_PointCoord - vec2(0.5)) * 2.0;
+          gl_FragColor = vec4(vColor, alpha);
+        }
+      `,
       transparent: true,
-      opacity: 0.6,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexColors: true
     });
     
     // Points
     const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
     scene.add(particlesMesh);
+    
+    // Add some lighting for ambience
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
     
     // Handle window resize
     const handleResize = () => {
@@ -92,6 +138,11 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
     const animate = () => {
       const elapsedTime = clock.getElapsedTime();
       
+      // Update shader time uniform
+      if (particlesMaterial.uniforms) {
+        particlesMaterial.uniforms.time.value = elapsedTime;
+      }
+      
       // Rotate based on mouse position with limited effect
       particlesMesh.rotation.x = mousePosition.y * 0.3;
       particlesMesh.rotation.y = mousePosition.x * 0.3;
@@ -99,24 +150,11 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
       // Slow continuous rotation for ambient movement
       particlesMesh.rotation.z = elapsedTime * 0.05;
       
-      // Respond to scroll position
-      const scrollEffect = scrollY * 0.0015;
+      // Respond to scroll position - more dramatic effect
+      const scrollEffect = scrollY * 0.002;
+      particlesMesh.rotation.x += scrollEffect * 0.05;
       particlesMesh.rotation.y += scrollEffect * 0.1;
-      particlesMesh.position.z = -scrollEffect * 2;
-      
-      // Wave effect
-      for (let i = 0; i < particlesCount; i++) {
-        const i3 = i * 3;
-        const x = particlesGeometry.attributes.position.array[i3];
-        const y = particlesGeometry.attributes.position.array[i3 + 1];
-        
-        // Apply sine wave effect based on time and position
-        const z = Math.sin(elapsedTime + x * 0.5) * 0.5;
-        
-        particlesGeometry.attributes.position.array[i3 + 2] = z;
-      }
-      
-      particlesGeometry.attributes.position.needsUpdate = true;
+      particlesMesh.position.z = -scrollEffect * 3;
       
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
@@ -138,7 +176,7 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({ scrollY }
   return (
     <canvas 
       ref={canvasRef}
-      className="fixed inset-0 -z-10 bg-gradient-to-b from-background/80 to-background"
+      className="fixed inset-0 -z-10 bg-gradient-to-b from-ghibli-midnight/90 via-background/90 to-background"
     />
   );
 };

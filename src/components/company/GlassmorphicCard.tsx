@@ -9,6 +9,7 @@ interface GlassmorphicCardProps {
   delay?: number;
   yOffset?: number;
   direction?: 'left' | 'right' | 'up' | 'down';
+  variant?: 'default' | 'dark' | 'light';
 }
 
 const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({ 
@@ -16,7 +17,8 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
   children, 
   delay = 0,
   yOffset = 30,
-  direction = 'up'
+  direction = 'up',
+  variant = 'default'
 }) => {
   // Calculate initial animation values based on direction
   const getDirectionValues = () => {
@@ -35,6 +37,18 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
 
   const { x, y } = getDirectionValues();
   
+  // Get background style based on variant
+  const getBackgroundStyle = () => {
+    switch (variant) {
+      case 'dark':
+        return "bg-black/40 backdrop-blur-xl border border-white/20 shadow-lg";
+      case 'light':
+        return "bg-white/30 backdrop-blur-xl border border-white/40 shadow-lg";
+      default:
+        return "bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg";
+    }
+  };
+  
   return (
     <motion.div
       initial={{ opacity: 0, x, y }}
@@ -47,14 +61,16 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
         stiffness: 50
       }}
       className={cn(
-        "relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg overflow-hidden", 
+        "relative rounded-2xl overflow-hidden", 
+        getBackgroundStyle(),
         className
       )}
     >
       {/* Inner light effect */}
       <div className="absolute inset-0 opacity-30 bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none" />
       
-      <div className="relative z-10">
+      {/* Content container with semi-opaque background for better text readability */}
+      <div className="relative z-10 p-6">
         {children}
       </div>
     </motion.div>
