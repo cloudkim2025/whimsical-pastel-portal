@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { verificationAPI } from '@/api/verification';
 import { useNavigate } from 'react-router-dom';
+import {useAuth} from "@/contexts/AuthContext.tsx";
 
 const categories = [
   { id: 'frontend', name: '프론트엔드' },
@@ -34,6 +35,17 @@ const InstructorApply: React.FC = () => {
   const [resumeName, setResumeName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(()=>{
+    if(user == null){
+      toast({
+        title: "인증 실패",
+        description: "로그인 후 이용해주세요"
+      });
+      navigate("/login")
+    }
+  },[user])
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

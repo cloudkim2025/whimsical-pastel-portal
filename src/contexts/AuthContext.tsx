@@ -56,18 +56,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       toast.error(data.message || '로그인에 실패했습니다.');
       return false;
+
     } catch (error: any) {
       const status = error.response?.status;
       const msg = error.response?.data?.message;
 
       if (status === 409) {
-        toast.error('해당 계정은 다른 브라우저나 기기에서 로그인된 상태입니다. 지금 로그인하면 기존 세션은 만료됩니다. 계속하시겠습니까?');
+        const confirmed = window.confirm(
+            msg ||
+            '다른 브라우저에서 이미 로그인된 계정입니다. 강제로 로그인하시겠습니까?\n\n(기존 세션은 종료됩니다)'
+        );
+        if (confirmed) {
+          // 👉 강제 로그인 실행
+          return await forceLogin(email, password, onSuccess);
+        }
       } else {
         toast.error(msg || '로그인 중 오류가 발생했습니다.');
       }
+
       return false;
     }
   };
+
 
   const forceLogin = async (
       email: string,
@@ -76,17 +86,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ): Promise<boolean> => {
     try {
       const { data } = await authAPI.forceLogin({ email, password });
-      if (data.loggedIn && data.accessToken) {
+
+      if (data?.loggedIn && data.accessToken) {
         tokenManager.setToken(data.accessToken);
         updateUserFromToken();
         toast.success(data.message || '강제 로그인 성공!');
         onSuccess?.();
         return true;
       }
-      toast.error(data.message || '강제 로그인 실패');
+
+      toast.error(data?.message || '강제 로그인 실패');
       return false;
+
     } catch (error: any) {
-      toast.error(error.response?.data?.message || '강제 로그인 중 오류가 발생했습니다.');
+      const status = error.response?.status;
+      const message = error.response?.data?.message;
+
+      if (status === 401) {
+        toast.error(message || '이메일 또는 비밀번호가 올바르지 않습니다.');
+      } else {
+        toast.error(message || '강제 로그인 중 오류가 발생했습니다.');
+      }
+
       return false;
     }
   };

@@ -10,15 +10,19 @@ import { lectureAPI } from '@/api/lecture';
 import Footer from '@/components/Footer';
 import axios from 'axios';
 import {authAPI} from "@/api";
+import PurchasedCoursesButton from '@/components/lectures/PurchasedCoursesButton';
 
 const categories = [
+  { id: 'all', name: '전체' },
   { id: 'frontend', name: '프론트엔드' },
   { id: 'backend', name: '백엔드' },
   { id: 'mobile', name: '모바일' },
-  { id: 'data', name: '데이터 사이언스' },
-  { id: 'ai', name: '인공지능' },
+  { id: 'ai', name: 'AI/머신러닝' },
   { id: 'devops', name: 'DevOps' },
-  { id: 'database', name: '데이터베이스' }
+  { id: 'database', name: '데이터베이스' },
+  { id: 'security', name: '보안' },
+  { id: 'cloud', name: '클라우드' },
+  { id: 'other', name: '기타' }
 ];
 
 interface Lecture {
@@ -81,9 +85,9 @@ const DevLectures: React.FC = () => {
     );
   };
 
-  const filteredLectures = selectedCategory
-      ? lectures.filter((lecture) => lecture.category === selectedCategory)
-      : lectures;
+  const filteredLectures = selectedCategory === 'all'
+      ? lectures
+      : lectures.filter((lecture) => lecture.category === selectedCategory);
 
 
   return (
@@ -193,6 +197,8 @@ const DevLectures: React.FC = () => {
             </Link>
           </div>
         </main>
+
+        <PurchasedCoursesButton />
         <Footer />
       </div>
   );

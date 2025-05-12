@@ -13,6 +13,8 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { lectureAPI } from '@/api/lecture';
 import VideoLectureModal from '@/components/VideoLectureModal';
+import {paymentAPI} from "@/api";
+import PurchasedCoursesButton from "@/components/lectures/PurchasedCoursesButton.tsx";
 
 const LectureDetail: React.FC = () => {
   const { lectureId } = useParams<{ lectureId: string }>();
@@ -33,15 +35,27 @@ const LectureDetail: React.FC = () => {
       if (!lectureId) return;
 
       try {
-        const res = await lectureAPI.getLectureDetail(lectureId);
-        setLecture(res.data);
+        const [lectureRes, purchasesRes] = await Promise.all([
+          lectureAPI.getLectureDetail(lectureId),
+          user ? paymentAPI.getMyPurchases() : Promise.resolve({ data: [] }) // 로그인 안 한 경우 빈 배열
+        ]);
+
+        const lectureData = lectureRes.data;
+        const purchases = purchasesRes.data;
+
+        const isPurchased = purchases.some((p: any) => String(p.productId) === String(lectureId));
+
+        setLecture({
+          ...lectureData,
+          isPurchased
+        });
       } catch (err) {
         toast.error('강의 정보를 불러오지 못했습니다.');
       }
     };
 
     fetchLecture();
-  }, [lectureId]);
+  }, [lectureId, user]);
 
   const toggleBookmark = () => {
     setIsBookmarked((prev) => !prev);
@@ -58,7 +72,7 @@ const LectureDetail: React.FC = () => {
       navigate('/login');
       return;
     }
-    navigate(`/checkout/${lectureId}`, { state: { lecture } });
+    navigate(`/checkout/${lecture.id}`);
   };
 
   const handleWatchLecture = () => {
@@ -401,7 +415,7 @@ const LectureDetail: React.FC = () => {
                           {lecture.isPurchased ? (
                               <span className="text-green-600">구매 완료</span>
                           ) : (
-                              <>₩{lecture.price}</>
+                              <>₩{lecture.price.toLocaleString('ko-KR')}</>
                           )}
                         </div>
                       </div>
@@ -453,8 +467,11 @@ const LectureDetail: React.FC = () => {
             isOpen={showVideoModal}
             onClose={() => setShowVideoModal(false)}
             course={lecture}
+            lectureId={lecture.id}
         />
+        <PurchasedCoursesButton />
       </div>
+
   );
 };
 

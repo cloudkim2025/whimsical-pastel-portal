@@ -22,11 +22,6 @@ import { authAPI } from '@/api';
 import { tokenManager } from '@/utils/tokenManager.ts';
 import { paymentAPI } from '@/api/payment';
 
-const mockPurchasedCourses = [
-  { id: 'course1', title: '웹 개발의 모든 것', instructor: '김강사 1', image: 'https://api.dicebear.com/7.x/shapes/svg?seed=course1', progress: 45, totalLectures: 9, completedLectures: 4 },
-  { id: 'course2', title: 'React 마스터 클래스', instructor: '박강사', image: 'https://api.dicebear.com/7.x/shapes/svg?seed=course2', progress: 20, totalLectures: 12, completedLectures: 2 },
-  { id: 'ai-course1', title: '데이터 사이언스 기초 - AI 강의', instructor: 'AI 튜터 1', image: 'https://api.dicebear.com/7.x/shapes/svg?seed=ai-course1', progress: 80, totalLectures: 10, completedLectures: 8 },
-];
 
 const Profile = () => {
   const { logout } = useAuth();
