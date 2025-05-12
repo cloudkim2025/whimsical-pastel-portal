@@ -1,10 +1,9 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Cloud, RotateView, Sparkles, MousePointerClick } from 'lucide-react';
+import { Cloud, RotateCw, Sparkles, MousePointerClick } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -402,7 +401,7 @@ const CompanyInfo: React.FC = () => {
                 ></motion.div>
                 
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
-                  <RotateView className="h-12 w-12 mb-4 text-white/80" />
+                  <RotateCw className="h-12 w-12 mb-4 text-white/80" />
                   <h2 className="text-3xl font-handwritten mb-2 drop-shadow-lg">교육 철학</h2>
                   <p className="text-center max-w-md mx-auto px-4">
                     우리는 모든 사람이 자신만의 속도와 방식으로 배울 권리가 있다고 믿습니다.
