@@ -25,13 +25,16 @@ const CompanyInfo: React.FC = () => {
     }
   };
   
-  // 3D Typography effect
+  // 3D Typography effect - Simplified version without FontLoader
   useEffect(() => {
     if (!canvasRef.current) return;
     
+    // Create scene
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 280, 0.1, 1000);
+    camera.position.z = 5;
     
+    // Create renderer
     const renderer = new THREE.WebGLRenderer({
       canvas: canvasRef.current,
       alpha: true
@@ -40,38 +43,84 @@ const CompanyInfo: React.FC = () => {
     renderer.setSize(window.innerWidth, 280);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     
-    const textMaterial = new THREE.MeshNormalMaterial();
+    // Create alternative 3D object - colorful cube array
+    const cubeGroup = new THREE.Group();
+    scene.add(cubeGroup);
     
-    // Create 3D text
-    const loader = new THREE.FontLoader();
-    loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
-      const textGeometry = new THREE.TextGeometry('Aigongbu', {
-        font: font,
-        size: 0.5,
-        height: 0.2,
+    // Create multiple cubes to form "Aigongbu" shape
+    const colors = [
+      0x94B49F, // ghibli-meadow
+      0x789395, // ghibli-stone
+      0x61A3BA, // ghibli-sky-blue
+      0x5E454B  // ghibli-forest
+    ];
+    
+    // Create cube pattern resembling text
+    const positions = [
+      // A
+      [-3.2, 0.5, 0], [-3.2, 0, 0], [-3.2, -0.5, 0],
+      [-2.7, 1, 0], [-2.2, 0.5, 0], [-2.2, 0, 0], [-2.2, -0.5, 0],
+      [-2.7, 0, 0],
+      // i
+      [-1.7, 0.5, 0], [-1.7, 0, 0], [-1.7, -0.5, 0], [-1.7, 1, 0],
+      // g
+      [-1.0, 0.5, 0], [-1.0, 0, 0], [-1.0, -0.5, 0], [-1.0, -1.0, 0],
+      [-0.5, 0.5, 0], [0, 0.5, 0], [0, 0, 0], [0, -0.5, 0], [-0.5, -0.5, 0],
+      [0, -1.0, 0], [-0.5, -1.0, 0],
+      // o
+      [0.5, 0.5, 0], [0.5, 0, 0], [0.5, -0.5, 0],
+      [1.0, 0.5, 0], [1.5, 0.5, 0], [1.5, 0, 0], [1.5, -0.5, 0],
+      [1.0, -0.5, 0],
+      // n
+      [2.0, 0.5, 0], [2.0, 0, 0], [2.0, -0.5, 0],
+      [2.5, 0.5, 0], [3.0, 0.5, 0], [3.0, 0, 0], [3.0, -0.5, 0]
+    ];
+    
+    positions.forEach((position, i) => {
+      const cubeSize = 0.2;
+      const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+      const material = new THREE.MeshPhongMaterial({ 
+        color: colors[i % colors.length],
+        shininess: 100
       });
       
-      textGeometry.center();
-      const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-      scene.add(textMesh);
-      
-      camera.position.z = 2;
-      
-      const clock = new THREE.Clock();
-      
-      // Animation
-      const animate = () => {
-        const elapsedTime = clock.getElapsedTime();
-        
-        textMesh.rotation.y = Math.sin(elapsedTime * 0.5) * 0.3;
-        textMesh.rotation.z = Math.sin(elapsedTime * 0.2) * 0.1;
-        
-        renderer.render(scene, camera);
-        requestAnimationFrame(animate);
-      };
-      
-      animate();
+      const cube = new THREE.Mesh(geometry, material);
+      cube.position.set(position[0], position[1], position[2]);
+      cubeGroup.add(cube);
     });
+    
+    // Center the group
+    cubeGroup.position.x = 0.5;
+    
+    // Add lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(1, 2, 3);
+    scene.add(directionalLight);
+    
+    const clock = new THREE.Clock();
+    
+    // Animation
+    const animate = () => {
+      const elapsedTime = clock.getElapsedTime();
+      
+      // Animate the entire group
+      cubeGroup.rotation.y = Math.sin(elapsedTime * 0.5) * 0.3;
+      cubeGroup.rotation.z = Math.sin(elapsedTime * 0.2) * 0.1;
+      
+      // Individual cube animations
+      cubeGroup.children.forEach((cube, i) => {
+        cube.rotation.x = Math.sin(elapsedTime + i * 0.1) * 0.2;
+        cube.position.y += Math.sin(elapsedTime * 2 + i) * 0.002;
+      });
+      
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+    
+    animate();
     
     // Handle window resize
     const handleResize = () => {
@@ -84,6 +133,14 @@ const CompanyInfo: React.FC = () => {
     
     return () => {
       window.removeEventListener('resize', handleResize);
+      
+      // Clean up Three.js resources
+      cubeGroup.children.forEach(cube => {
+        (cube as THREE.Mesh).geometry.dispose();
+        ((cube as THREE.Mesh).material as THREE.Material).dispose();
+      });
+      
+      renderer.dispose();
     };
   }, []);
   
