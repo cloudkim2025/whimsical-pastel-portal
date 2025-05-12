@@ -1,18 +1,11 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { FileCode, RefreshCw, Clipboard, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChatSessionMeta } from "@/types/userChatSession";
 import { SessionMeta } from "@/types/session";
 import { Typewriter } from "react-simple-typewriter";
-import { motion, AnimatePresence } from "framer-motion";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-
-import { EditorState } from "@codemirror/state";
-import { EditorView, keymap, lineNumbers } from "@codemirror/view";
-import { javascript } from "@codemirror/lang-javascript";
-import { oneDark } from "@codemirror/theme-one-dark";
-import { defaultKeymap, historyKeymap } from "@codemirror/commands";
-import { foldGutter, foldKeymap } from "@codemirror/language";
 
 interface LectureCodePanelProps {
     session: ChatSessionMeta | SessionMeta | null;
@@ -23,7 +16,6 @@ const LectureCodePanel: React.FC<LectureCodePanelProps> = ({ session, onRefresh 
     const [copied, setCopied] = useState(false);
     const [fontSize, setFontSize] = useState(14);
     const editorContainerRef = useRef<HTMLDivElement | null>(null);
-    const editorViewRef = useRef<EditorView | null>(null);
     const prevSessionIdRef = useRef<string | null>(null);
     const prevFontSizeRef = useRef<number>(fontSize);
 
@@ -38,56 +30,48 @@ const LectureCodePanel: React.FC<LectureCodePanelProps> = ({ session, onRefresh 
 
     const currentSessionId = getSessionKey();
 
-    // 에디터 초기화 및 업데이트를 통합 관리
+    // Use a simpler code display approach to avoid dependency conflicts
     useEffect(() => {
-        const initializeEditor = () => {
+        const initializeEditor = async () => {
             if (!editorContainerRef.current) return;
-
-            // 기존 에디터 인스턴스가 있으면 파괴
-            if (editorViewRef.current) {
-                editorViewRef.current.destroy();
-                editorViewRef.current = null;
-            }
-
-            const startState = EditorState.create({
-                doc: codeToDisplay,
-                extensions: [
-                    lineNumbers(),
-                    foldGutter(),
-                    javascript(),
-                    oneDark,
-                    keymap.of([
-                        ...defaultKeymap,
-                        ...historyKeymap,
-                        ...foldKeymap
-                    ]),
-                    EditorView.lineWrapping,
-                    EditorView.updateListener.of((update) => {
-                        if (update.docChanged) {
-                            // console.log("document changed", update.state.doc.toString());
-                        }
-                    })
-                ],
-            });
-
-            const view = new EditorView({
-                state: startState,
-                parent: editorContainerRef.current,
-            });
-
-            editorViewRef.current = view;
+            
+            // Clear previous content
+            editorContainerRef.current.innerHTML = '';
+            
+            // Create pre element for code display with proper styling
+            const pre = document.createElement('pre');
+            pre.className = 'code-display';
+            pre.style.margin = '0';
+            pre.style.padding = '0.5rem';
+            pre.style.overflow = 'auto';
+            pre.style.backgroundColor = 'transparent';
+            pre.style.color = '#D4D4D4';
+            pre.style.fontFamily = 'monospace';
+            pre.style.fontSize = `${fontSize}px`;
+            pre.style.lineHeight = '1.5';
+            pre.style.whiteSpace = 'pre-wrap';
+            pre.style.wordBreak = 'break-word';
+            
+            // Format the code with line numbers
+            const codeLines = codeToDisplay.split('\n');
+            const formattedCode = codeLines.map((line, index) => {
+                const lineNumber = index + 1;
+                return `<span style="color: #666; user-select: none; display: inline-block; width: 2em; text-align: right; margin-right: 1em; opacity: 0.5;">${lineNumber}</span>${line}`;
+            }).join('\n');
+            
+            pre.innerHTML = formattedCode;
+            editorContainerRef.current.appendChild(pre);
         };
 
-        // 폰트 크기가 변경되었거나, 세션 ID가 변경되었을 경우에만 에디터 초기화
-        if (prevFontSizeRef.current !== fontSize || prevSessionIdRef.current !== currentSessionId) {
+        // Only re-initialize when needed
+        if (
+            prevFontSizeRef.current !== fontSize || 
+            prevSessionIdRef.current !== currentSessionId ||
+            editorContainerRef.current?.childNodes.length === 0
+        ) {
             initializeEditor();
             prevFontSizeRef.current = fontSize;
             prevSessionIdRef.current = currentSessionId;
-        } else if (editorViewRef.current && editorViewRef.current.state.doc.toString() !== codeToDisplay) {
-            // 내용이 변경되었을 경우에만 내용 업데이트
-            editorViewRef.current.dispatch({
-                changes: { from: 0, to: editorViewRef.current.state.doc.length, insert: codeToDisplay },
-            });
         }
     }, [codeToDisplay, fontSize, currentSessionId]);
 
@@ -142,8 +126,15 @@ const LectureCodePanel: React.FC<LectureCodePanelProps> = ({ session, onRefresh 
                         </CopyToClipboard>
                         <div
                             ref={editorContainerRef}
-                            className="codemirror-editor-container"
-                            style={{ position: 'relative', zIndex: 1, minHeight: '200px' }}
+                            className="code-editor-container"
+                            style={{ 
+                                position: 'relative', 
+                                zIndex: 1, 
+                                minHeight: '200px',
+                                backgroundColor: '#1E1E1E',
+                                borderRadius: '0.25rem',
+                                padding: '0.5rem'
+                            }}
                         />
                     </div>
                 </div>
