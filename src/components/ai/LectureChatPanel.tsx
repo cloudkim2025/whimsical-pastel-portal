@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import { MessageSquare, Plus, Send, Bot } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Message {

@@ -49,7 +49,6 @@ const AILectures: React.FC = () => {
   const ws = useRef<WebSocket | null>(null);
   const { toast } = useToast();
 
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsBooting(false);
@@ -66,7 +65,6 @@ const AILectures: React.FC = () => {
     const loadInitialData = async () => {
       try {
         await Promise.all([fetchChatSessions(), fetchLatestSessions()]);
-        await new Promise((res) => setTimeout(res, 2000)); // ← 여유 시간
         setShowContent(true);
         toast({
           title: "준비되었습니다",
@@ -207,13 +205,13 @@ const AILectures: React.FC = () => {
         const msg = JSON.parse(event.data);
         const type = msg.type;
         if (type === "analysis") {
-             const text = String(msg.analysis);
-             // 첫 번째 빈 줄 앞까지를 요약으로, 뒤는 코드로 분리
-                 const [newSummary, ...rest] = text.split("\n\n");
-             setActiveSummary(newSummary.trim());                // 요약 업데이트
-             setActiveCode(rest.join("\n\n").trim() || "// 코드 없음"); // 코드 업데이트
-             setIsProcessing(false);
-             return;
+          const text = String(msg.analysis);
+          // 첫 번째 빈 줄 앞까지를 요약으로, 뒤는 코드로 분리
+          const [newSummary, ...rest] = text.split("\n\n");
+          setActiveSummary(newSummary.trim());                // 요약 업데이트
+          setActiveCode(rest.join("\n\n").trim() || "// 코드 없음"); // 코드 업데이트
+          setIsProcessing(false);
+          return;
         }
 
         // **1) analysis 타입 처리**

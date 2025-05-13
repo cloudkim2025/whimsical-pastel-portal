@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { FileCode, Zap, Clipboard, Check, Code2, FileJson } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,10 +18,10 @@ interface LectureCodePanelProps {
     onRefresh?: () => void;
 }
 
-    const LectureCodePanel: React.FC<LectureCodePanelProps> = ({
-        session,
-        onRefresh
-    }) => {
+const LectureCodePanel: React.FC<LectureCodePanelProps> = ({
+                                                               session,
+                                                               onRefresh
+                                                           }) => {
     const [copied, setCopied] = useState(false);
     const [fontSize, setFontSize] = useState(14);
     const [tab, setTab] = useState<'summary' | 'code' | 'analysis'>('summary');
@@ -61,13 +60,13 @@ interface LectureCodePanelProps {
     };
 
     // 우선순위: summaryContent → session.summary, codeContent → session.code
-        const summaryToDisplay = session
-            ? session.summary || "(요약 없음)"
-            : "// 세션이 선택되지 않았습니다.";
+    const summaryToDisplay = session
+        ? session.summary || "(요약 없음)"
+        : "// 세션이 선택되지 않았습니다.";
 
-        const codeToDisplay = session && "code" in session && session.code
-            ? session.code
-            : "(코드 없음)";
+    const codeToDisplay = session && "code" in session && session.code
+        ? session.code
+        : "(코드 없음)";
 
     // 에디터 초기화 및 업데이트를 통합 관리
     useEffect(() => {

@@ -1,9 +1,8 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Bot, Clock, FileText, Search, X } from "lucide-react";
 import { ChatSessionMeta } from "@/types/userChatSession";
 import { SessionMeta } from "@/types/session";
-import { motion, AnimatePresence} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface LectureSidebarProps {
     sessions: ChatSessionMeta[];
