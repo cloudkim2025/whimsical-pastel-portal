@@ -16,6 +16,7 @@ const OAuthRedirectHandler = () => {
         const code = params.get('code');
         const returnedState = params.get('state');
 
+
         const savedState = localStorage.getItem('oauth_state'); // 이전에 저장해둔 state
 
         // 기본 예외 처리
@@ -54,9 +55,10 @@ const OAuthRedirectHandler = () => {
                                             const provider = 'NAVER'; // or 가져온 값
                                             await authAPI.linkSocialAccount(accessToken, provider);
                                             tokenManager.setToken(accessToken);
-                                            updateUserFromToken();
+                                            await updateUserFromToken(); // ✅ 여기 비동기 처리
                                             toast.success('연동 완료! 로그인되었습니다.');
                                             navigate('/');
+
                                         } catch {
                                             toast.error('연동에 실패했습니다.');
                                             navigate('/login');
@@ -72,7 +74,7 @@ const OAuthRedirectHandler = () => {
                 }
 
                 tokenManager.setToken(accessToken);
-                updateUserFromToken();
+                await updateUserFromToken(); // ✅ 비동기 처리
                 toast.success(message || '소셜 로그인 성공!');
                 navigate('/');
             } catch (e) {

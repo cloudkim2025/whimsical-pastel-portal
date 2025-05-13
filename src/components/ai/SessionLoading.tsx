@@ -1,13 +1,12 @@
-
 import React from "react";
 import { motion } from "framer-motion";
 
 const colors = [
-    "bg-purple-300", 
-    "bg-indigo-300", 
-    "bg-blue-300", 
-    "bg-teal-300", 
-    "bg-green-300", 
+    "bg-purple-300",
+    "bg-indigo-300",
+    "bg-blue-300",
+    "bg-teal-300",
+    "bg-green-300",
     "bg-amber-300",
 ];
 
@@ -44,17 +43,17 @@ const SessionLoading: React.FC = () => {
             </div>
 
             {/* Logo animation */}
-            <motion.div 
+            <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.8 }}
                 className="mb-8"
             >
                 <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-indigo-600">
-                    <motion.path 
-                        d="M12 3v3m0 12v3m-9-9H6m12 0h3m-2.5-6.5L17 7M7 17l1.5-1.5M7 7l1.5 1.5M17 17l-1.5-1.5M16 12a4 4 0 11-8 0 4 4 0 018 0z" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
+                    <motion.path
+                        d="M12 3v3m0 12v3m-9-9H6m12 0h3m-2.5-6.5L17 7M7 17l1.5-1.5M7 7l1.5 1.5M17 17l-1.5-1.5M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                        stroke="currentColor"
+                        strokeWidth="2"
                         strokeLinecap="round"
                         initial={{ pathLength: 0, opacity: 0 }}
                         animate={{ pathLength: 1, opacity: 1 }}
@@ -64,7 +63,7 @@ const SessionLoading: React.FC = () => {
             </motion.div>
 
             {/* 로딩 텍스트 */}
-            <motion.h1 
+            <motion.h1
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}

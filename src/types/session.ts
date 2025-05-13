@@ -1,10 +1,20 @@
+// src/types/session.ts
 
-// Session metadata interface
+export interface OutlinePart {
+    part_id: string;
+    title: string;
+    description: string;
+    lines?: number[];
+}
+
 export interface SessionMeta {
-  session_id: string;
-  title: string;
-  summary?: string;
-  code?: string;
-  created_at?: string;
-  updated_at?: string;
+    session_id: string;
+    user_id: string;
+    title: string;
+    summary: string;
+    outline: OutlinePart[];
+    documents?: string[];
+    code?: string;
+    language?: string;
+    created_at: string;
 }

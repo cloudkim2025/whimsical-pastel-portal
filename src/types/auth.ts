@@ -3,7 +3,7 @@ export type UserRole = 'USER' | 'INSTRUCTOR' | 'ADMIN';
 
 // 로그인 시 전역 상태에 저장될 유저 정보 (프론트 기준)
 export interface User {
-  sub: string;
+  userId: number;
   nickname: string;
   profileImage?: string;
 }

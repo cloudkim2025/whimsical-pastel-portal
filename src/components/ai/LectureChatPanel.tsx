@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import { MessageSquare, Plus, Send, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,13 +18,13 @@ interface LectureChatPanelProps {
 }
 
 const LectureChatPanel: React.FC<LectureChatPanelProps> = ({
-    messages,
-    userInput,
-    setUserInput,
-    isProcessing,
-    onSendMessage,
-    onNewChatSession,
-}) => {
+                                                               messages,
+                                                               userInput,
+                                                               setUserInput,
+                                                               isProcessing,
+                                                               onSendMessage,
+                                                               onNewChatSession,
+                                                           }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const [typingIndicator, setTypingIndicator] = useState("");

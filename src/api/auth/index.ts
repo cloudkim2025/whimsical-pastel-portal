@@ -2,6 +2,8 @@
 import API from '@/utils/apiClient';
 
 export const authAPI = {
+    registerPushToken: (payload: { fcmToken: string }) =>
+        API.post('/noti/user/push-token', payload),
     // 이메일 인증 코드 전송
     sendVerificationCode: (email: string) =>
         API.post('/auths/email/send-code', { email }),

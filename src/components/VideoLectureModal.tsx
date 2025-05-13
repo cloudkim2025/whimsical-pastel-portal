@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { videoAPI } from '@/api/video';
+import React, {useEffect, useState} from 'react';
+import {Dialog, DialogContent, DialogTitle} from '@/components/ui/dialog';
+import {videoAPI} from '@/api/video';
 
 interface VideoPlayerModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    lectureId: number;
+    isOpen: boolean,
+    onClose: () => void,
+    lectureId: number,
+    course?: any
 }
 
-const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({ isOpen, onClose, lectureId }) => {
+const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({isOpen, onClose, lectureId, course}) => {
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -78,7 +79,7 @@ const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({ isOpen, onClose, le
                             onError={(e) => {
                                 console.error('❌ 비디오 재생 에러', e);
                             }}
-                            style={{ width: "100%", height: "100%" }}
+                            style={{width: "100%", height: "100%"}}
                         />
                     )}
                 </div>

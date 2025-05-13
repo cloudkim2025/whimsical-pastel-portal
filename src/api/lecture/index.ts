@@ -1,4 +1,6 @@
+
 import API from '@/utils/apiClient';
+import { CourseType } from '@/types/lecture';
 
 export const lectureAPI = {
   // 강의 목록 조회

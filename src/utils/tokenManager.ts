@@ -3,7 +3,7 @@ import type { User } from '@/types/auth';
 import { decodeTokenPayload } from '@/utils/decodeToken';
 
 export interface DecodedTokenPayload {
-  sub: string;
+  userId: number;
   nickname: string;
   profileImage?: string;
   [key: string]: any;
@@ -45,7 +45,7 @@ export const tokenManager = {
     if (!payload) return null;
 
     return {
-      sub: payload.sub,
+      userId: payload.userId,
       nickname: payload.nickname,
       profileImage: payload.profileImage,
     }

@@ -5,7 +5,6 @@ import Footer from '@/components/Footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InstructorManagement from '@/components/admin/InstructorManagement';
 import LectureManagement from '@/components/admin/LectureManagement';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -17,16 +16,6 @@ import {
   Clock,
   Send
 } from 'lucide-react';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger
-} from '@/components/ui/drawer';
 import {
   Select,
   SelectContent,
@@ -40,6 +29,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {authAPI} from "@/api";
+import { notiAPI, RecipientType } from '@/api/noti';
 
 const Admin: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(true);
@@ -53,6 +43,11 @@ const Admin: React.FC = () => {
   const [notificationTime, setNotificationTime] = useState('12:00');
   const [notificationSubject, setNotificationSubject] = useState('');
   const [notificationContent, setNotificationContent] = useState('');
+  const [isScheduleActive, setIsScheduleActive] = useState(false);
+
+  const toggleScheduleActivation = () => {
+    setIsScheduleActive((prev) => !prev);
+  };
 
   useEffect(() => {
     // URL 경로에서 현재 탭 확인
@@ -88,20 +83,93 @@ const Admin: React.FC = () => {
     checkAdmin();
   }, [navigate]);
 
-  const handleSendEmail = () => {
-    // This would connect to an API in a real application
+  const convertRecipientType = (value: string): RecipientType => {
+    switch (value) {
+      case 'all':
+        return 'ALL';
+      case 'instructors':
+        return 'INSTRUCTORS';
+      case 'students':
+        return 'STUDENTS';
+      default:
+        throw new Error('잘못된 수신자 타입입니다.');
+    }
+  };
+
+
+  const handleSendEmail = async () => {
     if (!emailSubject.trim() || !emailContent.trim()) {
       toast.error("제목과 내용을 입력해주세요.");
       return;
     }
 
-    toast.success(`${recipientType === 'all' ? '모든 사용자' :
-        recipientType === 'instructors' ? '강사' : '학생'}에게 이메일을 발송했습니다.`);
+    const recipient = convertRecipientType(recipientType);
 
-    // Reset form
-    setEmailSubject('');
-    setEmailContent('');
+    try {
+      if (isScheduleActive && selectedDate && notificationTime) {
+        const scheduleTime = new Date(`${selectedDate.toISOString().split('T')[0]}T${notificationTime}:00`).toISOString();
+        await notiAPI.sendScheduledEmail({
+          recipientType: recipient,
+          subject: emailSubject,
+          content: emailContent,
+          scheduleTime,
+        });
+        toast.success("이메일 예약 전송 완료!");
+      } else {
+        await notiAPI.sendEmail({
+          recipientType: recipient,
+          subject: emailSubject,
+          content: emailContent,
+        });
+        toast.success("이메일 전송 완료!");
+      }
+
+      // Reset form
+      setEmailSubject('');
+      setEmailContent('');
+    } catch (err) {
+      console.error(err);
+      toast.error("이메일 전송에 실패했습니다.");
+    }
   };
+
+
+  const handleSendPush = async () => {
+    if (!emailSubject.trim() || !emailContent.trim()) {
+      toast.error("제목과 내용을 입력해주세요.");
+      return;
+    }
+
+    const recipient = convertRecipientType(recipientType);
+
+    try {
+      if (isScheduleActive && selectedDate && notificationTime) {
+        const scheduleTime = new Date(`${selectedDate.toISOString().split('T')[0]}T${notificationTime}:00`).toISOString();
+        await notiAPI.sendScheduledPushNotification({
+          recipientType: recipient,
+          title: emailSubject,
+          body: emailContent,
+          scheduleTime,
+        });
+        toast.success("푸시 예약 전송 완료!");
+      } else {
+        await notiAPI.sendPushNotification({
+          recipientType: recipient,
+          title: emailSubject,
+          body: emailContent,
+        });
+        toast.success("푸시 전송 완료!");
+      }
+
+      // Reset form
+      setEmailSubject('');
+      setEmailContent('');
+    } catch (err) {
+      console.error(err);
+      toast.error("푸시 전송에 실패했습니다.");
+    }
+  };
+
 
   const handleScheduleNotification = () => {
     // This would connect to an API in a real application
@@ -175,7 +243,7 @@ const Admin: React.FC = () => {
                 <Link to="/admin/messages" className="korean-text w-full">메시지 관리</Link>
               </TabsTrigger>
             </TabsList>
-            
+
             <Routes>
               <Route path="/" element={<Navigate to="instructors" replace />} />
               <Route path="instructors" element={<InstructorManagement />} />
@@ -208,16 +276,17 @@ const Admin: React.FC = () => {
               } />
               <Route path="messages" element={
                 <div className="grid gap-6 md:grid-cols-2">
-                  {/* Email Sending Card */}
+                  {/* 왼쪽: 메시지 작성 + 모든 버튼 */}
                   <Card className="bg-white/50 backdrop-blur-sm border-white/20">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Mail className="h-5 w-5" />
-                        이메일 보내기
+                        메시지 작성
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
+                        {/* 수신자 선택 */}
                         <div className="space-y-2">
                           <Label htmlFor="recipient">수신자 선택</Label>
                           <Select value={recipientType} onValueChange={setRecipientType}>
@@ -232,106 +301,101 @@ const Admin: React.FC = () => {
                           </Select>
                         </div>
 
+                        {/* 제목 */}
                         <div className="space-y-2">
                           <Label htmlFor="subject">제목</Label>
                           <Input
-                            id="subject"
-                            value={emailSubject}
-                            onChange={(e) => setEmailSubject(e.target.value)}
-                            placeholder="이메일 제목"
+                              id="subject"
+                              value={emailSubject}
+                              onChange={(e) => setEmailSubject(e.target.value)}
+                              placeholder="제목 입력"
                           />
                         </div>
 
+                        {/* 내용 */}
                         <div className="space-y-2">
                           <Label htmlFor="content">내용</Label>
                           <Textarea
-                            id="content"
-                            value={emailContent}
-                            onChange={(e) => setEmailContent(e.target.value)}
-                            placeholder="이메일 내용"
-                            rows={5}
+                              id="content"
+                              value={emailContent}
+                              onChange={(e) => setEmailContent(e.target.value)}
+                              placeholder="메시지 내용 입력"
+                              rows={5}
                           />
                         </div>
 
-                        <Button
-                          onClick={handleSendEmail}
-                          className="w-full bg-ghibli-meadow hover:bg-ghibli-forest"
-                        >
-                          <Send className="mr-2 h-4 w-4" />
-                          이메일 보내기
-                        </Button>
+                        {/* 정사각형 버튼들 (모두 왼쪽에) */}
+                        <div className="flex gap-4 justify-between pt-2">
+                          <Button
+                              className="w-48 h-16 bg-blue-500 hover:bg-blue-600 text-white text-sm"
+                              onClick={handleSendEmail}
+                          >
+                            이메일 보내기
+                          </Button>
+                          <Button
+                              className="w-48 h-16 bg-green-500 hover:bg-green-600 text-white text-sm"
+                              onClick={handleSendPush}
+                          >
+                            푸시알람 보내기
+                          </Button>
+                          <Button
+                              className={`w-16 h-16 ${isScheduleActive ? 'bg-orange-500' : 'bg-gray-400'} text-white text-[11px] leading-4 flex items-center justify-center`}
+                              onClick={toggleScheduleActivation}
+                              style={{ whiteSpace: 'pre-line' }} // 개행 문자 적용
+                          >
+                            {isScheduleActive ? '예약\n활성' : '예약\n비활성'}
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  {/* Scheduled Notification Card */}
-                  <Card className="bg-white/50 backdrop-blur-sm border-white/20">
+                  {/* 오른쪽: 예약 설정 (버튼 없음) */}
+                  <Card className="bg-white/50 backdrop-blur-sm border-white/20 relative">
+                    {!isScheduleActive && (
+                        <div className="absolute inset-0 bg-black/10 backdrop-blur-sm z-10 rounded-xl" />
+                    )}
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Calendar className="h-5 w-5" />
-                        예약 알림
+                        예약 설정
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className={`${!isScheduleActive ? 'pointer-events-none select-none' : ''}`}>
                       <div className="space-y-4">
+                        {/* 날짜 선택 */}
                         <div className="space-y-2">
                           <Label>날짜 선택</Label>
                           <div className="border rounded-md p-1">
                             <CalendarComponent
-                              mode="single"
-                              selected={selectedDate}
-                              onSelect={setSelectedDate}
-                              className="mx-auto"
+                                mode="single"
+                                selected={selectedDate}
+                                onSelect={setSelectedDate}
+                                className="mx-auto"
                             />
                           </div>
                         </div>
 
+                        {/* 시간 선택 */}
                         <div className="space-y-2">
                           <Label htmlFor="time">시간 선택</Label>
                           <div className="flex items-center">
                             <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
                             <Input
-                              id="time"
-                              type="time"
-                              value={notificationTime}
-                              onChange={(e) => setNotificationTime(e.target.value)}
+                                id="time"
+                                type="time"
+                                value={notificationTime}
+                                onChange={(e) => setNotificationTime(e.target.value)}
                             />
                           </div>
                         </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="notif-subject">제목</Label>
-                          <Input
-                            id="notif-subject"
-                            value={notificationSubject}
-                            onChange={(e) => setNotificationSubject(e.target.value)}
-                            placeholder="알림 제목"
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="notif-content">내용</Label>
-                          <Textarea
-                            id="notif-content"
-                            value={notificationContent}
-                            onChange={(e) => setNotificationContent(e.target.value)}
-                            placeholder="알림 내용"
-                            rows={3}
-                          />
-                        </div>
-
-                        <Button
-                          onClick={handleScheduleNotification}
-                          className="w-full bg-ghibli-meadow hover:bg-ghibli-forest"
-                        >
-                          <Clock className="mr-2 h-4 w-4" />
-                          알림 예약하기
-                        </Button>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
               } />
+
+
             </Routes>
           </Tabs>
         </div>
