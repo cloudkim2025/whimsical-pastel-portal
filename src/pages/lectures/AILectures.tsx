@@ -82,11 +82,13 @@ const AILectures: React.FC = () => {
         setIsLoading(false);
       }
     };
+
     loadInitialData();
   }, [isLoading, toast]);
 
   const fetchChatSessions = async () => {
     try {
+
       const res = await API.get<ChatSessionMeta[]>("/chat_sessions", {
         params: { user_id: userId },
       });
