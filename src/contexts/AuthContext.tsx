@@ -34,15 +34,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userInfo = tokenManager.getUserInfo(); // 토큰에서 유저 정보 파싱
     setUser(userInfo || null);
 
-      try {
-        const fcmToken = await getFcmToken();
-        if (fcmToken) {
-          await authAPI.registerPushToken({ fcmToken });
-          console.log('✅ FCM 토큰 등록 완료');
-        }
-      } catch (err) {
-        console.error('❌ FCM 토큰 등록 실패:', err);
-      }
+      // try {
+      //   const fcmToken = await getFcmToken();
+      //   if (fcmToken) {
+      //     await authAPI.registerPushToken({ fcmToken });
+      //     console.log('✅ FCM 토큰 등록 완료');
+      //   }
+      // } catch (err) {
+      //   console.error('❌ FCM 토큰 등록 실패:', err);
+      // }
 
   };
 

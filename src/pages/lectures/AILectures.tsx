@@ -1,26 +1,25 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Header from "@/components/Header";
 import LectureSidebar from "@/components/ai/LectureSidebar";
 import LectureCodePanel from "@/components/ai/LectureCodePanel";
 import LectureChatPanel from "@/components/ai/LectureChatPanel";
 import AIBootUpAnimation from "@/components/ai/AIBootUpAnimation";
 import SessionLoading from "@/components/ai/SessionLoading";
-import { Book, PanelLeft, Bot, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import { useToast } from "@/hooks/use-toast";
-import API from "@/utils/AIapiClient";
-import { ChatSessionMeta } from "@/types/userChatSession";
-import { SessionMeta } from "@/types/session";
-
-interface Message {
-  role: "system" | "user" | "assistant";
-  content: string;
-  timestamp?: string;
-}
+import {Book, Bot, PanelLeft, Zap} from "lucide-react";
+import {AnimatePresence, motion} from "framer-motion";
+import {useToast} from "@/hooks/use-toast";
+import API from "@/utils/apiClient";
+import {ChatSessionMeta} from "@/types/userChatSession";
+import {SessionMeta} from "@/types/session";
+import {useAuth} from "@/contexts/AuthContext";
+import {useNavigate} from "react-router-dom";
+import {aiChatAPI} from "@/api/aiChat";
+import { Message } from "@/types/chat";
+import { tokenManager } from "@/utils/tokenManager";
 
 const AILectures: React.FC = () => {
-  const userId = "test_user";
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isBooting, setIsBooting] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -48,20 +47,38 @@ const AILectures: React.FC = () => {
   );
   const ws = useRef<WebSocket | null>(null);
   const { toast } = useToast();
+  const userId= 41
 
+
+  // ✅ 부팅 애니메이션 타이머 처리
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsBooting(false);
       setIsLoading(true);
     }, 2000);
+
     return () => {
       clearTimeout(timer);
       ws.current?.close();
     };
   }, []);
 
+// ✅ 사용자 로그인 여부 검사
+  useEffect(() => {
+    if (!user) {
+      toast({
+        title: "로그인이 필요합니다",
+        description: "계속하려면 로그인해주세요.",
+        variant: "destructive",
+      });
+      navigate("/login");
+    }
+  }, [user, toast, navigate]);
+
+// ✅ 초기 데이터 로딩 (세션 목록 + 최신 문서)
   useEffect(() => {
     if (!isLoading) return;
+
     const loadInitialData = async () => {
       try {
         await Promise.all([fetchChatSessions(), fetchLatestSessions()]);
@@ -72,7 +89,7 @@ const AILectures: React.FC = () => {
           variant: "default",
         });
       } catch (err) {
-        console.error("초기 데이터 로딩 실패:", err);
+        console.error("[초기 로딩 실패]", err);
         toast({
           title: "로드 실패",
           description: "초기 데이터 로딩에 실패했습니다.",
@@ -86,80 +103,93 @@ const AILectures: React.FC = () => {
     loadInitialData();
   }, [isLoading, toast]);
 
+// ✅ WebSocket 연결 시도 (userId, sessionId 둘 다 있을 때만)
+//   useEffect(() => {
+//     if (!user?.userId) return;              // 아직 user 없음
+//     if (!activeSession?.chat_session_id) return;  // 아직 세션 없음
+//
+//     const token = tokenManager.getToken();
+//     if (!token) {
+//       console.warn("[WebSocket] 토큰이 아직 없음 → 500ms 후 재시도");
+//       const retry = setTimeout(() => {
+//         connectWebSocket(activeSession.chat_session_id);
+//       }, 500);
+//
+//       return () => clearTimeout(retry);
+//     }
+//
+//     connectWebSocket(activeSession.chat_session_id);
+//   }, [user?.userId, activeSession?.chat_session_id]);
+
+  // 🔹 1. 채팅 세션 목록 불러오기
   const fetchChatSessions = async () => {
     try {
-
-      const res = await API.get<ChatSessionMeta[]>("/chat_sessions", {
-        params: { user_id: userId },
-      });
+      const res = await aiChatAPI.fetchChatSessions();
+      console.log("[DEBUG] ChatSessions:", res.data);
       setChatSessions(res.data);
     } catch (err) {
-      console.error("fetchChatSessions 오류:", err);
+      console.error("[ERROR] fetchChatSessions 실패:", err);
       setChatSessions([]);
     }
   };
 
+// 🔹 2. 최신 문서 기반 세션 불러오기
   const fetchLatestSessions = async () => {
     try {
-      const res = await API.get<SessionMeta[]>("/sessions/latest", {
-        params: { user_id: userId },
-      });
+      const res = await aiChatAPI.fetchLatestSessions();
+      console.log("[DEBUG] LatestSessions:", res.data);
       setLatestSessions(res.data);
     } catch (err) {
-      console.error("fetchLatestSessions 오류:", err);
+      console.error("[ERROR] fetchLatestSessions 실패:", err);
       setLatestSessions([]);
     }
   };
 
+// 🔹 3. 기존 세션 선택 시
   const selectChatSession = async (session: ChatSessionMeta) => {
+    console.log("[INFO] 기존 세션 선택됨:", session.chat_session_id);
     setActiveSession(session);
     messagesRef.current = [];
+
     try {
-      const chatRes = await API.get<Message[]>(
-          `/chat_sessions/${session.chat_session_id}/logs`
-      );
+      const chatRes = await aiChatAPI.fetchChatLogs(session.chat_session_id);
       messagesRef.current = [...chatRes.data];
       setChatMessages([...messagesRef.current]);
-    } catch {
+    } catch (err) {
+      console.error("[ERROR] 채팅 로그 불러오기 실패:", err);
       messagesRef.current = [
         { role: "system", content: "대화 내역 로드 실패" },
       ];
       setChatMessages([...messagesRef.current]);
     }
-    setActiveCode(
-        `[요약]\n${session.summary || "(요약 없음)"}\n\n[코드]\n${
-            session.code || "(코드 없음)"
-        }`
-    );
+
+    setActiveCode(formatCodeBlock(session.summary, session.code));
     setActiveSummary(session.summary || "(요약 없음)");
-    setAnalysis(""); // 초기화
+    setAnalysis("");
     connectWebSocket(session.chat_session_id);
   };
 
+// 🔹 4. 최신 문서 기반 세션 생성 시
   const selectLatestSession = async (session: SessionMeta) => {
+    console.log("[INFO] 최신 문서 기반 세션 생성 시도:", session.title);
+
     try {
-      const createRes = await API.post<ChatSessionMeta>("/chat_sessions", {
-        user_id: userId,
+      const res = await aiChatAPI.createChatSession({
         initial_question: session.title,
         summary: session.summary,
         code: session.code,
       });
 
-      const newChatSession = createRes.data;
+      const newChatSession = res.data;
       setActiveSession(newChatSession);
-
-      setActiveCode(
-          `[요약]\n${newChatSession.summary || "(요약 없음)"}\n\n[코드]\n${
-              newChatSession.code || "(코드 없음)"
-          }`
-      );
+      setActiveCode(formatCodeBlock(newChatSession.summary, newChatSession.code));
       setActiveSummary(newChatSession.summary || "(요약 없음)");
       setAnalysis("");
 
       messagesRef.current = [
         {
           role: "system",
-          content: `"${session.title}" 최신문서를 기반으로 새 대화가 생성되었습니다.`,
+          content: `"${session.title}" 최신 문서를 기반으로 새 대화가 생성되었습니다.`,
         },
       ];
       setChatMessages([...messagesRef.current]);
@@ -173,12 +203,14 @@ const AILectures: React.FC = () => {
         description: `"${session.title}" 기반 세션이 생성되었습니다.`,
         variant: "default",
       });
-    } catch (e) {
-      console.error("최신문서 기반 chat session 생성 실패:", e);
+
+    } catch (err) {
+      console.error("[ERROR] 최신 문서 기반 세션 생성 실패:", err);
       messagesRef.current = [
         { role: "system", content: "최신문서 기반 세션 생성 실패" },
       ];
       setChatMessages([...messagesRef.current]);
+
       toast({
         title: "대화 생성 실패",
         description: "최신문서 기반 대화 생성에 실패했습니다.",
@@ -187,97 +219,92 @@ const AILectures: React.FC = () => {
     }
   };
 
+// 🔸 유틸 함수 (가독성 보완용)
+  const formatCodeBlock = (summary?: string, code?: string): string => {
+    return `[요약]\n${summary || "(요약 없음)"}\n\n[코드]\n${code || "(코드 없음)"}`;
+  };
+
+
   const connectWebSocket = (sessionId?: string) => {
+    // const userId = user?.userId;
+    const accessToken = tokenManager.getToken();
+
+    if (!userId || !accessToken) {
+      console.error("[WebSocket] 유저 정보 또는 토큰 없음 → 연결 생략");
+      return;
+    }
+
     ws.current?.close();
-    const url =
-        API.defaults.baseURL!.replace(/^http/, "ws") +
-        "/aichat/websocket";
-    const socket = new WebSocket(url);
+
+    const baseHttp = API.defaults.baseURL || "http://localhost:9000";
+    const wsUrl = baseHttp.replace(/^http/, "ws");
+    const query = new URLSearchParams({
+      token: accessToken,
+      user_id: String(userId),
+      ...(sessionId ? { session_id: sessionId } : {}),
+    });
+
+    const socket = new WebSocket(`${wsUrl}/aichat/websocket?${query.toString()}`);
     ws.current = socket;
 
-    socket.onopen = () => {
-      const payload = sessionId
-          ? { user_id: userId, session_id: sessionId }
-          : { user_id: userId };
-      socket.send(JSON.stringify(payload));
-    };
+    console.log("[WebSocket] 연결 시도:", socket.url);
 
     socket.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
+        console.log("[WebSocket 메시지 수신]:", msg);
         const type = msg.type;
-        if (type === "analysis") {
-          const text = String(msg.analysis);
-          // 첫 번째 빈 줄 앞까지를 요약으로, 뒤는 코드로 분리
-          const [newSummary, ...rest] = text.split("\n\n");
-          setActiveSummary(newSummary.trim());                // 요약 업데이트
-          setActiveCode(rest.join("\n\n").trim() || "// 코드 없음"); // 코드 업데이트
-          setIsProcessing(false);
-          return;
-        }
 
-        // **1) analysis 타입 처리**
-        if (type === "analysis") {
-          const analysisText =
-              typeof msg.analysis === "string"
-                  ? msg.analysis
-                  : String(msg.analysis);
-          setAnalysis(analysisText);
-          console.log("[DEBUG] analysis 패널 업데이트 완료");
-          return;
-        }
+        switch (type) {
+          case "analysis":
+            const [summary, ...rest] = String(msg.analysis).split("\n\n");
+            setActiveSummary(summary.trim());
+            setActiveCode(rest.join("\n\n").trim() || "// 코드 없음");
+            break;
 
-        // **2) chat 요약 타입**
-        if (type === "chat") {
-          let content =
-              typeof msg.summary === "string"
-                  ? msg.summary
-                  : String(msg.summary);
-          content = content.replace(/^요약[:：]?\s*/i, "").trim();
-          messagesRef.current.push({
-            role: "assistant",
-            content,
-          });
-        }
-        // **3) 시스템 메시지**
-        else if (type === "system") {
-          messagesRef.current.push({
-            role: "system",
-            content: msg.message,
-          });
-        }
-        // **4) 에러**
-        else if (type === "error") {
-          console.error("[ERROR] WebSocket error message:", msg.message);
-          messagesRef.current.push({
-            role: "system",
-            content:
-                "아이공 분석 실패: 잠시 후 다시 시도해주세요.",
-          });
-        }
-        // **5) 세션 업데이트**
-        else if (type === "session_update") {
-          setChatSessions((prev) =>
-              prev.map((sess) =>
-                  sess.chat_session_id === msg.chat_session_id
-                      ? { ...sess, title: msg.new_title }
-                      : sess
-              )
-          );
-        }
-        // **6) code 탭(순수 코드)**
-        else if (type === "code") {
-          const raw = msg.code || "";
-          const [rawSummary, ...rawCodeArr] = raw.split("\n\n");
-          setActiveSummary(rawSummary.replace(/^\[요약\]\s*/i, "").trim());
-          setActiveCode(rawCodeArr.join("\n\n").trim() || "// 코드 없음");
+          case "chat":
+            messagesRef.current.push({
+              role: "assistant",
+              content: String(msg.summary).replace(/^요약[:：]?\s*/i, "").trim(),
+            });
+            break;
+
+          case "system":
+            messagesRef.current.push({ role: "system", content: msg.message });
+            break;
+
+          case "error":
+            console.error("[WebSocket ERROR]:", msg.message);
+            messagesRef.current.push({
+              role: "system",
+              content: "아이공 분석 실패: 잠시 후 다시 시도해주세요.",
+            });
+            break;
+
+          case "session_update":
+            setChatSessions((prev) =>
+                prev.map((s) =>
+                    s.chat_session_id === msg.chat_session_id
+                        ? { ...s, title: msg.new_title }
+                        : s
+                )
+            );
+            break;
+
+          case "code":
+            const [codeSummary, ...codeBody] = String(msg.code || "").split("\n\n");
+            setActiveSummary(codeSummary.replace(/^\[요약\]\s*/i, "").trim());
+            setActiveCode(codeBody.join("\n\n").trim() || "// 코드 없음");
+            break;
+
+          default:
+            console.warn("[WebSocket] 알 수 없는 타입:", type);
         }
       } catch (err) {
-        console.error("WebSocket JSON parse error:", err);
+        console.error("WebSocket 메시지 처리 실패:", err);
         messagesRef.current.push({
           role: "system",
-          content:
-              "아이공 분석 처리 중 오류 발생: 잠시 후 다시 시도해주세요.",
+          content: "아이공 분석 처리 중 오류 발생: 잠시 후 다시 시도해주세요.",
         });
       } finally {
         setChatMessages([...messagesRef.current]);
@@ -285,15 +312,16 @@ const AILectures: React.FC = () => {
       }
     };
 
-    socket.onerror = (e) => {
-      console.error("WebSocket error:", e);
+    socket.onerror = (err) => {
+      console.error("[WebSocket ERROR]:", err);
       setIsProcessing(false);
     };
 
     socket.onclose = () => {
-      console.warn("WebSocket closed");
+      console.warn("[WebSocket] 연결 종료됨");
     };
   };
+
 
   const handleSendMessage = () => {
     if (
@@ -301,15 +329,16 @@ const AILectures: React.FC = () => {
         !userInput.trim() ||
         isProcessing ||
         ws.current?.readyState !== WebSocket.OPEN
-    )
+    ) {
       return;
+    }
+
     setIsProcessing(true);
-    messagesRef.current = [
-      ...messagesRef.current,
-      { role: "user", content: userInput },
-    ];
+
+    messagesRef.current.push({ role: "user", content: userInput });
     setChatMessages([...messagesRef.current]);
-    ws.current.send(
+
+    ws.current?.send(
         JSON.stringify({
           question: userInput,
           language: "en",
@@ -318,21 +347,21 @@ const AILectures: React.FC = () => {
           documents: [],
         })
     );
+
     setUserInput("");
   };
+
 
   const handleRefresh = () => {
     if (!activeSession || ws.current?.readyState !== WebSocket.OPEN) return;
 
     setAnalysis("");
-
-    messagesRef.current = [
-      ...messagesRef.current,
-      { role: "user", content: "아이공" },
-    ];
-    setChatMessages([...messagesRef.current]);
     setIsProcessing(true);
-    ws.current.send(
+
+    messagesRef.current.push({ role: "user", content: "아이공" });
+    setChatMessages([...messagesRef.current]);
+
+    ws.current?.send(
         JSON.stringify({
           question: "아이공",
           language: "en",
@@ -345,32 +374,31 @@ const AILectures: React.FC = () => {
 
   const handleNewChatSession = async () => {
     try {
-      const res = await API.post<ChatSessionMeta>("/chat_sessions", {
-        user_id: userId,
-        initial_question: "",
-      });
-      setActiveSession(res.data);
+      const res = await aiChatAPI.createNewSession();
+      const newSession = res.data;
+
+      setActiveSession(newSession);
+
       messagesRef.current = [
         { role: "system", content: "새로운 대화가 시작되었습니다." },
       ];
       setChatMessages([...messagesRef.current]);
-      setActiveCode(
-          `[요약]\n${res.data.summary || "(요약 없음)"}\n\n[코드]\n${
-              res.data.code || "(코드 없음)"
-          }`
-      );
-      setActiveSummary(res.data.summary || "(요약 없음)");
+
+      setActiveSummary(newSession.summary || "(요약 없음)");
+      setActiveCode(`[요약]\n${newSession.summary || "(요약 없음)"}\n\n[코드]\n${newSession.code || "(코드 없음)"}`);
       setAnalysis("");
-      connectWebSocket(res.data.chat_session_id);
+
+      connectWebSocket(newSession.chat_session_id);
       await fetchChatSessions();
       setSidebarView("history");
+
       toast({
         title: "새 대화 생성됨",
         description: "새로운 대화가 시작되었습니다.",
         variant: "default",
       });
-    } catch (e) {
-      console.error("새 세션 생성 실패:", e);
+    } catch (err) {
+      console.error("새 세션 생성 실패:", err);
       toast({
         title: "대화 생성 실패",
         description: "새 대화 생성에 실패했습니다.",
@@ -378,6 +406,7 @@ const AILectures: React.FC = () => {
       });
     }
   };
+
 
   return isBooting ? (
       <AIBootUpAnimation onComplete={() => {}} />

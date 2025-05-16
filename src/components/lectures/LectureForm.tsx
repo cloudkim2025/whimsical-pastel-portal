@@ -13,7 +13,7 @@ import {useAiCurriculum} from '@/hooks/useAiCurriculum';
 import {Alert, AlertDescription} from '@/components/ui/alert';
 
 interface LectureFormProps {
-  userId?: string;
+  userId?: number;
 }
 
 const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
@@ -215,7 +215,17 @@ const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => generateCurriculum(videoFile)}
+                        onClick={() => {
+                          if (!videoFile) {
+                            toast({
+                              variant: 'destructive',
+                              title: '영상 누락',
+                              description: 'AI 분석을 위해 영상을 먼저 업로드해주세요.',
+                            });
+                            return;
+                          }
+                          generateCurriculum(videoFile);
+                        }}
                         disabled={isAnalyzing}
                     >
                       {isAnalyzing ? (
