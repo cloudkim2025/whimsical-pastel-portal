@@ -68,3 +68,6 @@ npm run dev
 ## 커스텀 도메인 사용하기 (Custom Domain)
 
 현재는 커스텀 도메인을 지원하지 않습니다. 자신의 도메인에 프로젝트를 배포하려면 Netlify 사용을 권장합니다. 자세한 내용은 문서를 참조하세요: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+
+
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/cloudkim2025/whimsical-pastel-portal?utm_source=oss&utm_medium=github&utm_campaign=cloudkim2025%2Fwhimsical-pastel-portal&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
