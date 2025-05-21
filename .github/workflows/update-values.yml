@@ -6,7 +6,7 @@ on:
       - main  # main 브랜치로 머지될 때만 CD 실행
 
 env:
-  AWS_REGION: ap-northeast-2  # 서울 리전
+  AWS_REGION: ap-northeast-2
   ECR_REPOSITORY: polar-msa-ecr
   IMAGE_TAG: ${{ github.sha }}
   SERVICE_NAME: front-service
