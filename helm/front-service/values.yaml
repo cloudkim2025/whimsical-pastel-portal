@@ -1,0 +1,20 @@
+replicaCount: 1               # HPA를 안 쓸 경우 수동 복제 수 지정
+
+image:
+  repository: 879381276515.dkr.ecr.ap-northeast-2.amazonaws.com/polar-msa-ecr
+  tag: front
+  pullPolicy: IfNotPresent
+
+containerPort: 80
+
+service:
+  protocol: TCP
+  port: 80
+  targetPort: 80
+  type: ClusterIP
+
+ingress:
+  host: himedia-b.com
+  subnets: subnet-0eba9bf4fcf915e31,subnet-08657494f4c5ea751
+  securityGroups: sg-08d728ccd2317bf35
+  certificateArn: arn:aws:acm:ap-northeast-2:879381276515:certificate/0dfd4e12-fcd9-4697-b202-d7093d86e8ca
