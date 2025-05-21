@@ -57,14 +57,10 @@ jobs:
           base: main
           delete-branch: true
 
-  enable-automerge:
-    runs-on: ubuntu-latest
-    needs: build-push-update
-    if: ${{ needs.build-push-update.outputs.pr-number != '' }}
-    steps:
       - name: Enable auto-merge
+        if: ${{ steps.cpr.outputs.pull-request-number != '' }}
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          pull-request-number: ${{ needs.build-push-update.outputs.pr-number }}
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
           merge-method: squash
