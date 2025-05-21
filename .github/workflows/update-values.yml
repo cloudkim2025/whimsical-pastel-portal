@@ -3,7 +3,10 @@ name: Build, Push Docker Image, Update Helm Chart, Auto PR + Merge
 on:
   push:
     branches:
-      - main  # main 브랜치로 머지될 때만 CD 실행
+      - main
+  pull_request:
+    branches:
+      - main
 
 env:
   AWS_REGION: ap-northeast-2
