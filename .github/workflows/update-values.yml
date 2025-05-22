@@ -7,9 +7,6 @@ on:
   pull_request:
     branches:
       - main
-  pull_request_target:
-    branches:
-      - main
 
 env:
   AWS_REGION: ap-northeast-2
@@ -78,14 +75,3 @@ jobs:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           pull-request-number: ${{ needs.build-push-update.outputs.pr-number }}
           merge-method: squash
-
-  # pull_request 트리거용 dummy check
-  pr-check:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    name: Build, Push, and Create PR
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Dummy check
-        run: echo "PR check passed"
