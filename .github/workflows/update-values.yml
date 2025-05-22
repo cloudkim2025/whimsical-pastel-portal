@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 env:
   AWS_REGION: ap-northeast-2
@@ -16,9 +13,8 @@ env:
   HELM_PATH: helm/front-service/values.yaml
 
 jobs:
-  # 실제 Docker 이미지 빌드 + ECR 푸시 + Helm 수정 + PR 생성
   build-push-update:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor != 'github-actions[bot]'
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     name: Build, Push, and Create PR
 
@@ -61,13 +57,11 @@ jobs:
           base: main
           delete-branch: true
 
-  # auto-merge 수행
   auto-merge:
     name: Auto Merge PR
     needs: build-push-update
     if: ${{ needs.build-push-update.outputs.pr-number != '' }}
     runs-on: ubuntu-latest
-
     steps:
       - name: Enable auto-merge
         uses: peter-evans/enable-pull-request-automerge@v2
