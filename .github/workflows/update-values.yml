@@ -1,7 +1,10 @@
-name: Build, Push Docker Image, Update Helm Chart, Push to update/*
+name: Build, Push Docker Image, Update Helm Chart, Auto PR + Merge
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -11,22 +14,19 @@ env:
   IMAGE_TAG: ${{ github.sha }}
   SERVICE_NAME: front-service
   HELM_PATH: helm/front-service/values.yaml
-  UPDATE_BRANCH: update/front-service-image-${{ github.sha }}
-  GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
 
 jobs:
-  build-push:
+  build-push-update:
+    if: github.ref == 'refs/heads/main' && !startsWith(github.head_ref, 'update/') && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    name: Build, Push, and Update Values
+    name: Build, Push, and Create PR
+
+    outputs:
+      pr-number: ${{ steps.cpr.outputs.pull-request-number }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -45,29 +45,16 @@ jobs:
           docker tag $SERVICE_NAME:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Update Helm values.yaml
+      - name: Update Helm values.yaml with new image tag
         run: |
           sed -i "s|tag: .*|tag: $IMAGE_TAG|" $HELM_PATH
 
-      - name: Create or update update/* branch and push
-        run: |
-          git checkout -b $UPDATE_BRANCH
-          git add $HELM_PATH
-          git commit -m "chore(front-service): update image tag to $IMAGE_TAG"
-          git push -u origin $UPDATE_BRANCH --force
-
-      - name: Install GitHub CLI
-        run: |
-          sudo apt update
-          sudo apt install gh -y
-
-      - name: Authenticate GitHub CLI
-        run: echo "${{ secrets.PERSONAL_GITHUB_TOKEN }}" | gh auth login --with-token
-
-      - name: Create Pull Request (if not exists)
-        run: |
-          gh pr create --base main \
-                       --head $UPDATE_BRANCH \
-                       --title "chore($SERVICE_NAME): update image tag to $IMAGE_TAG" \
-                       --body "Auto-generated PR to update Docker image tag to `${{ github.sha }}`" \
-                       --label auto-pr || echo "PR already exists or failed to create"
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5 # 기본적으로 diff 없으면 PR을 생성하지 않음
+        with:
+          commit-message: "chore(${{ env.SERVICE_NAME }}): update image tag to $IMAGE_TAG"
+          title: "chore(${{ env.SERVICE_NAME }}): update image tag to $IMAGE_TAG"
+          body: "Auto-generated PR to update Docker image tag to `${{ github.sha }}`"
+          branch: update/${{ env.SERVICE_NAME }}-image-${{ github.sha }}
+          base: main
