@@ -1,0 +1,16 @@
+name: Enable Auto Merge on PR
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  enable-auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable auto-merge
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          merge-method: squash

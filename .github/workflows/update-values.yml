@@ -1,4 +1,4 @@
-name: Build, Push Docker Image, Update Helm Chart, Auto PR + Merge
+name: Build, Push Docker Image, Update Helm Chart, Push to update/*
 
 on:
   push:
@@ -11,23 +11,21 @@ env:
   IMAGE_TAG: ${{ github.sha }}
   SERVICE_NAME: front-service
   HELM_PATH: helm/front-service/values.yaml
+  UPDATE_BRANCH: update/front-service-image-${{ github.sha }}
 
 jobs:
-  build-push-update:
-    if: |
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      github.actor != 'github-actions[bot]' &&
-      !startsWith(github.event.head_commit.message, 'chore(front-service): update image tag')
+  build-push:
     runs-on: ubuntu-latest
-    name: Build, Push, and Create PR
-
-    outputs:
-      pr-number: ${{ steps.cpr.outputs.pull-request-number }}
+    name: Build, Push, and Update Values
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -46,30 +44,13 @@ jobs:
           docker tag $SERVICE_NAME:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Update Helm values.yaml with new image tag
+      - name: Update Helm values.yaml
         run: |
           sed -i "s|tag: .*|tag: $IMAGE_TAG|" $HELM_PATH
 
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          commit-message: "chore(${{ env.SERVICE_NAME }}): update image tag to $IMAGE_TAG"
-          title: "chore(${{ env.SERVICE_NAME }}): update image tag to $IMAGE_TAG"
-          body: "Auto-generated PR to update Docker image tag to `${{ github.sha }}`"
-          branch: update/${{ env.SERVICE_NAME }}-image-${{ github.sha }}
-          base: main
-          delete-branch: true
-
-  auto-merge:
-    name: Auto Merge PR
-    needs: build-push-update
-    if: ${{ needs.build-push-update.outputs.pr-number != '' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Enable auto-merge
-        uses: peter-evans/enable-pull-request-automerge@v2
-        with:
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          pull-request-number: ${{ needs.build-push-update.outputs.pr-number }}
-          merge-method: squash
+      - name: Create or update update/* branch and push
+        run: |
+          git checkout -b $UPDATE_BRANCH
+          git add $HELM_PATH
+          git commit -m "chore(front-service): update image tag to $IMAGE_TAG"
+          git push -u origin $UPDATE_BRANCH --force
