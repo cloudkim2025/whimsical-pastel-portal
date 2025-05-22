@@ -17,17 +17,7 @@ env:
 
 jobs:
   build-push-update:
-    if: |
-      (
-        github.event_name == 'push' &&
-        github.ref == 'refs/heads/main' &&
-        github.actor != 'github-actions[bot]'
-      ) ||
-      (
-        github.event_name == 'pull_request' &&
-        github.base_ref == 'main' &&
-        !startsWith(github.head_ref || '', 'update/')
-      )
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !startsWith(github.head_ref, 'update/') && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     name: Build, Push, and Create PR
 
