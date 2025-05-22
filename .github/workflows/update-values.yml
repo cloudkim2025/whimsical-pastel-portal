@@ -16,14 +16,6 @@ env:
   HELM_PATH: helm/front-service/values.yaml
 
 jobs:
-  Check-for-Auto-Merge:
-    name: Check for Auto Merge
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Always pass
-        run: echo "Auto merge check passed"
-
   build-push-update:
     if: github.ref == 'refs/heads/main' && !startsWith(github.head_ref, 'update/') && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
