@@ -60,7 +60,7 @@ jobs:
           base: main
           delete-branch: true
 
-  auto-merge:
+  auto-merge: # auto
     name: Auto Merge PR
     needs: build-push-update
     if: ${{ needs.build-push-update.outputs.pr-number != '' }}
