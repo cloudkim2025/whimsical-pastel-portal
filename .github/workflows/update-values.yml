@@ -16,7 +16,7 @@ env:
   HELM_PATH: helm/front-service/values.yaml
 
 jobs:
-  pr-alive-check:
+  Check-for-Auto-Merge:
     name: Check for Auto Merge
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
