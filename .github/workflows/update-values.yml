@@ -12,6 +12,7 @@ env:
   SERVICE_NAME: front-service
   HELM_PATH: helm/front-service/values.yaml
   UPDATE_BRANCH: update/front-service-image-${{ github.sha }}
+  GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
 
 jobs:
   build-push:
@@ -54,3 +55,16 @@ jobs:
           git add $HELM_PATH
           git commit -m "chore(front-service): update image tag to $IMAGE_TAG"
           git push -u origin $UPDATE_BRANCH --force
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt update
+          sudo apt install gh -y
+
+      - name: Create Pull Request (if not exists)
+        run: |
+          gh pr create --base main \
+                       --head $UPDATE_BRANCH \
+                       --title "chore($SERVICE_NAME): update image tag to $IMAGE_TAG" \
+                       --body "Auto-generated PR to update Docker image tag to `${{ github.sha }}`" \
+                       --label auto-pr || echo "PR already exists or failed to create"
