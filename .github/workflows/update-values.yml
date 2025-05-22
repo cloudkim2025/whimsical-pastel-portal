@@ -1,10 +1,7 @@
-name: Build, Push Docker Image, Update Helm Chart, Auto PR + Merge
+name: Build, Push Docker Image, Update Helm Chart, Create PR
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -17,12 +14,13 @@ env:
 
 jobs:
   build-push-update:
-    if: github.ref == 'refs/heads/main' && !startsWith(github.head_ref, 'update/') && github.actor != 'github-actions[bot]'
+    # 무한 순환 방지 조건
+    if: >
+      github.ref == 'refs/heads/main' &&
+      !contains(github.event.head_commit.message, 'update image tag to')
+
     runs-on: ubuntu-latest
     name: Build, Push, and Create PR
-
-    outputs:
-      pr-number: ${{ steps.cpr.outputs.pull-request-number }}
 
     steps:
       - name: Checkout repository
@@ -39,7 +37,7 @@ jobs:
         run: |
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      - name: Build and push Docker image to ECR
+      - name: Build and push Docker image
         run: |
           docker build -t $SERVICE_NAME:$IMAGE_TAG .
           docker tag $SERVICE_NAME:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
@@ -51,10 +49,11 @@ jobs:
 
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v5 # 기본적으로 diff 없으면 PR을 생성하지 않음
+        uses: peter-evans/create-pull-request@v5
         with:
           commit-message: "chore(${{ env.SERVICE_NAME }}): update image tag to $IMAGE_TAG"
           title: "chore(${{ env.SERVICE_NAME }}): update image tag to $IMAGE_TAG"
           body: "Auto-generated PR to update Docker image tag to `${{ github.sha }}`"
           branch: update/${{ env.SERVICE_NAME }}-image-${{ github.sha }}
           base: main
+          delete-branch: true
