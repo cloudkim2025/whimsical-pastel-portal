@@ -2,7 +2,7 @@ replicaCount: 1 # HPA 안 쓸 경우 수동 복제 수 지정
 
 image:
   repository: 879381276515.dkr.ecr.ap-northeast-2.amazonaws.com/polar-msa-ecr
-  tag: 57415d9585489a5225369bc499c1ffc20a3c94cd
+  tag: dfad328fad161208ac30a62bb48b5c454f5ce45a
   pullPolicy: IfNotPresent
 
 containerPort: 80
