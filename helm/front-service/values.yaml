@@ -2,7 +2,7 @@ replicaCount: 1 # HPA 안 쓸 경우 수동 복제 수 지정
 
 image:
   repository: 879381276515.dkr.ecr.ap-northeast-2.amazonaws.com/aigungbu/service-images
-  tag: d74ee2ab246877d1fb4c15f1dbf4f7aa5e950bbc
+  tag: 6e3d0392180dfb248c5d98f7787033e238bb0cd0
   pullPolicy: IfNotPresent
 
 containerPort: 80
@@ -15,13 +15,13 @@ service:
 
 env:
   - name: VITE_NAVER_CLIENT_ID
-    value: __VITE_NAVER_CLIENT_ID__
+    value: avCowJdnr6vGSMChndkD
   - name: VITE_NAVER_REDIRECT_URI
-    value: __VITE_NAVER_REDIRECT_URI__
+    value: http://localhost:8080/login/oauth2/redirect
   - name: VITE_IMP_CODE
-    value: __VITE_IMP_CODE__
+    value: imp18800044
   - name: VITE_CHANNEL_KEY
-    value: __VITE_CHANNEL_KEY__
+    value: channel-key-c1a1895a-5dfc-41e0-b333-25fc99b11ad8
 
 ingress:
   host: himedia-b.com
