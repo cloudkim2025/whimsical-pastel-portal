@@ -1,8 +1,8 @@
 replicaCount: 1 # HPA 안 쓸 경우 수동 복제 수 지정
 
 image:
-  repository: 879381276515.dkr.ecr.ap-northeast-2.amazonaws.com/polar-msa-ecr
-  tag: dfad328fad161208ac30a62bb48b5c454f5ce45a
+  repository: 879381276515.dkr.ecr.ap-northeast-2.amazonaws.com/aigungbu/service-images
+  tag: lastes
   pullPolicy: IfNotPresent
 
 containerPort: 80
@@ -15,6 +15,6 @@ service:
 
 ingress:
   host: himedia-b.com
-  subnets: subnet-0eba9bf4fcf915e31,subnet-08657494f4c5ea751
-  securityGroups: sg-08d728ccd2317bf35
+  subnets: subnet-0d0377067129f0bc4,subnet-01fd87bdca41defe0
+  securityGroups: sg-01aec0238789ac98c
   certificateArn: arn:aws:acm:ap-northeast-2:879381276515:certificate/0dfd4e12-fcd9-4697-b202-d7093d86e8ca
