@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Home } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthWithRedirect } from '@/hooks/useAuthWithRedirect';
+import { GoogleIcon, NaverIcon, KakaoIcon } from '@/components/icons/SocialIcons';
 import type { LoginRequest } from '@/types/auth';
 
 /**
@@ -116,30 +116,32 @@ const Login = () => {
                 <span className="px-2 bg-white text-ghibli-stone">또는</span>
               </div>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-3">
+            <div className="mt-6 space-y-3">
               <button
                 type="button"
                 onClick={() => handleSocialLogin('google')}
-                className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-white hover:bg-gray-50 transition-all duration-300"
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-ghibli-earth/30 rounded-lg shadow-sm bg-white hover:bg-gray-50 transition-all duration-300"
               >
-                <span className="sr-only">Sign in with Google</span>
-                <span className="text-red-500 font-bold text-sm">G</span>
+                <GoogleIcon className="w-5 h-5" />
+                <span className="text-gray-700 font-medium">Google로 로그인</span>
               </button>
+              
               <button
                 type="button"
                 onClick={() => handleSocialLogin('naver')}
-                className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-[#03C75A] hover:bg-[#02AD4F] transition-all duration-300"
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-ghibli-earth/30 rounded-lg shadow-sm bg-[#03C75A] hover:bg-[#02AD4F] transition-all duration-300"
               >
-                <span className="sr-only">Sign in with Naver</span>
-                <span className="text-white font-bold text-sm">N</span>
+                <NaverIcon className="w-5 h-5" />
+                <span className="text-white font-medium">네이버로 로그인</span>
               </button>
+              
               <button
                 type="button"
                 onClick={() => handleSocialLogin('kakao')}
-                className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-[#FEE500] hover:bg-[#FEDB00] transition-all duration-300"
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-ghibli-earth/30 rounded-lg shadow-sm bg-[#FEE500] hover:bg-[#FEDB00] transition-all duration-300"
               >
-                <span className="sr-only">Sign in with Kakao</span>
-                <span className="text-[#3A1D1D] font-bold text-sm">K</span>
+                <KakaoIcon className="w-5 h-5" />
+                <span className="text-[#3A1D1D] font-medium">카카오로 로그인</span>
               </button>
             </div>
           </div>
