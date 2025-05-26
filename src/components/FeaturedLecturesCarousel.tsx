@@ -156,7 +156,7 @@ const FeaturedLecturesCarousel: React.FC = () => {
                   <img
                     src={lecture.image}
                     alt={lecture.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top md:object-center"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                   

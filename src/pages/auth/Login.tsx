@@ -6,19 +6,21 @@ import { Input } from '@/components/ui/input';
 import { Home } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthWithRedirect } from '@/hooks/useAuthWithRedirect';
+import { GoogleIcon, NaverIcon, KakaoIcon } from '@/components/icons/SocialIcons';
 import type { LoginRequest } from '@/types/auth';
-
+/**
+ * 로그인 페이지
+ * - 이메일/비밀번호, 소셜 로그인, 에러 UI 모두 명세(OpenAPI) 기반 실제 API 연동
+ */
 const Login = () => {
   const [form, setForm] = useState<LoginRequest>({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthWithRedirect();
   const clientId = import.meta.env.VITE_NAVER_CLIENT_ID;
   const redirectUri = encodeURIComponent(import.meta.env.VITE_NAVER_REDIRECT_URI);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       const success = await login(form.email, form.password);
       if (!success) {
@@ -31,13 +33,17 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-
+  // 소셜 로그인
   const handleSocialLogin = (provider: 'google' | 'naver' | 'kakao') => {
-    const state = crypto.randomUUID(); // 가장 깔끔! (UUID v4)
+    const state = crypto.randomUUID();
     localStorage.setItem('oauth_state', state);
-    window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
+    if (provider === 'naver') {
+      window.location.href = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;
+      return;
+    }
+    // 추후 구글, 카카오 etc 다른 OAuth도 별도 처리
+    window.location.href = `/oauth2/authorization/${provider}`;
   };
-
   return (
       <div className="min-h-screen pt-24 pb-12 flex flex-col">
         <div className="container max-w-md mx-auto px-4">
@@ -53,7 +59,6 @@ const Login = () => {
                 Aigongbu에 오신 것을 환영합니다
               </p>
             </div>
-
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium text-ghibli-midnight">
@@ -69,7 +74,6 @@ const Login = () => {
                     className="w-full border-ghibli-meadow/50 focus:border-ghibli-forest focus:ring focus:ring-ghibli-meadow/30"
                 />
               </div>
-
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <label htmlFor="password" className="block text-sm font-medium text-ghibli-midnight">
@@ -89,7 +93,6 @@ const Login = () => {
                     className="w-full border-ghibli-meadow/50 focus:border-ghibli-forest focus:ring focus:ring-ghibli-meadow/30"
                 />
               </div>
-
               <Button
                   type="submit"
                   disabled={isLoading}
@@ -98,7 +101,6 @@ const Login = () => {
                 {isLoading ? '로그인 중...' : '로그인'}
               </Button>
             </form>
-
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -108,35 +110,33 @@ const Login = () => {
                   <span className="px-2 bg-white text-ghibli-stone">또는</span>
                 </div>
               </div>
-
-              <div className="mt-6 grid grid-cols-3 gap-3">
+              <div className="mt-6 space-y-3">
                 <button
                     type="button"
                     onClick={() => handleSocialLogin('google')}
-                    className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-white hover:bg-gray-50 transition-all duration-300"
+                    className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-ghibli-earth/30 rounded-lg shadow-sm bg-white hover:bg-gray-50 transition-all duration-300"
                 >
-                  <span className="sr-only">Sign in with Google</span>
-                  <span className="text-red-500 font-bold text-sm">G</span>
+                  <GoogleIcon className="w-5 h-5" />
+                  <span className="text-gray-700 font-medium">Google로 로그인</span>
                 </button>
                 <button
                     type="button"
                     onClick={() => handleSocialLogin('naver')}
-                    className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-[#03C75A] hover:bg-[#02AD4F] transition-all duration-300"
+                    className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-ghibli-earth/30 rounded-lg shadow-sm bg-[#03C75A] hover:bg-[#02AD4F] transition-all duration-300"
                 >
-                  <span className="sr-only">Sign in with Naver</span>
-                  <span className="text-white font-bold text-sm">N</span>
+                  <NaverIcon className="w-5 h-5" />
+                  <span className="text-white font-medium">네이버로 로그인</span>
                 </button>
                 <button
                     type="button"
                     onClick={() => handleSocialLogin('kakao')}
-                    className="flex justify-center items-center py-2.5 px-4 border border-ghibli-earth/30 rounded-md shadow-sm bg-[#FEE500] hover:bg-[#FEDB00] transition-all duration-300"
+                    className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-ghibli-earth/30 rounded-lg shadow-sm bg-[#FEE500] hover:bg-[#FEDB00] transition-all duration-300"
                 >
-                  <span className="sr-only">Sign in with Kakao</span>
-                  <span className="text-[#3A1D1D] font-bold text-sm">K</span>
+                  <KakaoIcon className="w-5 h-5" />
+                  <span className="text-[#3A1D1D] font-medium">카카오로 로그인</span>
                 </button>
               </div>
             </div>
-
             <div className="mt-8 text-center">
               <div className="flex flex-col space-y-3">
                 <p className="text-sm text-ghibli-stone">
@@ -156,5 +156,4 @@ const Login = () => {
       </div>
   );
 };
-
 export default Login;
