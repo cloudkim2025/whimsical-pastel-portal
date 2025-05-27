@@ -27,6 +27,6 @@ env:
 
 ingress:
   host: himedia-b.com
-  subnets: subnet-0d5ca7ca45e8b4005,subnet-0bd05e6e98f37ab5f
-  securityGroups: sg-0f76473653df2a2ab
+  subnets: subnet-00acc7c6377ef0998,subnet-0f0d4b7b414076b7b
+  securityGroups: sg-024be808dcf48c86b
   certificateArn: arn:aws:acm:ap-northeast-2:879381276515:certificate/0dfd4e12-fcd9-4697-b202-d7093d86e8ca
