@@ -47,14 +47,6 @@ jobs:
         run: |
           sed -i "s|tag: .*|tag: $IMAGE_TAG|" $HELM_PATH
 
-      - name: Update Helm values.yaml with image tag and secrets
-        run: |
-          sed -i "s|__IMAGE_TAG__|$IMAGE_TAG|" $HELM_PATH
-          sed -i "s|__VITE_NAVER_CLIENT_ID__|${{ secrets.VITE_NAVER_CLIENT_ID }}|" $HELM_PATH
-          sed -i "s|__VITE_NAVER_REDIRECT_URI__|${{ secrets.VITE_NAVER_REDIRECT_URI }}|" $HELM_PATH
-          sed -i "s|__VITE_IMP_CODE__|${{ secrets.VITE_IMP_CODE }}|" $HELM_PATH
-          sed -i "s|__VITE_CHANNEL_KEY__|${{ secrets.VITE_CHANNEL_KEY }}|" $HELM_PATH
-
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v5

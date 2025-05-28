@@ -29,10 +29,24 @@ spec:
             preStop:
               exec:
                 command: [ "sh", "-c", "sleep 5" ]
-          {{- if .Values.env }}
           env:
-            {{- range .Values.env }}
-            - name: {{ .name }}
-              value: {{ .value | quote }}
-            {{- end }}
-          {{- end }}
+            - name: VITE_NAVER_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: front-service-secrets
+                  key: VITE_NAVER_CLIENT_ID
+            - name: VITE_NAVER_REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  name: front-service-secrets
+                  key: VITE_NAVER_REDIRECT_URI
+            - name: VITE_IMP_CODE
+              valueFrom:
+                secretKeyRef:
+                  name: front-service-secrets
+                  key: VITE_IMP_CODE
+            - name: VITE_CHANNEL_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: front-service-secrets
+                  key: VITE_CHANNEL_KEY

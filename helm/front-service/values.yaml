@@ -26,15 +26,6 @@ service:
   targetPort: 80
   type: ClusterIP
 
-env:
-  - name: VITE_NAVER_CLIENT_ID
-    value: __VITE_NAVER_CLIENT_ID__
-  - name: VITE_NAVER_REDIRECT_URI
-    value: __VITE_NAVER_REDIRECT_URI__
-  - name: VITE_IMP_CODE
-    value: __VITE_IMP_CODE__
-  - name: VITE_CHANNEL_KEY
-    value: __VITE_CHANNEL_KEY__
 
 #ingress:
 #  host: himedia-b.com
