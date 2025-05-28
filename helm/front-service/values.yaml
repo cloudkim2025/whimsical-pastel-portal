@@ -2,12 +2,23 @@ name: front-service
 
 replicaCount: 1 # HPA 안 쓸 경우 수동 복제 수 지정
 
+nodeSelector:
+  nodegroup-type: first
+
 image:
   repository: 879381276515.dkr.ecr.ap-northeast-2.amazonaws.com/aigongbu/service-images
   tag: dbac4bd43cc659da932367db90af87ee7f4f5d37
   pullPolicy: IfNotPresent
 
 containerPort: 80
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
 
 service:
   protocol: TCP
@@ -25,8 +36,8 @@ env:
   - name: VITE_CHANNEL_KEY
     value: __VITE_CHANNEL_KEY__
 
-ingress:
-  host: himedia-b.com
-  subnets: subnet-00acc7c6377ef0998,subnet-0f0d4b7b414076b7b
-  securityGroups: sg-024be808dcf48c86b
-  certificateArn: arn:aws:acm:ap-northeast-2:879381276515:certificate/0dfd4e12-fcd9-4697-b202-d7093d86e8ca
+#ingress:
+#  host: himedia-b.com
+#  subnets: subnet-00acc7c6377ef0998,subnet-0f0d4b7b414076b7b
+#  securityGroups: sg-024be808dcf48c86b
+#  certificateArn: arn:aws:acm:ap-northeast-2:879381276515:certificate/0dfd4e12-fcd9-4697-b202-d7093d86e8ca
