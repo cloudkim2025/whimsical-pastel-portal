@@ -4,7 +4,6 @@ import { tokenManager } from './tokenManager';
 // import { toast } from 'react-toastify'; // UI 알림 라이브러리 쓸 경우
 
 const API = axios.create({
-    // baseURL: 'http://gateway-service:9000',
     headers: {
         'Content-Type': 'application/json',
     },
