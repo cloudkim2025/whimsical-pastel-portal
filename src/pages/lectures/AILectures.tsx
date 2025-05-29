@@ -236,7 +236,7 @@ const AILectures: React.FC = () => {
 
     ws.current?.close();
 
-    const baseHttp = API.defaults.baseURL || "http://localhost:9000";
+    const baseHttp = API.defaults.baseURL || "http://himedia-b.com";
     const wsUrl = baseHttp.replace(/^http/, "ws");
     const query = new URLSearchParams({
       token: accessToken,
