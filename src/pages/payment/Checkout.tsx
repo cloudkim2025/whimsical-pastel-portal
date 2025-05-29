@@ -46,7 +46,7 @@ const Checkout = () => {
     fetchLecture();
   }, [user, lectureId, navigate]);
 
-  // PortOne 스크립트 로딩
+  // PortOne 스크립트 로딩..
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://cdn.iamport.kr/v1/iamport.js';
