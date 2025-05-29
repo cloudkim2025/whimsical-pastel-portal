@@ -33,7 +33,7 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  // 소셜 로그인
+  // 소셜 로그인,
   const handleSocialLogin = (provider: 'google' | 'naver' | 'kakao') => {
     const state = crypto.randomUUID();
     localStorage.setItem('oauth_state', state);
