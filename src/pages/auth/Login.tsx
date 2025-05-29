@@ -17,7 +17,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthWithRedirect();
   const clientId = "avCowJdnr6vGSMChndkD";
-  const redirectUri = encodeURIComponent("http://localhost:8080/login/oauth2/redirect");
+  const redirectUri = encodeURIComponent("https://himedia-b.com/login/oauth2/redirect");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
