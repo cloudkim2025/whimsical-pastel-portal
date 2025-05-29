@@ -55,7 +55,7 @@ const Checkout = () => {
 
     script.onload = () => {
       const { IMP } = window as any;
-      const impCode = import.meta.env.VITE_IMP_CODE;
+      const impCode = window.__ENV__.VITE_IMP_CODE;
       if (IMP && impCode) {
         IMP.init(impCode);
       } else {
