@@ -10,15 +10,9 @@ RUN npm run build  # dist/ 생성됨
 
 FROM nginx:stable-alpine
 
-WORKDIR /usr/share/nginx/html
-
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder /app/dist .
-
-# entrypoint.sh 복사 & 실행권한 부여
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

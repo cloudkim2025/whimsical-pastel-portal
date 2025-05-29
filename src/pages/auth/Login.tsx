@@ -16,8 +16,8 @@ const Login = () => {
   const [form, setForm] = useState<LoginRequest>({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthWithRedirect();
-  const clientId = window.__ENV__.VITE_NAVER_CLIENT_ID;
-  const redirectUri = encodeURIComponent(window.__ENV__.VITE_NAVER_REDIRECT_URI);
+  const clientId = "avCowJdnr6vGSMChndkD";
+  const redirectUri = encodeURIComponent("http://localhost:8080/login/oauth2/redirect");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

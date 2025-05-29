@@ -46,7 +46,7 @@ const Checkout = () => {
     fetchLecture();
   }, [user, lectureId, navigate]);
 
-  // PortOne 스크립트 로딩..
+  // PortOne 스크립트 로딩
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://cdn.iamport.kr/v1/iamport.js';
@@ -55,7 +55,7 @@ const Checkout = () => {
 
     script.onload = () => {
       const { IMP } = window as any;
-      const impCode = window.__ENV__.VITE_IMP_CODE;
+      const impCode = import.meta.env.VITE_IMP_CODE;
       if (IMP && impCode) {
         IMP.init(impCode);
       } else {
