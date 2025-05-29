@@ -16,8 +16,8 @@ const Login = () => {
   const [form, setForm] = useState<LoginRequest>({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthWithRedirect();
-  const clientId = "avCowJdnr6vGSMChndkD";
-  const redirectUri = encodeURIComponent("https://himedia-b.com/login/oauth2/redirect");
+  const clientId = window.__ENV__.VITE_NAVER_CLIENT_ID;
+  const redirectUri = encodeURIComponent(window.__ENV__.VITE_NAVER_REDIRECT_URI);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -33,7 +33,7 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  // 소셜 로그인
+  // 소셜 로그인,
   const handleSocialLogin = (provider: 'google' | 'naver' | 'kakao') => {
     const state = crypto.randomUUID();
     localStorage.setItem('oauth_state', state);
