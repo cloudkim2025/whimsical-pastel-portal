@@ -1,4 +1,4 @@
-name: CI - Front-Service Build & Test with Codecov
+name: CI - Build & Test with Codecov
 
 on:
   push:

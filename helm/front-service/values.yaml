@@ -1,6 +1,6 @@
 name: front-service
 
-replicaCount: 1 # HPA 안 쓸 경우 수동 복제 수 지정
+replicaCount: 1               # HPA 안 쓸 경우 수동 복제 수 지정
 
 nodeSelector:
   nodegroup-type: first
@@ -12,7 +12,7 @@ image:
 
 containerPort: 80
 
-resources:
+resources:                    # 오토 스케일 기반 마련
   requests:
     cpu: 50m
     memory: 64Mi
@@ -26,9 +26,11 @@ service:
   targetPort: 80
   type: ClusterIP
 
-
 ingress:
   host: himedia-b.com
   subnets: subnet-03eedfd68084ed958,subnet-0f93cd897bbfa1938
   securityGroups: sg-092e9de239e2f3c69
   certificateArn: arn:aws:acm:ap-northeast-2:879381276515:certificate/0dfd4e12-fcd9-4697-b202-d7093d86e8ca
+
+hpa:
+  enabled: false
