@@ -2,14 +2,14 @@
 export const generateTopLecturesData = () => {
   // Using the provided instructor images
   const uploadedImages = [
-    'public/lovable-uploads/54a601ec-8297-4281-9f86-96314a37d694.png', // AI로 보는 세상
-    'public/lovable-uploads/872cdf2e-5e57-4437-9d56-e3d9de32f64e.png', // OAuth2 로그인
-    'public/lovable-uploads/f3deb0c3-69a6-4303-938a-b75ec8a7156a.png', // AWS 클라우드
-    'public/lovable-uploads/5058af0f-6ce4-43e0-999f-79c23b02bfe6.png', // iOS 앱 개발
-    'public/lovable-uploads/377ae563-df7f-443f-94fd-8ff42f1b5220.png', // REST API
-    'public/lovable-uploads/dbeefc26-dadd-4789-9a11-87c800bc1f06.png', // REST API 2
-    'public/lovable-uploads/9b530af4-f3e8-4917-a3ea-b2572b23abfd.png', // Vue 3
-    'public/lovable-uploads/0091da42-215f-49f1-aec1-327c8338951c.png'  // 스프링 부트
+    'https://aigongbu-lecture-files.s3.ap-northeast-2.amazonaws.com/thumbnails/thumbnails_1_3.png', // AI로 보는 세상
+    'https://aigongbu-lecture-files.s3.ap-northeast-2.amazonaws.com/thumbnails/thumbnails_2_4.png', // OAuth2 로그인
+    'https://aigongbu-lecture-files.s3.ap-northeast-2.amazonaws.com/thumbnails/thumbnails_3_5.png', // AWS 클라우드
+    'https://aigongbu-lecture-files.s3.ap-northeast-2.amazonaws.com/thumbnails/thumbnail_98_3.png', // iOS 앱 개발
+    'https://aigongbu-lecture-files.s3.ap-northeast-2.amazonaws.com/thumbnails/thumbnails_5_7.png', // REST API
+    'https://aigongbu-lecture-files.s3.ap-northeast-2.amazonaws.com/thumbnails/thumbnails_6_8.png', // REST API 2
+    'https://aigongbu-lecture-files.s3.ap-northeast-2.amazonaws.com/thumbnails/thumbnails_7_9.png', // Vue 3
+    'https://aigongbu-lecture-files.s3.ap-northeast-2.amazonaws.com/thumbnails/thumbnails_18_20.png'  // 스프링 부트
   ];
   
   // Course topics and names
