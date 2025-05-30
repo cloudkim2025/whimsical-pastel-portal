@@ -17,7 +17,8 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: {{ .Values.ingress.host }}
+{{- range .Values.ingress.hosts }}
+    - host: {{ . }}
       http:
         paths:
           - path: /
@@ -26,7 +27,7 @@ spec:
               service:
                 name: front-service
                 port:
-                  number: {{ .Values.service.port }}
+                  number: {{ $.Values.service.port }}
           - path: /auths
             pathType: Prefix
             backend:
@@ -69,7 +70,10 @@ spec:
                 name: gateway-service
                 port:
                   number: 80
+{{- end }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host }}
-      secretName: dummy-cert # ACM이기 때문에 더미 값 OK
+{{- range .Values.ingress.hosts }}
+        - {{ . }}
+{{- end }}
+      secretName: dummy-cert # ACM 사용 시 더미 가능
