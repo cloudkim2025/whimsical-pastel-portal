@@ -47,7 +47,7 @@ export const usePayment = ({ lectureId }: UsePaymentProps) => {
               console.log("muid"+ rsp.merchant_uid)
 
               toast.success('결제가 완료되었습니다!');
-              navigate(`/lecture/${lectureId}`); // ✅ 완료 후 이동도 고려
+               // navigate(`/lecture/${lectureId}`);
             } catch (err) {
               console.error('❌ 결제 저장 실패:', err);
               toast.error('결제는 완료되었지만, 서버 저장 중 오류가 발생했습니다.');
