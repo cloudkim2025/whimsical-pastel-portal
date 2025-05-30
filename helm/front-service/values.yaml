@@ -27,7 +27,7 @@ service:
   type: ClusterIP
 
 ingress:
-  host: himedia-b.com
+  host: aigongbu.store
   subnets: subnet-03eedfd68084ed958,subnet-0f93cd897bbfa1938
   securityGroups: sg-092e9de239e2f3c69
   certificateArn: arn:aws:acm:ap-northeast-2:879381276515:certificate/0dfd4e12-fcd9-4697-b202-d7093d86e8ca
