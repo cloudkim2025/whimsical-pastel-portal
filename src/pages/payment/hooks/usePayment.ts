@@ -42,6 +42,9 @@ export const usePayment = ({ lectureId }: UsePaymentProps) => {
                 paidAmount: rsp.paid_amount,
                 paymentMethod: 'KG_inicis_' + rsp.pay_method,
               });
+              console.log("par"+ parsedPrice)
+              console.log("pamount"+ rsp.paid_amount)
+              console.log("muid"+ rsp.merchant_uid)
 
               toast.success('결제가 완료되었습니다!');
               navigate(`/lecture/${lectureId}`); // ✅ 완료 후 이동도 고려
