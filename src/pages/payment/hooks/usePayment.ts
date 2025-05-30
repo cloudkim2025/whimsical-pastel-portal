@@ -42,12 +42,9 @@ export const usePayment = ({ lectureId }: UsePaymentProps) => {
                 paidAmount: rsp.paid_amount,
                 paymentMethod: 'KG_inicis_' + rsp.pay_method,
               });
-              console.log("par"+ parsedPrice)
-              console.log("pamount"+ rsp.paid_amount)
-              console.log("muid"+ rsp.merchant_uid)
 
               toast.success('결제가 완료되었습니다!');
-               // navigate(`/lecture/${lectureId}`);
+               navigate(`/lecture/${lectureId}`);
             } catch (err) {
               console.error('❌ 결제 저장 실패:', err);
               toast.error('결제는 완료되었지만, 서버 저장 중 오류가 발생했습니다.');
