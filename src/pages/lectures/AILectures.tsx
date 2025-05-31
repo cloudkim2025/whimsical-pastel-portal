@@ -225,54 +225,54 @@ const AILectures: React.FC = () => {
   };
 
 
-  const connectWebSocket = (sessionId?: string) => {
-    // const userId = user?.userId;
-    const accessToken = tokenManager.getToken();
+    const connectWebSocket = (sessionId?: string) => {
+      const accessToken = tokenManager.getToken();
 
-    if (!userId || !accessToken) {
-      console.error("[WebSocket] 유저 정보 또는 토큰 없음 → 연결 생략");
-      return;
-    }
+      if (!userId || !accessToken) {
+        console.error("[WebSocket] 유저 정보 또는 토큰 없음 → 연결 생략");
+        return;
+      }
 
-    ws.current?.close();
+      // 기존 연결 종료
+      ws.current?.close();
 
-    // Base URL 가져오기
-    const baseHttp = API.defaults.baseURL || "https://aigongbu.store";
+      // Base URL 가져오기
+      const baseHttp = API.defaults.baseURL || "https://aigongbu.store";
 
-    // 프로토콜 변환 로직 수정
-    let wsUrl;
-    if (baseHttp.startsWith("https://")) {
-      // HTTPS -> WSS (보안 웹소켓)
-      wsUrl = baseHttp.replace(/^https:\/\//, "wss://");
-    } else if (baseHttp.startsWith("http://")) {
-      // HTTP -> WS (일반 웹소켓)
-      wsUrl = baseHttp.replace(/^http:\/\//, "ws://");
-    } else {
-      // 프로토콜이 없는 경우 현재 페이지 프로토콜 기준으로 결정
-      const isSecure = window.location.protocol === "https:";
-      wsUrl = `${isSecure ? "wss" : "ws"}://${baseHttp}`;
-    }
+      // 프로토콜 변환 로직 수정
+      let wsUrl;
+      if (baseHttp.startsWith("https://")) {
+        // HTTPS -> WSS (보안 웹소켓)
+        wsUrl = baseHttp.replace(/^https:\/\//, "wss://");
+      } else if (baseHttp.startsWith("http://")) {
+        // HTTP -> WS (일반 웹소켓)
+        wsUrl = baseHttp.replace(/^http:\/\//, "ws://");
+      } else {
+        // 프로토콜이 없는 경우 현재 페이지 프로토콜 기준으로 결정
+        const isSecure = window.location.protocol === "https:";
+        wsUrl = `${isSecure ? "wss" : "ws"}://${baseHttp}`;
+      }
 
-    // 쿼리 파라미터 생성
-    const query = new URLSearchParams({
-      token: accessToken,
-      user_id: String(userId),
-      ...(sessionId ? { session_id: sessionId } : {}),
-    });
+      // 쿼리 파라미터 생성
+      const query = new URLSearchParams({
+        token: accessToken,
+        user_id: String(userId),
+        ...(sessionId ? { session_id: sessionId } : {}),
+      });
 
-    // WebSocket URL 생성
-    const fullWsUrl = `${wsUrl}/aichat/websocket?${query.toString()}`;
+      // WebSocket URL 생성
+      const fullWsUrl = `${wsUrl}/aichat/websocket?${query.toString()}`;
 
-    console.log("[WebSocket] 연결 시도:", fullWsUrl);
+      console.log("[WebSocket] 연결 시도:", fullWsUrl);
 
-    try {
-      const socket = new WebSocket(fullWsUrl);
-      ws.current = socket;
+      try {
+        const socket = new WebSocket(fullWsUrl);
+        ws.current = socket;
 
-      // 연결 성공 핸들러
-      socket.onopen = () => {
-        console.log("[WebSocket] 연결 성공!");
-      };
+        // 연결 성공 핸들러
+        socket.onopen = () => {
+          console.log("[WebSocket] 연결 성공!");
+        };
 
     console.log("[WebSocket] 연결 시도:", socket.url);
 
