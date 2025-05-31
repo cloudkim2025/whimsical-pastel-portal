@@ -236,16 +236,43 @@ const AILectures: React.FC = () => {
 
     ws.current?.close();
 
-    const baseHttp = API.defaults.baseURL || "http://aigongbu.store";
-    const wsUrl = baseHttp.replace(/^http/, "ws");
+    // Base URL 가져오기
+    const baseHttp = API.defaults.baseURL || "https://aigongbu.store";
+
+    // 프로토콜 변환 로직 수정
+    let wsUrl;
+    if (baseHttp.startsWith("https://")) {
+      // HTTPS -> WSS (보안 웹소켓)
+      wsUrl = baseHttp.replace(/^https:\/\//, "wss://");
+    } else if (baseHttp.startsWith("http://")) {
+      // HTTP -> WS (일반 웹소켓)
+      wsUrl = baseHttp.replace(/^http:\/\//, "ws://");
+    } else {
+      // 프로토콜이 없는 경우 현재 페이지 프로토콜 기준으로 결정
+      const isSecure = window.location.protocol === "https:";
+      wsUrl = `${isSecure ? "wss" : "ws"}://${baseHttp}`;
+    }
+
+    // 쿼리 파라미터 생성
     const query = new URLSearchParams({
       token: accessToken,
       user_id: String(userId),
       ...(sessionId ? { session_id: sessionId } : {}),
     });
 
-    const socket = new WebSocket(`${wsUrl}/aichat/websocket?${query.toString()}`);
-    ws.current = socket;
+    // WebSocket URL 생성
+    const fullWsUrl = `${wsUrl}/aichat/websocket?${query.toString()}`;
+
+    console.log("[WebSocket] 연결 시도:", fullWsUrl);
+
+    try {
+      const socket = new WebSocket(fullWsUrl);
+      ws.current = socket;
+
+      // 연결 성공 핸들러
+      socket.onopen = () => {
+        console.log("[WebSocket] 연결 성공!");
+      };
 
     console.log("[WebSocket] 연결 시도:", socket.url);
 
