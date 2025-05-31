@@ -47,7 +47,7 @@ const AILectures: React.FC = () => {
   );
   const ws = useRef<WebSocket | null>(null);
   const { toast } = useToast();
-  const userId= 41
+  const userId = 41;
 
 
   // ✅ 부팅 애니메이션 타이머 처리
@@ -225,128 +225,132 @@ const AILectures: React.FC = () => {
   };
 
 
-    const connectWebSocket = (sessionId?: string) => {
-      const accessToken = tokenManager.getToken();
+  const connectWebSocket = (sessionId?: string) => {
+    const accessToken = tokenManager.getToken();
 
-      if (!userId || !accessToken) {
-        console.error("[WebSocket] 유저 정보 또는 토큰 없음 → 연결 생략");
-        return;
-      }
+    if (!userId || !accessToken) {
+      console.error("[WebSocket] 유저 정보 또는 토큰 없음 → 연결 생략");
+      return;
+    }
 
-      // 기존 연결 종료
-      ws.current?.close();
+    // 기존 연결 종료
+    ws.current?.close();
 
-      // Base URL 가져오기
-      const baseHttp = API.defaults.baseURL || "https://aigongbu.store";
+    // Base URL 가져오기
+    const baseHttp = API.defaults.baseURL || "https://aigongbu.store";
 
-      // 프로토콜 변환 로직 수정
-      let wsUrl;
-      if (baseHttp.startsWith("https://")) {
-        // HTTPS -> WSS (보안 웹소켓)
-        wsUrl = baseHttp.replace(/^https:\/\//, "wss://");
-      } else if (baseHttp.startsWith("http://")) {
-        // HTTP -> WS (일반 웹소켓)
-        wsUrl = baseHttp.replace(/^http:\/\//, "ws://");
-      } else {
-        // 프로토콜이 없는 경우 현재 페이지 프로토콜 기준으로 결정
-        const isSecure = window.location.protocol === "https:";
-        wsUrl = `${isSecure ? "wss" : "ws"}://${baseHttp}`;
-      }
+    // 프로토콜 변환 로직 수정
+    let wsUrl;
+    if (baseHttp.startsWith("https://")) {
+      // HTTPS -> WSS (보안 웹소켓)
+      wsUrl = baseHttp.replace(/^https:\/\//, "wss://");
+    } else if (baseHttp.startsWith("http://")) {
+      // HTTP -> WS (일반 웹소켓)
+      wsUrl = baseHttp.replace(/^http:\/\//, "ws://");
+    } else {
+      // 프로토콜이 없는 경우 현재 페이지 프로토콜 기준으로 결정
+      const isSecure = window.location.protocol === "https:";
+      wsUrl = `${isSecure ? "wss" : "ws"}://${baseHttp}`;
+    }
 
-      // 쿼리 파라미터 생성
-      const query = new URLSearchParams({
-        token: accessToken,
-        user_id: String(userId),
-        ...(sessionId ? { session_id: sessionId } : {}),
-      });
+    // 쿼리 파라미터 생성
+    const query = new URLSearchParams({
+      token: accessToken,
+      user_id: String(userId),
+      ...(sessionId ? { session_id: sessionId } : {}),
+    });
 
-      // WebSocket URL 생성
-      const fullWsUrl = `${wsUrl}/aichat/websocket?${query.toString()}`;
+    // WebSocket URL 생성
+    const fullWsUrl = `${wsUrl}/aichat/websocket?${query.toString()}`;
 
-      console.log("[WebSocket] 연결 시도:", fullWsUrl);
+    console.log("[WebSocket] 연결 시도:", fullWsUrl);
 
-      try {
-        const socket = new WebSocket(fullWsUrl);
-        ws.current = socket;
+    try {
+      const socket = new WebSocket(fullWsUrl);
+      ws.current = socket;
 
-        // 연결 성공 핸들러
-        socket.onopen = () => {
-          console.log("[WebSocket] 연결 성공!");
-        };
+      // 연결 성공 핸들러
+      socket.onopen = () => {
+        console.log("[WebSocket] 연결 성공!");
+      };
 
-    console.log("[WebSocket] 연결 시도:", socket.url);
+      console.log("[WebSocket] 연결 시도:", socket.url);
 
-    socket.onmessage = (event) => {
-      try {
-        const msg = JSON.parse(event.data);
-        console.log("[WebSocket 메시지 수신]:", msg);
-        const type = msg.type;
+      socket.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          console.log("[WebSocket 메시지 수신]:", msg);
+          const type = msg.type;
 
-        switch (type) {
-          case "analysis":
-            const [summary, ...rest] = String(msg.analysis).split("\n\n");
-            setActiveSummary(summary.trim());
-            setActiveCode(rest.join("\n\n").trim() || "// 코드 없음");
-            break;
+          switch (type) {
+            case "analysis":
+              const [summary, ...rest] = String(msg.analysis).split("\n\n");
+              setActiveSummary(summary.trim());
+              setActiveCode(rest.join("\n\n").trim() || "// 코드 없음");
+              break;
 
-          case "chat":
-            messagesRef.current.push({
-              role: "assistant",
-              content: String(msg.summary).replace(/^요약[:：]?\s*/i, "").trim(),
-            });
-            break;
+            case "chat":
+              messagesRef.current.push({
+                role: "assistant",
+                content: String(msg.summary).replace(/^요약[:：]?\s*/i, "").trim(),
+              });
+              break;
 
-          case "system":
-            messagesRef.current.push({ role: "system", content: msg.message });
-            break;
+            case "system":
+              messagesRef.current.push({ role: "system", content: msg.message });
+              break;
 
-          case "error":
-            console.error("[WebSocket ERROR]:", msg.message);
-            messagesRef.current.push({
-              role: "system",
-              content: "아이공 분석 실패: 잠시 후 다시 시도해주세요.",
-            });
-            break;
+            case "error":
+              console.error("[WebSocket ERROR]:", msg.message);
+              messagesRef.current.push({
+                role: "system",
+                content: "아이공 분석 실패: 잠시 후 다시 시도해주세요.",
+              });
+              break;
 
-          case "session_update":
-            setChatSessions((prev) =>
-                prev.map((s) =>
-                    s.chat_session_id === msg.chat_session_id
-                        ? { ...s, title: msg.new_title }
-                        : s
-                )
-            );
-            break;
+            case "session_update":
+              setChatSessions((prev) =>
+                  prev.map((s) =>
+                      s.chat_session_id === msg.chat_session_id
+                          ? { ...s, title: msg.new_title }
+                          : s
+                  )
+              );
+              break;
 
-          case "code":
-            const [codeSummary, ...codeBody] = String(msg.code || "").split("\n\n");
-            setActiveSummary(codeSummary.replace(/^\[요약\]\s*/i, "").trim());
-            setActiveCode(codeBody.join("\n\n").trim() || "// 코드 없음");
-            break;
+            case "code":
+              const [codeSummary, ...codeBody] = String(msg.code || "").split("\n\n");
+              setActiveSummary(codeSummary.replace(/^\[요약\]\s*/i, "").trim());
+              setActiveCode(codeBody.join("\n\n").trim() || "// 코드 없음");
+              break;
 
-          default:
-            console.warn("[WebSocket] 알 수 없는 타입:", type);
+            default:
+              console.warn("[WebSocket] 알 수 없는 타입:", type);
+          }
+        } catch (err) {
+          console.error("WebSocket 메시지 처리 실패:", err);
+          messagesRef.current.push({
+            role: "system",
+            content: "아이공 분석 처리 중 오류 발생: 잠시 후 다시 시도해주세요.",
+          });
+        } finally {
+          setChatMessages([...messagesRef.current]);
+          setIsProcessing(false);
         }
-      } catch (err) {
-        console.error("WebSocket 메시지 처리 실패:", err);
-        messagesRef.current.push({
-          role: "system",
-          content: "아이공 분석 처리 중 오류 발생: 잠시 후 다시 시도해주세요.",
-        });
-      } finally {
-        setChatMessages([...messagesRef.current]);
+      };
+
+      socket.onerror = (err) => {
+        console.error("[WebSocket ERROR]:", err);
         setIsProcessing(false);
-      }
-    };
+      };
 
-    socket.onerror = (err) => {
-      console.error("[WebSocket ERROR]:", err);
+      socket.onclose = () => {
+        console.warn("[WebSocket] 연결 종료됨");
+      };
+    } catch (error) {
+      console.error("[WebSocket] 연결 시도 중 오류:", error);
       setIsProcessing(false);
-    };
-
-    socket.onclose = () => {
-      console.warn("[WebSocket] 연결 종료됨");
-    };
+    }
   };
 
 
@@ -355,7 +359,7 @@ const AILectures: React.FC = () => {
         !activeSession ||
         !userInput.trim() ||
         isProcessing ||
-        ws.current?.readyState !== WebSocket.OPEN
+        ws.current?.readyState !== 1 /* WebSocket.OPEN */
     ) {
       return;
     }
@@ -380,7 +384,7 @@ const AILectures: React.FC = () => {
 
 
   const handleRefresh = () => {
-    if (!activeSession || ws.current?.readyState !== WebSocket.OPEN) return;
+    if (!activeSession || ws.current?.readyState !== 1 /* WebSocket.OPEN */) return;
 
     setAnalysis("");
     setIsProcessing(true);
