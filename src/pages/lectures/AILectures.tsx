@@ -172,50 +172,73 @@ const AILectures: React.FC = () => {
 // 🔹 4. 최신 문서 기반 세션 생성 시
   const selectLatestSession = async (session: SessionMeta) => {
     console.log("[INFO] 최신 문서 기반 세션 생성 시도:", session.title);
-
+    
+    setIsProcessing(true);
     try {
-      const res = await aiChatAPI.createChatSession({
-        initial_question: session.title,
-        summary: session.summary,
-        code: session.code,
-      });
+      // 최대 3번까지 재시도
+      let retryCount = 0;
+      let success = false;
+      let newChatSession;
+      
+      while (retryCount < 3 && !success) {
+        try {
+          const res = await aiChatAPI.createChatSession({
+            initial_question: session.title,
+            summary: session.summary,
+            code: session.code,
+          });
+          
+          newChatSession = res.data;
+          success = true;
+        } catch (error) {
+          console.warn(`[RETRY ${retryCount + 1}/3] 세션 생성 재시도 중...`);
+          retryCount++;
+          
+          if (retryCount >= 3) throw error;
+          
+          // 재시도 전 잠시 대기
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+      
+      if (success && newChatSession) {
+        setActiveSession(newChatSession);
+        setActiveCode(formatCodeBlock(newChatSession.summary, newChatSession.code));
+        setActiveSummary(newChatSession.summary || "(요약 없음)");
+        setAnalysis("");
 
-      const newChatSession = res.data;
-      setActiveSession(newChatSession);
-      setActiveCode(formatCodeBlock(newChatSession.summary, newChatSession.code));
-      setActiveSummary(newChatSession.summary || "(요약 없음)");
-      setAnalysis("");
+        messagesRef.current = [
+          {
+            role: "system",
+            content: `"${session.title}" 최신 문서를 기반으로 새 대화가 생성되었습니다.`,
+          },
+        ];
+        setChatMessages([...messagesRef.current]);
 
-      messagesRef.current = [
-        {
-          role: "system",
-          content: `"${session.title}" 최신 문서를 기반으로 새 대화가 생성되었습니다.`,
-        },
-      ];
-      setChatMessages([...messagesRef.current]);
+        connectWebSocket(newChatSession.chat_session_id);
+        await fetchChatSessions();
+        setSidebarView("history");
 
-      connectWebSocket(newChatSession.chat_session_id);
-      await fetchChatSessions();
-      setSidebarView("history");
-
-      toast({
-        title: "새 세션 생성됨",
-        description: `"${session.title}" 기반 세션이 생성되었습니다.`,
-        variant: "default",
-      });
-
+        toast({
+          title: "새 세션 생성됨",
+          description: `"${session.title}" 기반 세션이 생성되었습니다.`,
+          variant: "default",
+        });
+      }
     } catch (err) {
       console.error("[ERROR] 최신 문서 기반 세션 생성 실패:", err);
       messagesRef.current = [
-        { role: "system", content: "최신문서 기반 세션 생성 실패" },
+        { role: "system", content: "서버 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요." },
       ];
       setChatMessages([...messagesRef.current]);
 
       toast({
         title: "대화 생성 실패",
-        description: "최신문서 기반 대화 생성에 실패했습니다.",
+        description: "서버 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -392,49 +415,87 @@ const AILectures: React.FC = () => {
     messagesRef.current.push({ role: "user", content: "아이공" });
     setChatMessages([...messagesRef.current]);
 
-    ws.current?.send(
-        JSON.stringify({
-          question: "아이공",
-          language: "en",
-          include_code: true,
-          summary_only: false,
-          documents: [],
-        })
-    );
+    try {
+      ws.current?.send(
+          JSON.stringify({
+            question: "아이공",
+            language: "en",
+            include_code: true,
+            summary_only: false,
+            documents: [],
+          })
+      );
+    } catch (err) {
+      console.error("WebSocket 메시지 처리 실패:", err);
+      messagesRef.current.push({
+        role: "system",
+        content: "아이공 분석 처리 중 오류 발생: 잠시 후 다시 시도해주세요.",
+      });
+      setChatMessages([...messagesRef.current]);
+      setIsProcessing(false);
+    }
   };
 
   const handleNewChatSession = async () => {
+    setIsProcessing(true);
     try {
-      const res = await aiChatAPI.createNewSession();
-      const newSession = res.data;
+      // 최대 3번까지 재시도
+      let retryCount = 0;
+      let success = false;
+      let newSession;
+      
+      while (retryCount < 3 && !success) {
+        try {
+          const res = await aiChatAPI.createNewSession();
+          newSession = res.data;
+          success = true;
+        } catch (error) {
+          console.warn(`[RETRY ${retryCount + 1}/3] 새 세션 생성 재시도 중...`);
+          retryCount++;
+          
+          if (retryCount >= 3) throw error;
+          
+          // 재시도 전 잠시 대기
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
 
-      setActiveSession(newSession);
+      if (success && newSession) {
+        setActiveSession(newSession);
 
-      messagesRef.current = [
-        { role: "system", content: "새로운 대화가 시작되었습니다." },
-      ];
-      setChatMessages([...messagesRef.current]);
+        messagesRef.current = [
+          { role: "system", content: "새로운 대화가 시작되었습니다." },
+        ];
+        setChatMessages([...messagesRef.current]);
 
-      setActiveSummary(newSession.summary || "(요약 없음)");
-      setActiveCode(`[요약]\n${newSession.summary || "(요약 없음)"}\n\n[코드]\n${newSession.code || "(코드 없음)"}`);
-      setAnalysis("");
+        setActiveSummary(newSession.summary || "(요약 없음)");
+        setActiveCode(`[요약]\n${newSession.summary || "(요약 없음)"}\n\n[코드]\n${newSession.code || "(코드 없음)"}`);      
+        setAnalysis("");
 
-      connectWebSocket(newSession.chat_session_id);
-      await fetchChatSessions();
-      setSidebarView("history");
-
-      toast({
-        title: "새 대화 생성됨",
-        description: "새로운 대화가 시작되었습니다.",
-        variant: "default",
-      });
+        connectWebSocket(newSession.chat_session_id);
+        await fetchChatSessions();
+        setSidebarView("history");
+        
+        toast({
+          title: "새 대화 생성됨",
+          description: "새로운 대화가 시작되었습니다.",
+          variant: "default",
+        });
+      }
     } catch (err) {
-      console.error("새 세션 생성 실패:", err);
+      console.error("[ERROR] 새 세션 생성 실패:", err);
       toast({
         title: "대화 생성 실패",
-        description: "새 대화 생성에 실패했습니다.",
+        description: "서버 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.",
         variant: "destructive",
       });
+      // 오류 발생 시 빈 메시지 표시
+      messagesRef.current = [
+        { role: "system", content: "서버 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요." },
+      ];
+      setChatMessages([...messagesRef.current]);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
