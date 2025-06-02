@@ -16,6 +16,7 @@ import {useNavigate} from "react-router-dom";
 import {aiChatAPI} from "@/api/aiChat";
 import { Message } from "@/types/chat";
 import { tokenManager } from "@/utils/tokenManager";
+import {GatewayURL} from "@/utils/baseURL.ts";
 
 const AILectures: React.FC = () => {
   const { user } = useAuth();
@@ -260,7 +261,7 @@ const AILectures: React.FC = () => {
     ws.current?.close();
 
     // Base URL 가져오기
-    const baseHttp = API.defaults.baseURL || "https://aigongbu.store";
+    const baseHttp = API.defaults.baseURL || GatewayURL.local;
 
     // 프로토콜 변환 로직 수정
     let wsUrl;

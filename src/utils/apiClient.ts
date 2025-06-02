@@ -1,9 +1,11 @@
 //utils/apiClient.ts
 import axios from 'axios';
 import { tokenManager } from './tokenManager';
+import {GatewayURL} from "@/utils/baseURL.ts";
 // import { toast } from 'react-toastify'; // UI 알림 라이브러리 쓸 경우
 
 const API = axios.create({
+    baseURL: GatewayURL.local,
     headers: {
         'Content-Type': 'application/json',
     },

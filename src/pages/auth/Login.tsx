@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useAuthWithRedirect } from '@/hooks/useAuthWithRedirect';
 import { GoogleIcon, NaverIcon, KakaoIcon } from '@/components/icons/SocialIcons';
 import type { LoginRequest } from '@/types/auth';
+import {getEnv} from "@/utils/getEnv.ts";
 /**
  * 로그인 페이지
  * - 이메일/비밀번호, 소셜 로그인, 에러 UI 모두 명세(OpenAPI) 기반 실제 API 연동
@@ -16,8 +17,8 @@ const Login = () => {
   const [form, setForm] = useState<LoginRequest>({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthWithRedirect();
-  const clientId = window.__ENV__.VITE_NAVER_CLIENT_ID;
-  const redirectUri = encodeURIComponent(window.__ENV__.VITE_NAVER_REDIRECT_URI);
+  const clientId = getEnv("VITE_NAVER_CLIENT_ID");
+  const redirectUri = encodeURIComponent(getEnv("VITE_NAVER_REDIRECT_URI") || "");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

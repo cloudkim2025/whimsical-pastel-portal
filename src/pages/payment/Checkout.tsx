@@ -7,6 +7,7 @@ import OrderSummary from './components/OrderSummary';
 import CheckoutSummary from './components/CheckoutSummary';
 import { usePayment } from './hooks/usePayment';
 import { lectureAPI } from '@/api/lecture';
+import {getEnv} from "@/utils/getEnv.ts";
 
 const Checkout = () => {
   const { lectureId } = useParams<{ lectureId: string }>();
@@ -55,7 +56,7 @@ const Checkout = () => {
 
     script.onload = () => {
       const { IMP } = window as any;
-      const impCode = window.__ENV__.VITE_IMP_CODE;
+      const impCode = getEnv("VITE_IMP_CODE");
       if (IMP && impCode) {
         IMP.init(impCode);
       } else {
