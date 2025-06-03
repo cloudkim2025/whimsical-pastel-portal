@@ -30,6 +30,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {authAPI} from "@/api";
 import { notiAPI, RecipientType } from '@/api/noti';
+import PaymentManagement from "@/components/admin/PaymentManagement.tsx";
 
 const Admin: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(true);
@@ -248,32 +249,7 @@ const Admin: React.FC = () => {
               <Route path="/" element={<Navigate to="instructors" replace />} />
               <Route path="instructors" element={<InstructorManagement />} />
               <Route path="lectures" element={<LectureManagement />} />
-              <Route path="payments" element={
-                <div className="grid gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <CreditCard className="h-5 w-5" />
-                        결제 관리
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground mb-4">
-                        이 섹션에서는 플랫폼의 모든 결제를 관리할 수 있습니다.
-                      </p>
-                      <div className="grid gap-4">
-                        <Button
-                          variant="outline"
-                          onClick={() => navigate('/payment-history')}
-                          className="w-full md:w-auto"
-                        >
-                          결제 내역 보기
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              } />
+              <Route path="payments" element={<PaymentManagement />} />
               <Route path="messages" element={
                 <div className="grid gap-6 md:grid-cols-2">
                   {/* 왼쪽: 메시지 작성 + 모든 버튼 */}
