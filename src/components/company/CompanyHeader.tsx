@@ -9,17 +9,10 @@ const CompanyHeader: React.FC = () => {
     <div className="text-center relative z-10 mb-12" data-aos="fade-up" data-aos-delay="100">
       <GlassmorphicCard variant="light" aosDelay={100} className="inline-block mb-6">
         <motion.div
-          animate={{ 
-            y: [0, -10, 0],
-            rotateZ: [0, 2, -2, 0]
-          }}
-          transition={{ 
-            repeat: Infinity,
-            duration: 6,
-            ease: "easeInOut" 
-          }}
-          className="icon-background rounded-full p-6 w-24 h-24 flex items-center justify-center mx-auto"
-        >
+  className="bg-white/15 backdrop-blur-md rounded-full p-6 w-24 h-24 flex items-center justify-center mx-auto mb-6 border border-white/30"
+>
+  <Cloud className="h-12 w-12 text-white" />
+</motion.div>
           <Cloud className="h-12 w-12 text-white" />
         </motion.div>
       </GlassmorphicCard>
