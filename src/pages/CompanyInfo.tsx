@@ -6,7 +6,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Cloud, MousePointerClick } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Parallax, ParallaxLayer } from 'react-parallax';
+// Fix the react-parallax import
+import { Parallax, ParallaxLayer } from '@react-spring/parallax';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -54,68 +55,65 @@ const CompanyInfo: React.FC = () => {
 
   return (
     <div className="min-h-screen relative overflow-x-hidden company-info-background">
-      {/* Enhanced 3D Background with Parallax */}
-      <Parallax pages={1} style={{ top: '0', left: '0' }}>
-        {/* Background blur elements layer */}
-        <ParallaxLayer offset={0} speed={0.1} className="background-layer">
-          <div className="blur-element blur-element-1"></div>
-          <div className="blur-element blur-element-2"></div>
-          <div className="blur-element blur-element-3"></div>
-          <div className="blur-element blur-element-4"></div>
-        </ParallaxLayer>
+      {/* Enhanced 3D Background with CSS instead of Parallax for now */}
+      <div className="fixed inset-0 z-0">
+        {/* Background blur elements */}
+        <div className="blur-element blur-element-1"></div>
+        <div className="blur-element blur-element-2"></div>
+        <div className="blur-element blur-element-3"></div>
+        <div className="blur-element blur-element-4"></div>
+      </div>
 
-        {/* Main content layer */}
-        <ParallaxLayer offset={0} speed={0.3}>
-          {/* Main content */}
-          <Header />
-          
-          {/* Scroll instructions */}
-          <motion.div
-            className="fixed bottom-8 right-8 z-30 bg-black/50 backdrop-blur-md p-3 rounded-full flex items-center gap-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.5, duration: 0.5 }}
-          >
-            <MousePointerClick className="h-5 w-5 text-white" />
-            <span className="text-white text-sm font-medium">스크롤하여 탐색하세요</span>
-          </motion.div>
+      {/* Main content */}
+      <div className="relative z-10">
+        <Header />
+        
+        {/* Scroll instructions */}
+        <motion.div
+          className="fixed bottom-8 right-8 z-30 bg-black/50 backdrop-blur-md p-3 rounded-full flex items-center gap-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
+        >
+          <MousePointerClick className="h-5 w-5 text-white" />
+          <span className="text-white text-sm font-medium">스크롤하여 탐색하세요</span>
+        </motion.div>
 
-          <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
-            <div className="max-w-4xl mx-auto">
-              {/* Company Header Section */}
-              <CompanyHeader />
+        <main className="container mx-auto px-4 pt-32 pb-16 relative z-10">
+          <div className="max-w-4xl mx-auto">
+            {/* Company Header Section */}
+            <CompanyHeader />
 
-              {/* Vision Section */}
-              <VisionSection />
+            {/* Vision Section */}
+            <VisionSection />
 
-              {/* Feature Section */}
-              <FeatureSection />
+            {/* Feature Section */}
+            <FeatureSection />
 
-              {/* Philosophy Section */}
-              <PhilosophySection />
+            {/* Philosophy Section */}
+            <PhilosophySection />
 
-              {/* Testimonials Section */}
-              <TestimonialsSection />
+            {/* Testimonials Section */}
+            <TestimonialsSection />
 
-              {/* Call to Action Section */}
-              <CTASection onStartFree={handleStartFree} />
+            {/* Call to Action Section */}
+            <CTASection onStartFree={handleStartFree} />
 
-              {/* Scroll indicator */}
-              <motion.div
-                className="flex justify-center my-12"
-                animate={{ y: [0, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-              >
-                <div className="bg-white/20 backdrop-blur-md p-3 rounded-full">
-                  <Cloud className="h-6 w-6 text-white" />
-                </div>
-              </motion.div>
-            </div>
-          </main>
-          
-          <Footer />
-        </ParallaxLayer>
-      </Parallax>
+            {/* Scroll indicator */}
+            <motion.div
+              className="flex justify-center my-12"
+              animate={{ y: [0, 10, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+            >
+              <div className="bg-white/20 backdrop-blur-md p-3 rounded-full">
+                <Cloud className="h-6 w-6 text-white" />
+              </div>
+            </motion.div>
+          </div>
+        </main>
+        
+        <Footer />
+      </div>
     </div>
   );
 };

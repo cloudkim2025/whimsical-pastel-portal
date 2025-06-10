@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import Tilt from 'react-tilt';
+// Fix the react-tilt import to work with TypeScript
+import ReactTilt from 'react-tilt';
 import { cn } from "@/lib/utils";
 
 interface GlassmorphicCardProps {
@@ -67,7 +68,7 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
       data-aos-delay={aosDelay}
       className="tilt-wrapper"
     >
-      <Tilt 
+      <ReactTilt 
         options={{
           max: 15,
           perspective: 1000,
@@ -100,7 +101,7 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
             {children}
           </div>
         </div>
-      </Tilt>
+      </ReactTilt>
     </motion.div>
   );
 };
