@@ -18,7 +18,7 @@ const TestimonialsSection: React.FC = () => {
         <div className="bg-white/15 backdrop-blur-sm p-4 rounded-full border border-white/30">
           <Award className="h-6 w-6 text-white mr-3" />
         </div>
-        <h2 className="text-2xl font-handwritten text-center text-white ml-4">고객 후기</h2>
+        <h2 className="text-2xl font-handwritten text-center ml-4" style={{ color: 'rgba(255, 255, 255, 0.95)', textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)' }}>고객 후기</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {testimonials.map((testimonial, index) => (
@@ -28,19 +28,21 @@ const TestimonialsSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1, duration: 0.5 }}
+            data-aos="fade-up" 
+            data-aos-delay={100 + (index * 100)}
           >
             <GlassmorphicCard variant="default">
               <div className="p-6">
-                <p className="text-white/90 italic mb-4 leading-relaxed">
+                <p className="italic mb-4 leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
                   "{testimonial.quote}"
                 </p>
                 <div className="flex items-center">
-                  <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-bold border border-white/30">
+                  <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold border border-white/30" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>
                     {testimonial.name.charAt(0)}
                   </div>
                   <div className="ml-4">
-                    <p className="font-medium text-white">{testimonial.name}</p>
-                    <p className="text-sm text-white/70">{testimonial.role}</p>
+                    <p className="font-medium" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>{testimonial.name}</p>
+                    <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.75)' }}>{testimonial.role}</p>
                   </div>
                 </div>
               </div>

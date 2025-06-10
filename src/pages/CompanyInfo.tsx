@@ -6,8 +6,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Cloud, MousePointerClick } from 'lucide-react';
 import { motion } from 'framer-motion';
-// Fix the react-parallax import
-import { Parallax, ParallaxLayer } from '@react-spring/parallax';
+import { useSpring, animated } from 'react-spring';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -31,7 +30,8 @@ const CompanyInfo: React.FC = () => {
       duration: 1000,
       easing: 'ease-out-cubic',
       once: true,
-      offset: 100
+      offset: 100,
+      delay: 100
     });
   }, []);
   
@@ -44,6 +44,42 @@ const CompanyInfo: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // React Spring animations for background elements
+  const floatAnimation1 = useSpring({
+    from: { transform: 'translateY(0px) scale(1)' },
+    to: { transform: 'translateY(-20px) scale(1.05)' },
+    config: { duration: 20000 },
+    loop: { reverse: true }
+  });
+
+  const floatAnimation2 = useSpring({
+    from: { transform: 'translateY(-10px) scale(1.02)' },
+    to: { transform: 'translateY(10px) scale(0.98)' },
+    config: { duration: 15000 },
+    loop: { reverse: true }
+  });
+
+  const floatAnimation3 = useSpring({
+    from: { transform: 'translateY(5px) scale(1.01)' },
+    to: { transform: 'translateY(-15px) scale(1.04)' },
+    config: { duration: 25000 },
+    loop: { reverse: true }
+  });
+
+  const floatAnimation4 = useSpring({
+    from: { transform: 'translateY(-5px) scale(0.99)' },
+    to: { transform: 'translateY(15px) scale(1.03)' },
+    config: { duration: 18000 },
+    loop: { reverse: true }
+  });
+
+  const floatAnimation5 = useSpring({
+    from: { transform: 'translateY(10px) scale(1.01)' },
+    to: { transform: 'translateY(-10px) scale(0.97)' },
+    config: { duration: 22000 },
+    loop: { reverse: true }
+  });
   
   const handleStartFree = () => {
     if (user) {
@@ -55,13 +91,14 @@ const CompanyInfo: React.FC = () => {
 
   return (
     <div className="min-h-screen relative overflow-x-hidden company-info-background">
-      {/* Enhanced 3D Background with CSS instead of Parallax for now */}
+      {/* Enhanced 3D Background with React Spring animations */}
       <div className="fixed inset-0 z-0">
-        {/* Background blur elements */}
-        <div className="blur-element blur-element-1"></div>
-        <div className="blur-element blur-element-2"></div>
-        <div className="blur-element blur-element-3"></div>
-        <div className="blur-element blur-element-4"></div>
+        {/* Animated background blur elements */}
+        <animated.div style={floatAnimation1} className="blur-element blur-element-1"></animated.div>
+        <animated.div style={floatAnimation2} className="blur-element blur-element-2"></animated.div>
+        <animated.div style={floatAnimation3} className="blur-element blur-element-3"></animated.div>
+        <animated.div style={floatAnimation4} className="blur-element blur-element-4"></animated.div>
+        <animated.div style={floatAnimation5} className="blur-element blur-element-5"></animated.div>
       </div>
 
       {/* Main content */}

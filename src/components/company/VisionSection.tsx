@@ -8,15 +8,15 @@ const VisionSection: React.FC = () => {
   return (
     <section className="py-10">
       <GlassmorphicCard className="overflow-hidden" variant="default" aosDelay={200}>
-        <div className="flex flex-col md:flex-row items-center gap-8 p-8">
+        <div className="flex flex-col md:flex-row items-center gap-8 p-8" data-aos="fade-left" data-aos-delay="200">
           <motion.div 
             className="w-full md:w-1/2"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
-              <h2 className="text-3xl font-handwritten text-white mb-4 drop-shadow-lg">우리의 비전</h2>
-              <p className="text-white/90 font-medium mb-4 leading-relaxed">
+              <h2 className="text-3xl font-handwritten mb-4 drop-shadow-lg" style={{ color: 'rgba(255, 255, 255, 0.95)', textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)' }}>우리의 비전</h2>
+              <p className="font-medium mb-4 leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
                 Aigongbu는 전통적인 교육 방식과 최신 AI 기술을 융합하여, 모든 학습자에게 
                 개인화된 학습 경험을 제공하는 혁신적인 플랫폼입니다.
               </p>
@@ -24,7 +24,8 @@ const VisionSection: React.FC = () => {
                 {['창의적', '혁신적', '개인화된'].map((tag, idx) => (
                   <span
                     key={idx}
-                    className="px-4 py-2 text-sm rounded-full bg-white/20 backdrop-blur-sm text-white border border-white/30 font-medium"
+                    className="px-4 py-2 text-sm rounded-full bg-white/20 backdrop-blur-sm border border-white/30 font-medium"
+                    style={{ color: 'rgba(255, 255, 255, 0.9)' }}
                   >
                     {tag}
                   </span>
@@ -43,7 +44,7 @@ const VisionSection: React.FC = () => {
                 <Sparkles className="h-20 w-20 text-white/80" />
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white/20 to-transparent backdrop-blur-sm">
-                <p className="text-white text-center font-bold text-lg drop-shadow-md">미래를 향한 교육 혁신</p>
+                <p className="text-center font-bold text-lg drop-shadow-md" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>미래를 향한 교육 혁신</p>
               </div>
             </div>
           </motion.div>

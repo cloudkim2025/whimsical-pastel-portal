@@ -38,21 +38,21 @@ const FeatureSection: React.FC = () => {
             direction={index % 2 === 0 ? 'left' : 'right'}
             variant="default"
             className="p-0"
-            aosDelay={100 + (index * 100)}
+            aosDelay={200 + (index * 100)}
           >
-            <div className="flex flex-col p-8">
+            <div className="flex flex-col p-8" data-aos="fade-up" data-aos-delay={200 + (index * 100)}>
               <div className="flex items-center mb-4">
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-white/30">
                   {feature.icon}
                 </div>
                 
-                <h3 className="text-xl font-handwritten text-white ml-4 drop-shadow-md">
+                <h3 className="text-xl font-handwritten ml-4 drop-shadow-md" style={{ color: 'rgba(255, 255, 255, 0.95)', textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)' }}>
                   {feature.title}
                 </h3>
               </div>
               
               <div className="bg-white/10 backdrop-blur-sm p-5 rounded-2xl border border-white/20">
-                <p className="text-white/90 font-medium leading-relaxed">
+                <p className="font-medium leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
                   {feature.description}
                 </p>
               </div>

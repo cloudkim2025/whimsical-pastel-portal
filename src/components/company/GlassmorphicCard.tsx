@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-// Fix the react-tilt import to work with TypeScript
-import ReactTilt from 'react-tilt';
+import Tilt from 'react-parallax-tilt';
 import { cn } from "@/lib/utils";
 
 interface GlassmorphicCardProps {
@@ -68,25 +67,26 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
       data-aos-delay={aosDelay}
       className="tilt-wrapper"
     >
-      <ReactTilt 
-        options={{
-          max: 15,
-          perspective: 1000,
-          scale: 1.02,
-          speed: 1000,
-          transition: true,
-          axis: null,
-          reset: true,
-          easing: "cubic-bezier(.03,.98,.52,.99)",
-          glare: true,
-          "max-glare": 0.3,
-          "glare-prerender": false
-        }}
+      <Tilt
+        perspective={1000}
+        scale={1.02}
+        transitionSpeed={1000}
+        gyroscope={true}
+        glareEnable={true}
+        glareMaxOpacity={0.3}
+        glareColor="#ffffff"
+        glarePosition="all"
+        glareBorderRadius="24px"
+        tiltMaxAngleX={15}
+        tiltMaxAngleY={15}
+        tiltReverse={false}
+        tiltAngleXInitial={0}
+        tiltAngleYInitial={0}
         className="tilt-container w-full h-full"
       >
         <div
           className={cn(
-            "relative rounded-3xl overflow-hidden w-full h-full", 
+            "relative rounded-3xl overflow-hidden w-full h-full glassmorphic-card", 
             getBackgroundStyle(),
             "before:absolute before:inset-0 before:rounded-3xl before:border before:border-white/50 before:opacity-60",
             "after:absolute after:inset-px after:rounded-3xl after:bg-gradient-to-br after:from-white/30 after:via-transparent after:to-transparent after:pointer-events-none",
@@ -101,7 +101,7 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
             {children}
           </div>
         </div>
-      </ReactTilt>
+      </Tilt>
     </motion.div>
   );
 };
