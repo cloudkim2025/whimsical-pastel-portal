@@ -68,17 +68,17 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
       className="tilt-wrapper"
     >
       <Tilt
-        perspective={1000}
-        scale={1.02}
-        transitionSpeed={1000}
+        perspective={1200}
+        scale={1.03}
+        transitionSpeed={800}
         gyroscope={true}
         glareEnable={true}
-        glareMaxOpacity={0.3}
+        glareMaxOpacity={0.4}
         glareColor="#ffffff"
         glarePosition="all"
-        glareBorderRadius="24px"
-        tiltMaxAngleX={15}
-        tiltMaxAngleY={15}
+        glareBorderRadius="20px"
+        tiltMaxAngleX={20}
+        tiltMaxAngleY={20}
         tiltReverse={false}
         tiltAngleXInitial={0}
         tiltAngleYInitial={0}
@@ -88,14 +88,9 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
           className={cn(
             "relative rounded-3xl overflow-hidden w-full h-full glassmorphic-card", 
             getBackgroundStyle(),
-            "before:absolute before:inset-0 before:rounded-3xl before:border before:border-white/50 before:opacity-60",
-            "after:absolute after:inset-px after:rounded-3xl after:bg-gradient-to-br after:from-white/30 after:via-transparent after:to-transparent after:pointer-events-none",
             className
           )}
         >
-          {/* Enhanced glass reflection effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/10 to-transparent opacity-70 pointer-events-none rounded-3xl" />
-          
           {/* Content container */}
           <div className="relative z-10">
             {children}

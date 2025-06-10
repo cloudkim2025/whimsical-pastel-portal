@@ -17,13 +17,14 @@ const CTASection: React.FC<CTASectionProps> = ({ onStartFree }) => {
           <div className="absolute -top-24 -left-24 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
           
-          <div className="bg-white/15 backdrop-blur-md p-8 rounded-2xl border border-white/25 mb-8">
+          <GlassmorphicCard variant="light" className="p-8 rounded-2xl mb-8">
             <motion.h2 
               className="text-2xl md:text-3xl font-handwritten mb-2 relative z-10"
               style={{ 
-                color: 'rgba(255, 255, 255, 0.95)',
-                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
-                fontWeight: 600
+                color: 'rgba(255, 255, 255, 1)',
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
+                fontWeight: 700,
+                letterSpacing: '-0.02em'
               }}
               animate={{
                 y: [0, -5, 0],
@@ -37,12 +38,22 @@ const CTASection: React.FC<CTASectionProps> = ({ onStartFree }) => {
             >
               함께 성장해요
             </motion.h2>
-          </div>
+          </GlassmorphicCard>
           
-          <p className="font-medium mb-8 max-w-2xl mx-auto relative z-10 bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-            Aigongbu와 함께 당신의 기술 여정을 시작하세요. 
-            우리는 당신이 꿈꾸는 미래로 가는 길을 밝혀줄 준비가 되어 있습니다.
-          </p>
+          <GlassmorphicCard variant="default" className="p-6 rounded-2xl mb-8 max-w-2xl mx-auto">
+            <p 
+              className="leading-relaxed relative z-10" 
+              style={{ 
+                color: 'rgba(255, 255, 255, 0.85)',
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+                lineHeight: 1.6,
+                fontWeight: 400
+              }}
+            >
+              Aigongbu와 함께 당신의 기술 여정을 시작하세요. 
+              우리는 당신이 꿈꾸는 미래로 가는 길을 밝혀줄 준비가 되어 있습니다.
+            </p>
+          </GlassmorphicCard>
           
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -51,8 +62,12 @@ const CTASection: React.FC<CTASectionProps> = ({ onStartFree }) => {
           >
             <Button 
               onClick={onStartFree}
-              className="py-4 px-10 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-2xl transition-all duration-300 shadow-xl hover:shadow-2xl relative overflow-hidden group font-bold text-lg border border-white/30"
-              style={{ color: 'rgba(255, 255, 255, 0.9)', textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)', fontWeight: 500 }}
+              className="glass-button py-4 px-10 rounded-2xl transition-all duration-300 shadow-xl hover:shadow-2xl relative overflow-hidden group font-bold text-lg"
+              style={{ 
+                color: 'rgba(255, 255, 255, 0.9)',
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
+                fontWeight: 500
+              }}
             >
               <span className="relative z-10">무료로 시작하기</span>
               <motion.span 

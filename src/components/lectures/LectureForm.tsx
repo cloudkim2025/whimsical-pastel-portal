@@ -1,270 +1,230 @@
-import React, {useState} from 'react';
-import {Input} from '@/components/ui/input';
-import {Textarea} from '@/components/ui/textarea';
-import {Button} from '@/components/ui/button';
-import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Loader2, UploadCloud} from 'lucide-react';
-import {useToast} from '@/hooks/use-toast';
-import {lectureAPI} from '@/api/lecture';
-import {categories} from '@/data/lectureCategories';
-import CurriculumPreview from '@/components/lectures/CurriculumPreview';
-import {useAiCurriculum} from '@/hooks/useAiCurriculum';
-import {Alert, AlertDescription} from '@/components/ui/alert';
+import React, { useState, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Plus, X } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface LectureFormProps {
-  userId?: number;
+  onSubmit: (data: FormData) => Promise<void>;
+  onCancel: () => void;
+  initialData?: any;
 }
 
-const LectureForm: React.FC<LectureFormProps> = ({ userId }) => {
-  const { toast } = useToast();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [thumbnailImage, setThumbnailImage] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const [category, setCategory] = useState('');
+const LectureForm: React.FC<LectureFormProps> = ({ onSubmit, onCancel, initialData }) => {
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [price, setPrice] = useState(initialData?.price || 0);
+  const [category, setCategory] = useState(initialData?.category || 'development');
+  const [difficulty, setDifficulty] = useState(initialData?.difficulty || 'beginner');
+  const [curriculum, setCurriculum] = useState(initialData?.curriculum || []);
+  const [newCurriculumItem, setNewCurriculumItem] = useState('');
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [videoName, setVideoName] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const { curriculum, isAnalyzing, generateCurriculum } = useAiCurriculum();
-
-  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setThumbnailImage(file);
-      setThumbnailPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setVideoFile(file);
-      setVideoName(file.name);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
-    if (!name || !description || !category || !thumbnailImage || !videoFile) {
+    
+    if (!title.trim() || !description.trim() || price <= 0) {
       toast({
+        title: "오류",
+        description: "모든 필드를 올바르게 입력해주세요.",
         variant: "destructive",
-        title: "입력 오류",
-        description: "모든 항목을 입력해주세요."
       });
       return;
     }
 
-    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('price', price.toString()); // Convert number to string
+    formData.append('category', category);
+    formData.append('difficulty', difficulty);
+    formData.append('curriculum', JSON.stringify(curriculum));
+    
+    if (thumbnailFile) {
+      formData.append('thumbnail', thumbnailFile);
+    }
+    
+    if (videoFile) {
+      formData.append('video', videoFile);
+    }
 
     try {
-      // FormData 객체 생성 및 데이터 추가
-      const formData = new FormData();
-      formData.append('title', name);
-      formData.append('description', description);
-      formData.append('category', category);
-
-      // 강사 ID가 있는 경우에만 추가
-      if (userId) {
-        formData.append('instructorId', userId);
-      }
-
-      // 커리큘럼 데이터 JSON 문자열로 변환하여 추가
-      if (curriculum && curriculum.length > 0) {
-        const curriculumJson = JSON.stringify(curriculum);
-        formData.append('curriculum', curriculumJson);
-      }
-
-      // 썸네일 이미지 추가
-      if (thumbnailImage) {
-        formData.append('thumbnailFile', thumbnailImage);
-      }
-
-      // 강의 영상 추가
-      if (videoFile) {
-        formData.append('videoFile', videoFile);
-      }
-
-      // API 호출
-      const response = await lectureAPI.createLecture(formData);
-
-      console.log('강의 등록 응답:', response);
-
+      await onSubmit(formData);
       toast({
-        title: "강의 업로드 완료",
-        description: "강의가 성공적으로 업로드되었습니다. 검토 후 게시됩니다."
+        title: "성공",
+        description: initialData ? "강의가 수정되었습니다." : "강의가 등록되었습니다.",
       });
-
-      // 폼 초기화
-      setName('');
-      setDescription('');
-      setThumbnailImage(null);
-      setThumbnailPreview(null);
-      setCategory('');
-      setVideoFile(null);
-      setVideoName('');
-    } catch (error: any) {
-      console.error('강의 업로드 오류:', error);
-
-      // 오류 메시지 처리
-      const errorMessage = error.response?.data?.message ||
-          error.response?.data?.error ||
-          '강의 업로드 중 오류가 발생했습니다.';
-
-      setError(errorMessage);
-
+    } catch (error) {
       toast({
+        title: "오류",
+        description: "강의 처리 중 오류가 발생했습니다.",
         variant: "destructive",
-        title: "업로드 실패",
-        description: errorMessage
       });
-    } finally {
-      setIsUploading(false);
     }
   };
 
+  const handleAddCurriculumItem = () => {
+    if (newCurriculumItem.trim()) {
+      setCurriculum([...curriculum, newCurriculumItem.trim()]);
+      setNewCurriculumItem('');
+    }
+  };
+
+  const handleRemoveCurriculumItem = (index: number) => {
+    const updatedCurriculum = [...curriculum];
+    updatedCurriculum.splice(index, 1);
+    setCurriculum(updatedCurriculum);
+  };
+
+  const onThumbnailDrop = useCallback((acceptedFiles: File[]) => {
+    setThumbnailFile(acceptedFiles[0]);
+  }, []);
+
+  const onVideoDrop = useCallback((acceptedFiles: File[]) => {
+    setVideoFile(acceptedFiles[0]);
+  }, []);
+
+  const {getRootProps: getThumbnailRootProps, getInputProps: getThumbnailInputProps, isDragActive: isThumbnailDragActive} = useDropzone({
+    onDrop: onThumbnailDrop,
+    accept: 'image/*',
+    maxFiles: 1
+  });
+
+  const {getRootProps: getVideoRootProps, getInputProps: getVideoInputProps, isDragActive: isVideoDragActive} = useDropzone({
+    onDrop: onVideoDrop,
+    accept: 'video/*',
+    maxFiles: 1
+  });
+
   return (
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="korean-text">강의 제목</Label>
-            <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="강의 제목을 입력하세요"
-                className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="category" className="korean-text">강의 카테고리</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="카테고리 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      <span className="korean-text">{cat.name}</span>
-                    </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="description" className="korean-text">강의 설명</Label>
-          <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="강의에 대한 상세 설명을 입력하세요"
-              className="w-full min-h-[150px]"
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+        <Label htmlFor="title">강의 제목</Label>
+        <Input
+          id="title"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="강의 제목을 입력하세요"
+        />
+      </div>
+      <div>
+        <Label htmlFor="description">강의 설명</Label>
+        <Textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="강의 내용을 상세하게 설명해주세요"
+        />
+      </div>
+      <div>
+        <Label htmlFor="price">가격 (원)</Label>
+        <Input
+          id="price"
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(Number(e.target.value))}
+          placeholder="가격을 설정하세요"
+        />
+      </div>
+      <div>
+        <Label htmlFor="category">카테고리</Label>
+        <Select value={category} onValueChange={setCategory}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="카테고리를 선택하세요" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="development">개발</SelectItem>
+            <SelectItem value="ai">AI</SelectItem>
+            <SelectItem value="design">디자인</SelectItem>
+            <SelectItem value="marketing">마케팅</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="difficulty">난이도</Label>
+        <Select value={difficulty} onValueChange={setDifficulty}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="난이도를 선택하세요" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="beginner">초급</SelectItem>
+            <SelectItem value="intermediate">중급</SelectItem>
+            <SelectItem value="advanced">고급</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label>커리큘럼</Label>
+        <div className="flex space-x-2 mb-2">
+          <Input
+            type="text"
+            placeholder="커리큘럼 항목을 입력하세요"
+            value={newCurriculumItem}
+            onChange={(e) => setNewCurriculumItem(e.target.value)}
           />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="thumbnail" className="korean-text">강의 썸네일</Label>
-            <div className="flex flex-col gap-4">
-              <Input
-                  id="thumbnail"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleThumbnailChange}
-                  className="w-full"
-              />
-              {thumbnailPreview && (
-                  <div className="w-full aspect-video overflow-hidden rounded-md border border-border">
-                    <img
-                        src={thumbnailPreview}
-                        alt="썸네일 미리보기"
-                        className="w-full h-full object-cover"
-                    />
-                  </div>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="videoFile" className="korean-text">강의 영상</Label>
-            <div className="space-y-4">
-              <Input
-                  id="videoFile"
-                  type="file"
-                  accept="video/*"
-                  onChange={handleVideoChange}
-                  className="w-full"
-              />
-              {videoName && (
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-md">
-                    <span className="text-sm truncate">{videoName}</span>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          if (!videoFile) {
-                            toast({
-                              variant: 'destructive',
-                              title: '영상 누락',
-                              description: 'AI 분석을 위해 영상을 먼저 업로드해주세요.',
-                            });
-                            return;
-                          }
-                          generateCurriculum(videoFile);
-                        }}
-                        disabled={isAnalyzing}
-                    >
-                      {isAnalyzing ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            <span className="korean-text">분석중...</span>
-                          </>
-                      ) : (
-                          <span className="korean-text">AI 분석</span>
-                      )}
-                    </Button>
-                  </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {curriculum.length > 0 && <CurriculumPreview curriculum={curriculum} />}
-
-        <div className="pt-4">
-          <Button
-              type="submit"
-              className="w-full flex items-center justify-center gap-2"
-              disabled={isUploading}
-          >
-            {isUploading ? (
-                <>
-                  <Loader2 className="animate-spin h-5 w-5" />
-                  <span className="korean-text">업로드 중...</span>
-                </>
-            ) : (
-                <>
-                  <UploadCloud className="h-5 w-5" />
-                  <span className="korean-text">강의 등록하기</span>
-                </>
-            )}
+          <Button type="button" variant="secondary" size="sm" onClick={handleAddCurriculumItem}>
+            <Plus className="h-4 w-4 mr-2" />
+            추가
           </Button>
         </div>
-      </form>
+        <ul>
+          {curriculum.map((item: string, index: number) => (
+            <li key={index} className="flex items-center justify-between py-2 border-b">
+              {item}
+              <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveCurriculumItem(index)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <Label>썸네일 업로드</Label>
+        <div {...getThumbnailRootProps()} className="dropzone w-full p-4 border-2 border-dashed rounded-md cursor-pointer">
+          <input {...getThumbnailInputProps()} />
+          {
+            isThumbnailDragActive ?
+              <p>썸네일 이미지를 놓으세요 ...</p> :
+              <p>썸네일 이미지를 드래그하거나 클릭하여 선택하세요.</p>
+          }
+          {thumbnailFile && (
+            <div>
+              <p>선택된 썸네일: {thumbnailFile.name}</p>
+            </div>
+          )}
+        </div>
+      </div>
+      <div>
+        <Label>강의 비디오 업로드</Label>
+        <div {...getVideoRootProps()} className="dropzone w-full p-4 border-2 border-dashed rounded-md cursor-pointer">
+          <input {...getVideoInputProps()} />
+          {
+            isVideoDragActive ?
+              <p>강의 비디오를 놓으세요 ...</p> :
+              <p>강의 비디오를 드래그하거나 클릭하여 선택하세요.</p>
+          }
+          {videoFile && (
+            <div>
+              <p>선택된 비디오: {videoFile.name}</p>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex justify-end space-x-2">
+        <Button type="button" variant="ghost" onClick={onCancel}>
+          취소
+        </Button>
+        <Button type="submit">
+          {initialData ? '강의 수정' : '강의 등록'}
+        </Button>
+      </div>
+    </form>
   );
 };
 

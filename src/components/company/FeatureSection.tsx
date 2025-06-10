@@ -42,20 +42,36 @@ const FeatureSection: React.FC = () => {
           >
             <div className="flex flex-col p-8" data-aos="fade-up" data-aos-delay={200 + (index * 100)}>
               <div className="flex items-center mb-4">
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-white/30">
+                <div className="icon-background rounded-2xl p-4">
                   {feature.icon}
                 </div>
                 
-                <h3 className="text-xl font-handwritten ml-4 drop-shadow-md" style={{ color: 'rgba(255, 255, 255, 0.95)', textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)' }}>
+                <h3 
+                  className="text-xl font-handwritten ml-4 drop-shadow-md" 
+                  style={{ 
+                    color: 'rgba(255, 255, 255, 1)',
+                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
+                    fontWeight: 700,
+                    letterSpacing: '-0.02em'
+                  }}
+                >
                   {feature.title}
                 </h3>
               </div>
               
-              <div className="bg-white/10 backdrop-blur-sm p-5 rounded-2xl border border-white/20">
-                <p className="font-medium leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              <GlassmorphicCard variant="light" className="p-5 rounded-2xl">
+                <p 
+                  className="leading-relaxed" 
+                  style={{ 
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+                    lineHeight: 1.6,
+                    fontWeight: 400
+                  }}
+                >
                   {feature.description}
                 </p>
-              </div>
+              </GlassmorphicCard>
             </div>
           </GlassmorphicCard>
         ))}
