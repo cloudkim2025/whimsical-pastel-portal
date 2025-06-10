@@ -24,7 +24,7 @@ const PhilosophySection: React.FC = () => {
 
   return (
     <section className="py-10">
-      <GlassmorphicCard className="overflow-hidden" variant="default">
+      <GlassmorphicCard className="overflow-hidden" variant="default" aosDelay={300}>
         <div className="relative h-64 overflow-hidden rounded-2xl m-6">
           <motion.div 
             className="absolute inset-0 bg-gradient-to-b from-white/20 to-white/10 backdrop-blur-sm"

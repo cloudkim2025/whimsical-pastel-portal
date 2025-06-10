@@ -7,7 +7,7 @@ import GlassmorphicCard from './GlassmorphicCard';
 const VisionSection: React.FC = () => {
   return (
     <section className="py-10">
-      <GlassmorphicCard className="overflow-hidden" variant="default">
+      <GlassmorphicCard className="overflow-hidden" variant="default" aosDelay={200}>
         <div className="flex flex-col md:flex-row items-center gap-8 p-8">
           <motion.div 
             className="w-full md:w-1/2"

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import Tilt from 'react-tilt';
 import { cn } from "@/lib/utils";
 
 interface GlassmorphicCardProps {
@@ -10,6 +11,7 @@ interface GlassmorphicCardProps {
   yOffset?: number;
   direction?: 'left' | 'right' | 'up' | 'down';
   variant?: 'default' | 'dark' | 'light';
+  aosDelay?: number;
 }
 
 const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({ 
@@ -18,7 +20,8 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
   delay = 0,
   yOffset = 30,
   direction = 'up',
-  variant = 'default'
+  variant = 'default',
+  aosDelay = 0
 }) => {
   // Calculate initial animation values based on direction
   const getDirectionValues = () => {
@@ -37,15 +40,15 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
 
   const { x, y } = getDirectionValues();
   
-  // Get background style based on variant
+  // Enhanced glassmorphism background style
   const getBackgroundStyle = () => {
     switch (variant) {
       case 'dark':
-        return "bg-white/10 backdrop-blur-xl border border-white/20";
+        return "glassmorphic-card-dark";
       case 'light':
-        return "bg-white/20 backdrop-blur-xl border border-white/30";
+        return "glassmorphic-card-light";
       default:
-        return "bg-white/15 backdrop-blur-xl border border-white/25";
+        return "glassmorphic-card-default";
     }
   };
   
@@ -60,30 +63,44 @@ const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
         type: 'spring',
         stiffness: 50
       }}
-      className={cn(
-        "relative rounded-3xl overflow-hidden", 
-        getBackgroundStyle(),
-        "shadow-xl shadow-black/10",
-        "before:absolute before:inset-0 before:rounded-3xl before:border before:border-white/40 before:opacity-50",
-        "after:absolute after:inset-px after:rounded-3xl after:bg-gradient-to-br after:from-white/20 after:via-transparent after:to-transparent after:pointer-events-none",
-        className
-      )}
-      style={{
-        boxShadow: `
-          0 8px 32px rgba(0, 0, 0, 0.12),
-          0 2px 16px rgba(0, 0, 0, 0.08),
-          inset 0 1px 0 rgba(255, 255, 255, 0.4),
-          inset 0 -1px 0 rgba(255, 255, 255, 0.1)
-        `
-      }}
+      data-aos="fade-up"
+      data-aos-delay={aosDelay}
+      className="tilt-wrapper"
     >
-      {/* Glass reflection effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/5 to-transparent opacity-60 pointer-events-none rounded-3xl" />
-      
-      {/* Content container */}
-      <div className="relative z-10">
-        {children}
-      </div>
+      <Tilt 
+        options={{
+          max: 15,
+          perspective: 1000,
+          scale: 1.02,
+          speed: 1000,
+          transition: true,
+          axis: null,
+          reset: true,
+          easing: "cubic-bezier(.03,.98,.52,.99)",
+          glare: true,
+          "max-glare": 0.3,
+          "glare-prerender": false
+        }}
+        className="tilt-container w-full h-full"
+      >
+        <div
+          className={cn(
+            "relative rounded-3xl overflow-hidden w-full h-full", 
+            getBackgroundStyle(),
+            "before:absolute before:inset-0 before:rounded-3xl before:border before:border-white/50 before:opacity-60",
+            "after:absolute after:inset-px after:rounded-3xl after:bg-gradient-to-br after:from-white/30 after:via-transparent after:to-transparent after:pointer-events-none",
+            className
+          )}
+        >
+          {/* Enhanced glass reflection effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/10 to-transparent opacity-70 pointer-events-none rounded-3xl" />
+          
+          {/* Content container */}
+          <div className="relative z-10">
+            {children}
+          </div>
+        </div>
+      </Tilt>
     </motion.div>
   );
 };

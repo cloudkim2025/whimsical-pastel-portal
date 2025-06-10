@@ -38,6 +38,7 @@ const FeatureSection: React.FC = () => {
             direction={index % 2 === 0 ? 'left' : 'right'}
             variant="default"
             className="p-0"
+            aosDelay={100 + (index * 100)}
           >
             <div className="flex flex-col p-8">
               <div className="flex items-center mb-4">

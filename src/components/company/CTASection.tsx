@@ -11,7 +11,7 @@ interface CTASectionProps {
 const CTASection: React.FC<CTASectionProps> = ({ onStartFree }) => {
   return (
     <section className="py-10">
-      <GlassmorphicCard className="text-center p-8" variant="default">
+      <GlassmorphicCard className="text-center p-8" variant="default" aosDelay={400}>
         {/* Decorative elements */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
