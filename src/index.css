@@ -207,7 +207,8 @@
 
 /* Font definitions */
 .font-handwritten {
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Inter', sans-serif; /* 모던한 폰트로 교체 */
+  font-weight: 600;
 }
 
 /* Float animation for background elements */
