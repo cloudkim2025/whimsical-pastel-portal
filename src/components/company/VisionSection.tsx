@@ -7,16 +7,16 @@ import GlassmorphicCard from './GlassmorphicCard';
 const VisionSection: React.FC = () => {
   return (
     <section className="py-10">
-      <GlassmorphicCard className="overflow-hidden" variant="dark">
-        <div className="flex flex-col md:flex-row items-center gap-8 p-6">
+      <GlassmorphicCard className="overflow-hidden" variant="default">
+        <div className="flex flex-col md:flex-row items-center gap-8 p-8">
           <motion.div 
             className="w-full md:w-1/2"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <div className="bg-black/30 backdrop-blur-sm p-5 rounded-xl">
-              <h2 className="text-3xl font-handwritten text-white mb-4 drop-shadow-md">우리의 비전</h2>
-              <p className="text-white font-medium mb-4">
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+              <h2 className="text-3xl font-handwritten text-white mb-4 drop-shadow-lg">우리의 비전</h2>
+              <p className="text-white/90 font-medium mb-4 leading-relaxed">
                 Aigongbu는 전통적인 교육 방식과 최신 AI 기술을 융합하여, 모든 학습자에게 
                 개인화된 학습 경험을 제공하는 혁신적인 플랫폼입니다.
               </p>
@@ -24,7 +24,7 @@ const VisionSection: React.FC = () => {
                 {['창의적', '혁신적', '개인화된'].map((tag, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1 text-sm rounded-full bg-ghibli-meadow/70 text-white border border-ghibli-meadow font-medium"
+                    className="px-4 py-2 text-sm rounded-full bg-white/20 backdrop-blur-sm text-white border border-white/30 font-medium"
                   >
                     {tag}
                   </span>
@@ -38,11 +38,11 @@ const VisionSection: React.FC = () => {
             whileHover={{ rotateY: 5, rotateX: 5 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <div className="relative h-60 w-full rounded-xl overflow-hidden shadow-xl bg-gradient-to-br from-ghibli-sky-blue/60 to-ghibli-meadow/60">
+            <div className="relative h-60 w-full rounded-2xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20">
               <div className="absolute inset-0 flex items-center justify-center">
-                <Sparkles className="h-20 w-20 text-white" />
+                <Sparkles className="h-20 w-20 text-white/80" />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white/20 to-transparent backdrop-blur-sm">
                 <p className="text-white text-center font-bold text-lg drop-shadow-md">미래를 향한 교육 혁신</p>
               </div>
             </div>

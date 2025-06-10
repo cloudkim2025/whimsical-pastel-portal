@@ -36,12 +36,12 @@ const FeatureSection: React.FC = () => {
             key={index} 
             delay={0.1 * index}
             direction={index % 2 === 0 ? 'left' : 'right'}
-            variant={index % 2 === 0 ? 'dark' : 'light'}
+            variant="default"
             className="p-0"
           >
-            <div className="flex flex-col p-6">
-              <div className="flex items-center mb-3 bg-ghibli-forest/40 p-3 rounded-lg">
-                <div className="bg-ghibli-forest rounded-full p-3">
+            <div className="flex flex-col p-8">
+              <div className="flex items-center mb-4">
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-white/30">
                   {feature.icon}
                 </div>
                 
@@ -50,8 +50,8 @@ const FeatureSection: React.FC = () => {
                 </h3>
               </div>
               
-              <div className="bg-black/20 backdrop-blur-sm p-4 rounded-lg">
-                <p className="text-white font-medium">
+              <div className="bg-white/10 backdrop-blur-sm p-5 rounded-2xl border border-white/20">
+                <p className="text-white/90 font-medium leading-relaxed">
                   {feature.description}
                 </p>
               </div>

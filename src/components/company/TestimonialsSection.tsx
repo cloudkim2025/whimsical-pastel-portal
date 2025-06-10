@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 import { Award } from 'lucide-react';
+import GlassmorphicCard from './GlassmorphicCard';
 
 const testimonials = [
   { name: "김지현", role: "프론트엔드 개발자", quote: "기초부터 실무까지 체계적으로 배울 수 있어서 좋았습니다. 특히 AI 튜터의 24시간 지원이 큰 도움이 되었어요." },
@@ -12,32 +13,42 @@ const testimonials = [
 
 const TestimonialsSection: React.FC = () => {
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-center mb-6">
-        <Award className="h-6 w-6 text-ghibli-forest mr-3" />
-        <h2 className="text-2xl font-handwritten text-center text-ghibli-forest">고객 후기</h2>
+    <section className="mb-10">
+      <div className="flex items-center justify-center mb-8">
+        <div className="bg-white/15 backdrop-blur-sm p-4 rounded-full border border-white/30">
+          <Award className="h-6 w-6 text-white mr-3" />
+        </div>
+        <h2 className="text-2xl font-handwritten text-center text-white ml-4">고객 후기</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {testimonials.map((testimonial, index) => (
-          <Card key={index} className="border border-ghibli-meadow/20 hover:shadow-lg transition-shadow duration-300">
-            <CardContent className="p-6">
-              <p className="text-ghibli-midnight italic mb-4">
-                "{testimonial.quote}"
-              </p>
-              <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-ghibli-meadow/20 flex items-center justify-center text-ghibli-forest font-bold">
-                  {testimonial.name.charAt(0)}
-                </div>
-                <div className="ml-3">
-                  <p className="font-medium text-ghibli-forest">{testimonial.name}</p>
-                  <p className="text-sm text-ghibli-stone">{testimonial.role}</p>
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1, duration: 0.5 }}
+          >
+            <GlassmorphicCard variant="default">
+              <div className="p-6">
+                <p className="text-white/90 italic mb-4 leading-relaxed">
+                  "{testimonial.quote}"
+                </p>
+                <div className="flex items-center">
+                  <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-bold border border-white/30">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div className="ml-4">
+                    <p className="font-medium text-white">{testimonial.name}</p>
+                    <p className="text-sm text-white/70">{testimonial.role}</p>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </GlassmorphicCard>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 
